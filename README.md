@@ -24,6 +24,6 @@ Open Jupyter notebook:
 For batch processing, copy si_pipeline.py and modify the specified animal and date
 Before you run it in python, please enter the following command line on Beast:
 
-'ulimit -n 4096'
+`ulimit -n 4096`
 
 The waveform extraction process sometimes opens too many files and Linux has a default limit of 1024.
