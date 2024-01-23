@@ -134,7 +134,16 @@ probe1_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe1_pre
 #]
 #run sorters in parallel
 #sortings = si.run_sorter_jobs(job_list = job_list,engine = 'joblib',engine_kwargs = {'n_jobs': 2})
+#remove duplicates
+probe0_sorting_ks2_5 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks2_5, censored_period_ms=0.3,method='keep_first')
+probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks3, censored_period_ms=0.3,method='keep_first')
+probe1_sorting_ks2_5 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks2_5, censored_period_ms=0.3,method='keep_first')
+probe1_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks3, censored_period_ms=0.3,method='keep_first')
 
+print(probe0_sorting_ks2_5)
+print(probe0_sorting_ks3)
+print(probe1_sorting_ks2_5)
+print(probe1_sorting_ks3)
 print('Start to all sorting done:')
 print(datetime.now() - startTime)
 
@@ -168,42 +177,55 @@ probe1_we_ks3 = si.extract_waveforms(probe1_preprocessed_corrected, probe1_sorti
                           **job_kwargs)
 del probe1_sorting_ks3
 ''' Compute quality metrics on the extracted waveforms'''
+template_metric_probe0_ks2_5 = si.compute_template_metrics(probe0_we_ks2_5)
+template_metric_probe0_ks3 = si.compute_template_metrics(probe0_we_ks3)
+template_metric_probe1_ks2_5 = si.compute_template_metrics(probe1_we_ks2_5)
+template_metric_probe1_ks3 = si.compute_template_metrics(probe1_we_ks3)
+
+noise_levels_probe0_ks2_5 = si.compute_noise_levels(probe0_we_ks2_5)
+noise_levels_probe0_ks3 = si.compute_noise_levels(probe0_we_ks3)
+noise_levels_probe1_ks2_5 = si.compute_noise_levels(probe1_we_ks2_5)
+noise_levels_probe1_ks3 = si.compute_noise_levels(probe1_we_ks3)
+
+PCA_probe0_ks2_5 = si.compute_principal_components(probe0_we_ks2_5)
+PCA_probe0_ks3 = si.compute_principal_components(probe0_we_ks3)
+PCA_probe1_ks2_5 = si.compute_principal_components(probe1_we_ks2_5)
+PCA_probe1_ks3 = si.compute_principal_components(probe1_we_ks3)
+
+template_similarity_probe0_ks2_5 = si.compute_template_similarity(probe0_we_ks2_5)
+template_similarity_probe0_ks3 = si.compute_template_similarity(probe0_we_ks3)
+template_similarity_probe1_ks2_5 = si.compute_template_similarity(probe1_we_ks2_5)
+template_similarity_probe1_ks3 = si.compute_template_similarity(probe1_we_ks3)
+
+correlograms_probe0_ks2_5 = si.compute_correlograms(probe0_we_ks2_5)
+correlograms_probe0_ks3 = si.compute_correlograms(probe0_we_ks3)
+correlograms_probe1_ks2_5 = si.compute_correlograms(probe1_we_ks2_5)
+correlograms_probe1_ks3 = si.compute_correlograms(probe1_we_ks3)
+
+amplitudes_probe0_ks2_5 = si.compute_spike_amplitudes(probe0_we_ks2_5)
+amplitudes_probe0_ks3 = si.compute_spike_amplitudes(probe0_we_ks3)
+amplitudes_probe1_ks2_5 = si.compute_spike_amplitudes(probe1_we_ks2_5)
+amplitudes_probe1_ks3 = si.compute_spike_amplitudes(probe1_we_ks3)
+
+unit_locations_probe0_ks2_5 = si.compute_unit_locations(probe0_we_ks2_5)
+unit_locations_probe0_ks3 = si.compute_unit_locations(probe0_we_ks3)
+unit_locations_probe1_ks2_5 = si.compute_unit_locations(probe1_we_ks2_5)
+unit_locations_probe1_ks3 = si.compute_unit_locations(probe1_we_ks3)
+
+spike_locations_probe0_ks2_5 = si.compute_spike_locations(probe0_we_ks2_5)
+spike_locations_probe0_ks3 = si.compute_spike_locations(probe0_we_ks3)
+spike_locations_probe1_ks2_5 = si.compute_spike_locations(probe1_we_ks2_5)
+spike_locations_probe1_ks3 = si.compute_spike_locations(probe1_we_ks3)
+isi_histograms_probe0_ks2_5 = si.compute_isi_histograms(probe0_we_ks2_5)
+isi_histograms_probe0_ks3 = si.compute_isi_histograms(probe0_we_ks3)
+isi_histograms_probe1_ks2_5 = si.compute_isi_histograms(probe1_we_ks2_5)
+isi_histograms_probe1_ks3 = si.compute_isi_histograms(probe1_we_ks3)
 #quality metrics
-probe0_ks2_5_metrics = si.compute_quality_metrics(probe0_we_ks2_5, metric_names=['firing_rate', 'presence_ratio', 'snr',
-                                                       'isi_violation', 'amplitude_cutoff'])
-
-probe0_ks3_metrics = si.compute_quality_metrics(probe0_we_ks3, metric_names=['firing_rate', 'presence_ratio', 'snr',
-                                                       'isi_violation', 'amplitude_cutoff'])
-probe1_ks2_5_metrics = si.compute_quality_metrics(probe1_we_ks2_5, metric_names=['firing_rate', 'presence_ratio', 'snr',
-                                                       'isi_violation', 'amplitude_cutoff'])
-probe1_ks3_metrics = si.compute_quality_metrics(probe1_we_ks3, metric_names=['firing_rate', 'presence_ratio', 'snr',
-                                                       'isi_violation', 'amplitude_cutoff'])
-
-'''Apply curation thresholds based on the quality metrics and save the cleaned waveforms'''
-#curation - similiar to allen
-amplitude_cutoff_thresh = 0.1
-isi_violations_ratio_thresh = 1
-presence_ratio_thresh = 0.9
-
-our_query = f"(amplitude_cutoff < {amplitude_cutoff_thresh}) & (isi_violations_ratio < {isi_violations_ratio_thresh}) & (presence_ratio > {presence_ratio_thresh})"
-probe0_ks2_5_keep_units = probe0_ks2_5_metrics.query(our_query)
-probe0_ks2_5_keep_unit_ids = probe0_ks2_5_keep_units.index.values
-probe0_ks2_5_we_clean = probe0_we_ks2_5.select_units(probe0_ks2_5_keep_unit_ids, new_folder=dst_folder +'/probe0/waveform_clean/kilosort2_5')
-
-probe0_ks3_keep_units = probe0_ks3_metrics.query(our_query)
-probe0_ks3_keep_unit_ids = probe0_ks3_keep_units.index.values
-probe0_ks3_we_clean = probe0_we_ks3.select_units(probe0_ks3_keep_unit_ids, new_folder=dst_folder +'/probe0/waveform_clean/kilosort3')
-
-probe1_ks2_5_keep_units = probe1_ks2_5_metrics.query(our_query)
-probe1_ks2_5_keep_unit_ids = probe1_ks2_5_keep_units.index.values
-probe1_ks2_5_we_clean = probe1_we_ks2_5.select_units(probe1_ks2_5_keep_unit_ids, new_folder=dst_folder +'/probe1/waveform_clean/kilosort2_5')
-
-
-probe1_ks3_keep_units = probe1_ks3_metrics.query(our_query)
-probe1_ks3_keep_unit_ids = probe1_ks3_keep_units.index.values
-probe1_ks3_we_clean = probe1_we_ks3.select_units(probe1_ks3_keep_unit_ids, new_folder=dst_folder +'/probe1/waveform_clean/kilosort3')
-
-
+qm_list = si.get_quality_metric_list()
+probe0_ks2_5_metrics = si.compute_quality_metrics(probe0_we_ks2_5, metric_names=qm_list)
+probe0_ks3_metrics = si.compute_quality_metrics(probe0_we_ks3, metric_names=qm_list)
+probe1_ks2_5_metrics = si.compute_quality_metrics(probe1_we_ks2_5, metric_names=qm_list)
+probe1_ks3_metrics = si.compute_quality_metrics(probe1_we_ks3, metric_names=qm_list)
 
 
 
@@ -217,10 +239,6 @@ file_list = ["/home/lab/spikeinterface_sorting/temp_data/probe0_preprocessed/pro
              "/home/lab/spikeinterface_sorting/temp_data/probe0/waveform/kilosort2_5/sorting.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe0/waveform/kilosort3/recording.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe0/waveform/kilosort3/sorting.json",
-             "/home/lab/spikeinterface_sorting/temp_data/probe0/waveform_clean/kilosort2_5/recording.json",
-             "/home/lab/spikeinterface_sorting/temp_data/probe0/waveform_clean/kilosort2_5/sorting.json",
-             "/home/lab/spikeinterface_sorting/temp_data/probe0/waveform_clean/kilosort3/recording.json",
-             "/home/lab/spikeinterface_sorting/temp_data/probe0/waveform_clean/kilosort3/sorting.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe0/sorters/kilosort2_5/in_container_sorting/provenance.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe0/sorters/kilosort2_5/in_container_sorting/si_folder.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe0/sorters/kilosort3/in_container_sorting/provenance.json",
@@ -229,10 +247,6 @@ file_list = ["/home/lab/spikeinterface_sorting/temp_data/probe0_preprocessed/pro
              "/home/lab/spikeinterface_sorting/temp_data/probe1/waveform/kilosort2_5/sorting.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe1/waveform/kilosort3/recording.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe1/waveform/kilosort3/sorting.json",
-             "/home/lab/spikeinterface_sorting/temp_data/probe1/waveform_clean/kilosort2_5/recording.json",
-             "/home/lab/spikeinterface_sorting/temp_data/probe1/waveform_clean/kilosort2_5/sorting.json",
-             "/home/lab/spikeinterface_sorting/temp_data/probe1/waveform_clean/kilosort3/recording.json",
-             "/home/lab/spikeinterface_sorting/temp_data/probe1/waveform_clean/kilosort3/sorting.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe1/sorters/kilosort2_5/in_container_sorting/provenance.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe1/sorters/kilosort2_5/in_container_sorting/si_folder.json",
              "/home/lab/spikeinterface_sorting/temp_data/probe1/sorters/kilosort3/in_container_sorting/provenance.json",
