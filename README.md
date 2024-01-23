@@ -303,6 +303,9 @@ Match units - take matched units only?
 
 
 ## Bomb Cell Metrics
+https://github.com/Julie-Fabre/bombcell/wiki/Detailed-overview-of-quality-metrics
+Consider run the result through bombcell as well? Write a script to merge both metric tables x unit by y metrics and see which units pass all the metrics?
+
 List of all the quality metrics, and associated parameters
 -Noise parameters:
 
@@ -329,3 +332,23 @@ Isolation distance
 L-ratio
 Silhouette score
 
+Quality metric parameters:
+Brief description
+Number of raw spikes to extract
+Save individual raw waveform traces for each unit	
+Spike width (in samples) to extract
+Extract raw data or not
+Time samples in the baseline raw waveforms to use for signal-to-noise ratio
+Refractory period time (s)
+Refractory period time (s) step
+Refractory period time (s)
+Refractory period censored time (s)
+Divide the recording into time chunks or not	computeTimeChunks
+Size of recording time chunks	
+Bin size in seconds for presence ratio	
+Compute presence ratio or not	computeDrift	
+Start time in samples to compute template waveform flatness	
+Stop time in samples to compute template waveform flatness	
+Threshold to detect template waveform peaks	
+Compute distance metrics or not
+Number of channels to use for distance metrics	
