@@ -1,7 +1,7 @@
 # si_lab
 Developed implementation of spikeinterface on Beast and Godzilla
 
-## Jupyter Notebook - Live Processes with Plotting
+# Jupyter Notebook - Live Processes with Plotting
 On Beast:
 
 `conda activate si_env`
@@ -20,7 +20,7 @@ Open Jupyter notebook:
 
 
 
-## Batch Processing in Background
+# Batch Processing in Background
 For batch processing, copy si_pipeline.py and modify the specified animal and date
 Before you run it in python, please enter the following command line on Beast:
 
@@ -34,7 +34,7 @@ For background processing:
 
 You can check the messages/errors of the script in the ouput file. Please kill the process when you finish
 
-## What Does This Pipeline Do?
+# What Does This Pipeline Do?
 
 1. Files are moved to local linux machine for offline processing.
 2. Apply several steps of preprocessing:
@@ -66,3 +66,20 @@ You can check the messages/errors of the script in the ouput file. Please kill t
 
 12. Compute quality metrics same as 11
 13. Auto + manual curation based on metrics and phy (to be decided and developed)
+
+# Post-Sorting Analysis Keypoints
+
+## Waveform extraction
+The waveform extraction is performed by randomly sampling a subset spikes from the recording for that each unit.
+
+This extracts all waveforms snippets for each unit.
+
+In the ~/waveform/ folder, ~/waveforms/ folder contains 'sample_index_#xx.npy' and 'waveforms_#xx.npy' for each unit.
+The sampled_index file contains indexes of the extracted waveforms and the waveforms file contains detailed info of the waveforms (num_spikes, num_sample, num_channel) properties starting from the indexes counting from the sampling number(num_sample).
+For example, Unit 10 has 200 spikes extracted from 500 spikes and at index#10 (10th spike) and this waveform starts at index#10 unitl index#10+num_sample.
+
+## Metrics
+With extracted waveform:
+We can compute all sorts of metrics for each unit based on the waveforms.
+
+Here are explanations of the metrics:
