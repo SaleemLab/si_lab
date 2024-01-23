@@ -83,3 +83,18 @@ With extracted waveform:
 We can compute all sorts of metrics for each unit based on the waveforms.
 
 Here are explanations of the metrics:
+
+
+
+## Sorter Comparison
+Refer these: https://spikeinterface.readthedocs.io/en/latest/modules_gallery/comparison/plot_5_comparison_sorter_weaknesses.html#sphx-glr-modules-gallery-comparison-plot-5-comparison-sorter-weaknesses-py
+https://spikeinterface.readthedocs.io/en/latest/modules/comparison.html
+
+Results:
+Matching firing events
+
+Compute agreement score:agreement_score[i, k] = match_event_count[i, k] / (event_counts_GT[i] + event_counts_ST[k] - match_event_count[i, k])
+
+Match units - take matched units only?
+
+
