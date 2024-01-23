@@ -192,15 +192,99 @@ You can imagine each unit's PCs a clusters in a 32 x 3 = 96-dimensional space. I
 >d-prime, in principal, gives you an estimate of the false positive rate for each unit. However, more work is required to validate this.
 
 
+**Nearest-neighbors hit rate**: Nearest-neighbors hit rate is another PC-based quality metric. It's derived from the 'isolation' metric originally reported in Chung, Magland et al. (2017). This metric looks at the PCs for one unit and calculates the fraction of their nearest neighbors that fall within the same cluster. If a unit is highly contaminated, then many of the closest spikes will come from other units. Nearest-neighbors hit rate is nice because it always falls between 0 and 1, making it straightforward to compare across different datasets.
+
+>How it can be biased
+>
+>Like the other PC-based metrics, nn_hit_rate can be negatively impacted by electrode drift.
+>
+>How it should be used
+>
+>nn_hit_rate is a nice proxy for overall cluster quality, but should be used in conjunction with other metrics that measure missing spikes or contamination rate more directly.
+
+
+**Silhouette score** : Gives the ratio between the cohesiveness of a cluster and its separation from other clusters. Values for silhouette score range from -1 to 1.
+
+>Expectation and use
+>
+>A good clustering with well separated and compact clusters will have a silhouette score close to 1. A low silhouette score (close to -1) indicates a poorly isolated cluster (both type I and type II error). SpikeInterface provides access to both implementations of >silhouette score.
+>
+>To reduce complexity the default implementation in SpikeInterface is to use the simplified silhouette score. This can be changes by switching the silhouette method to either ‘full’ (the Rousseeuw implementation) or (‘simplified’, ‘full’) for both methods when entering >the qm_params parameter.
+
+
+**Sliding refractory period violations** : Compute maximum allowed refractory period violations for all possible refractory periods in recording. Bins of 0.25ms are used in the [IBL] implementation. For each bin, this maximum value is compared with that observed in the recording. In the [IBL] implementation, a threshold is imposed and a binary value returned (based on whether the unit ‘passes’ the metric). The SpikeInterface implementation, instead, returns the minimum contamination with at least 90% confidence. This contamination value is between 0 and 1.
+
+>Expectation and use
+>
+>Similar to the ISI violations metric, this metric quantifies the number of refractory period violations seen in the recording of the unit. This is an estimate of the false positive rate. A high number of violations indicates contamination, so a low value is expected >for high quality units.
+
+**amplitude CV (coefficient of variation)** : a measure of the amplitude variability. It is computed as the ratio between the standard deviation and the amplitude mean. To obtain a better estimate of this measure, it is first computed separately for several temporal bins. Out of these values, the median and the range (percentile distance, by default between the 5th and 95th percentiles) are computed.
+
+>Expectation and use
+>
+>The amplitude CV median is expected to be relatively low for well-isolated units, indicating a “stereotypical” spike shape.
+>
+>The amplitude CV range can be high in the presence of noise contamination, due to amplitude outliers like in the example below.
+
+
+**Amplitude median** : Geometric median amplitude is computed in the log domain. The metric is then converted back to original units.
+
+>Expectation and use
+>
+>A larger value (larger signal) indicates a better unit.
 
 
 
+**Firing range** : The firing range indicates the dispersion of the firing rate of a unit across the recording. It is computed by taking the difference between the 95th percentile’s firing rate and the 5th percentile’s firing rate computed over short time bins (e.g. 10 s).
 
+>Expectation and use
+>
+>Very high levels of firing ranges, outside of a physiological range, might indicate noise contamination.
 
+**L-ratio** : The Mahalanobis distance and chi-squared inverse cdf (given the assumption that the spikes in the cluster distribute normally in each dimension) are used to find the probability of cluster membership for each spike. L-ratio uses 4 principal components (PCs) for each tetrode channel (the first being energy, the square root of the sum of squares of each sample in the waveform, followed by the first 3 PCs of the energy normalised waveform). This yields spikes which are each represented as a point in 16 dimensional space.
 
+>Expectation and use
+>
+>Since this metric identifies unit separation, a high value indicates a highly contaminated unit (type I error) ([Schmitzer-Torbert] et al.). [Jackson] et al. suggests that this measure is also correlated with type II errors (although more strongly with type I errors).
+>
+>A well separated unit should have a low L-ratio ([Schmitzer-Torbert] et al.).
 
+**Standard Deviation (SD) ratio** : All spikes from the same neuron should have the same shape. This means that at the peak of the spike, the standard deviation of the voltage should be the same as that of noise. If spikes from multiple neurons are grouped into a single unit, the standard deviation of spike amplitudes would likely be increased.
 
+>Expectation and use
+>
+>For a unit representing a single neuron, this metric should return a value close to one. However for units that are contaminated, the value can be significantly higher.
 
+**Synchrony Metrics* : This function is providing a metric for the presence of synchronous spiking events across multiple spike trains.
+
+The complexity is used to characterize synchronous events within the same spike train and across different spike trains. This way synchronous events can be found both in multi-unit and single-unit spike trains. Complexity is calculated by counting the number of spikes (i.e. non-empty bins) that occur at the same sample index, within and across spike trains.
+
+Synchrony metrics can be computed for different synchrony sizes (>1), defining the number of simultaneous spikes to count.
+
+>Expectation and use
+>
+>A larger value indicates a higher synchrony of the respective spike train with the other spike trains. Larger values, especially for larger sizes, indicate a higher probability of noisy spikes in spike trains.
+
+**Drift metrics (drift_ptp, drift_std, drift_mad)** : 
+Geometric positions and times of spikes within the cluster are estimated. Over the duration of the recording, the drift observed in positions of spikes is calculated in intervals, with respect to the overall median positions over the entire recording. These are referred to as “drift signals”.
+
+The drift_ptp is the peak-to-peak of the drift signal for each unit.
+
+The drift_std is the standard deviation of the drift signal for each unit.
+
+The drift_mad is the median absolute deviation of the drift signal for each unit.
+
+The SpikeInterface implementation differes from the original Allen because it uses spike location estimates (using compute_spike_locations() - either center of mass or monopolar triangulation), instead of the center of mass of the first PC projection. In addition the Allen Institute implementation assumes linear and equally spaced arrangement of channels.
+
+Finally, the original “cumulative_drift” and “max_drift” metrics have been refactored/modified for the following reasons:
+
+“max_drift” is calculated with the peak-to-peak, so it’s been renamed “drift_ptp”
+
+“cumulative_drift” sums the absolute value of the drift signal for each interval. This makes it very sensitive to the number of bins (and hence the recording duration)! The “drift_std” and “drift_mad”, instead, are measures of the dispersion of the drift signal and are insensitive to the recording duration.
+
+>Expectation and use
+>
+>Drift metrics represents how much, in um, a unit has moved over the recording. Larger values indicate more “drifty” units, possibly of lower quality.
 
 
 
