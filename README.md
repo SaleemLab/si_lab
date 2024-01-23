@@ -288,10 +288,6 @@ Finally, the original “cumulative_drift” and “max_drift” metrics have be
 
 
 
-
-
-
-
 ## Sorter Comparison
 Refer these: https://spikeinterface.readthedocs.io/en/latest/modules_gallery/comparison/plot_5_comparison_sorter_weaknesses.html#sphx-glr-modules-gallery-comparison-plot-5-comparison-sorter-weaknesses-py
 https://spikeinterface.readthedocs.io/en/latest/modules/comparison.html
@@ -303,4 +299,33 @@ Compute agreement score:agreement_score[i, k] = match_event_count[i, k] / (event
 
 Match units - take matched units only?
 
+
+
+
+## Bomb Cell Metrics
+List of all the quality metrics, and associated parameters
+-Noise parameters:
+
+Brief description	Quality metric field	Calculated	Associated parameter	Associated classification parameter
+Number of waveform peaks	nPeaks	Always	N/A	param.maxNPeaks
+Number of waveform troughs	nTroughs	Always	N/A	param.maxNTroughs
+Waveform peak-to-trough duration	waveformDuration _peakTrough	Always	N/A	Yes (see below)
+Waveform spatial decay slope	spatialDecaySlope	Always	Yes (see below)	param. minSpatialDecaySlope
+Waveform baseline flatness	waveformBaselineFlatness	Always	Yes (see below)	param. maxWvBaselineFraction
+Non-somatic parameters:
+Brief description	Quality metric field	Calculated	Associated parameter	Associated classification parameter
+Main waveform peak precedes trough	isSomatic	Always	N/A	param.somatic
+Main waveform peak is larger than trough	isSomatic	Always	N/A	param.somatic
+Multi-unit parameters:
+Brief description	Quality metric field	Calculated	Associated parameter	Associated classification parameter
+Number of spikes	nSpikes	Always	N/A	param.minNumSpikes
+Percentage of spikes below detection threshold	percentageSpikesMissing _gaussian	Always	N/A	param. maxPercSpikesMissing
+Fraction of refractory period violations	fractionRPVs _estimatedTauR	Always	Yes (see below)	param. maxRPVviolations
+Drift estimate	maxDriftEstimate	Always	N/A	param.maxDrift
+Presence ratio	presenceRatio	Always	Yes (see below)	param. minPresenceRatio
+Mean raw waveform amplitude	rawAmplitude	if param.extractRaw	Yes (see below)	param.minAmplitude
+Signal-to-noise ratio	signalToNoiseRatio	if param.computeDrift	Yes (see below)	param.minSNR
+Isolation distance	isoD	if param. computeDistanceMetrics	Yes (see below)	param.isoDmin
+L-ratio	Lratio	if param. computeDistanceMetrics	Yes (see below)	param.lratioMax
+Silhouette score	silhouetteScore	if param. computeDistanceMetrics	Yes (see below)	param.ssMin
 
