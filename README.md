@@ -161,6 +161,7 @@ Similar as above
 >
 >As with all metrics, ISI violations may not be stable throughout the experiment. It may be helpful to re-calculate it for the specific epochs you're analyzing.
 >Two neurons with similar waveforms, but firing in largely non-overlapping epochs, could end up being merged into the same cluster. In this case, the ISI violations may be low, even though the resulting unit is a highly contaminated. This situation would tricky to ?>catch, but fortunately shouldn't happen very often.
+>
 >How it should be used:
 >
 >Setting your ISI violations threshold to 0 (or close to it), will help ensure that contaminated units don't make it into your analysis, but will greatly reduce the number of units available. You should think carefully about what degree of contamination your analysis >can tolerate without biasing your conclusions. For example, if you are comparing firing rates of individual units across areas, you'll want to set a low ISI violations threshold to prevent contaminating spikes from affecting your estimates. On the other hand, if >you're comparing overall firing rates between areas, counting spikes from contaminated clusters may be valid.
@@ -186,9 +187,11 @@ You can imagine each unit's PCs a clusters in a 32 x 3 = 96-dimensional space. I
 **d-prime** : Like isolation distance, d-prime is another metric calculated for the waveform PCs. It uses linear discriminant analysis to calculate the separability of one unit's PC cluster and all of the others. A higher d-prime value indicates that the unit is better isolated from its neighbors.
 
 >How it can be biased:
+>
 >Like isolation distance, d-prime is not tolerant to drift. Since a single value of d-prime is computed for the entire session, the d-prime value is actually a lower bound on the true value of this metric computed at any one timepoint.
 >
 >How it should be used:
+>
 >d-prime, in principal, gives you an estimate of the false positive rate for each unit. However, more work is required to validate this.
 
 
@@ -255,7 +258,7 @@ You can imagine each unit's PCs a clusters in a 32 x 3 = 96-dimensional space. I
 >
 >For a unit representing a single neuron, this metric should return a value close to one. However for units that are contaminated, the value can be significantly higher.
 
-**Synchrony Metrics* : This function is providing a metric for the presence of synchronous spiking events across multiple spike trains.
+**Synchrony Metrics** : This function is providing a metric for the presence of synchronous spiking events across multiple spike trains.
 
 The complexity is used to characterize synchronous events within the same spike train and across different spike trains. This way synchronous events can be found both in multi-unit and single-unit spike trains. Complexity is calculated by counting the number of spikes (i.e. non-empty bins) that occur at the same sample index, within and across spike trains.
 
@@ -309,46 +312,89 @@ Consider run the result through bombcell as well? Write a script to merge both m
 List of all the quality metrics, and associated parameters
 -Noise parameters:
 
-Brief description	
-Number of waveform peaks	
-Number of waveform troughs	
-Waveform peak-to-trough duration
-Waveform spatial decay slope
-Waveform baseline flatness
-Non-somatic parameters:
 Brief description
+
+Number of waveform peaks	
+
+Number of waveform troughs	
+
+Waveform peak-to-trough duration
+
+Waveform spatial decay slope
+
+Waveform baseline flatness
+
+Non-somatic parameters:
+
+Brief description
+
 Main waveform peak precedes trough	
+
 Main waveform peak is larger than trough
+
 Multi-unit parameters:
+
 Brief description	
+
 Number of spikes	
+
 Percentage of spikes below detection threshold
+
 Fraction of refractory period violations
+
 Drift estimate	maxDriftEstimate
+
 Presence ratio	presenceRatio
+
 Mean raw waveform amplitude
+
 Signal-to-noise ratio
+
 Isolation distance
+
 L-ratio
+
 Silhouette score
 
+
 Quality metric parameters:
+
 Brief description
+
 Number of raw spikes to extract
+
 Save individual raw waveform traces for each unit	
+
 Spike width (in samples) to extract
+
 Extract raw data or not
+
 Time samples in the baseline raw waveforms to use for signal-to-noise ratio
+
 Refractory period time (s)
+
 Refractory period time (s) step
+
 Refractory period time (s)
+
 Refractory period censored time (s)
+
 Divide the recording into time chunks or not	computeTimeChunks
+
 Size of recording time chunks	
+
 Bin size in seconds for presence ratio	
+
 Compute presence ratio or not	computeDrift	
+
 Start time in samples to compute template waveform flatness	
+
 Stop time in samples to compute template waveform flatness	
+
 Threshold to detect template waveform peaks	
+
 Compute distance metrics or not
+
 Number of channels to use for distance metrics	
+
+
