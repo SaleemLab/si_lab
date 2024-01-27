@@ -222,24 +222,24 @@ def si_process(base_folder, mouse, date,dst_folder):
 
     '''minor corrections to the folder path of files before moving the files to server'''
     #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
-    file_list = [dst_folder + "temp_data/probe0_preprocessed/provenance.json",
-                dst_folder + "temp_data/probe1_preprocessed/provenance.json",
-                dst_folder + "temp_data/probe0/waveform/kilosort2_5/recording.json",
-                dst_folder + "temp_data/probe0/waveform/kilosort2_5/sorting.json",
-                dst_folder + "temp_data/probe0/waveform/kilosort3/recording.json",
-                dst_folder + "temp_data/probe0/waveform/kilosort3/sorting.json",
-                dst_folder + "temp_data/probe0/sorters/kilosort2_5/in_container_sorting/provenance.json",
-                dst_folder + "temp_data/probe0/sorters/kilosort2_5/in_container_sorting/si_folder.json",
-                dst_folder + "temp_data/probe0/sorters/kilosort3/in_container_sorting/provenance.json",
-                dst_folder + "temp_data/probe0/sorters/kilosort3/in_container_sorting/si_folder.json",
-                dst_folder + "temp_data/probe1/waveform/kilosort2_5/recording.json",
-                dst_folder + "temp_data/probe1/waveform/kilosort2_5/sorting.json",
-                dst_folder + "temp_data/probe1/waveform/kilosort3/recording.json",
-                dst_folder + "temp_data/probe1/waveform/kilosort3/sorting.json",
-                dst_folder + "temp_data/probe1/sorters/kilosort2_5/in_container_sorting/provenance.json",
-                dst_folder + "temp_data/probe1/sorters/kilosort2_5/in_container_sorting/si_folder.json",
-                dst_folder + "temp_data/probe1/sorters/kilosort3/in_container_sorting/provenance.json",
-                dst_folder + "temp_data/probe1/sorters/kilosort3/in_container_sorting/si_folder.json"]
+    file_list = [dst_folder + "probe0_preprocessed/provenance.json",
+                dst_folder + "probe1_preprocessed/provenance.json",
+                dst_folder + "probe0/waveform/kilosort2_5/recording.json",
+                dst_folder + "probe0/waveform/kilosort2_5/sorting.json",
+                dst_folder + "probe0/waveform/kilosort3/recording.json",
+                dst_folder + "probe0/waveform/kilosort3/sorting.json",
+                dst_folder + "probe0/sorters/kilosort2_5/in_container_sorting/provenance.json",
+                dst_folder + "probe0/sorters/kilosort2_5/in_container_sorting/si_folder.json",
+                dst_folder + "probe0/sorters/kilosort3/in_container_sorting/provenance.json",
+                dst_folder + "probe0/sorters/kilosort3/in_container_sorting/si_folder.json",
+                dst_folder + "probe1/waveform/kilosort2_5/recording.json",
+                dst_folder + "probe1/waveform/kilosort2_5/sorting.json",
+                dst_folder + "probe1/waveform/kilosort3/recording.json",
+                dst_folder + "probe1/waveform/kilosort3/sorting.json",
+                dst_folder + "probe1/sorters/kilosort2_5/in_container_sorting/provenance.json",
+                dst_folder + "probe1/sorters/kilosort2_5/in_container_sorting/si_folder.json",
+                dst_folder + "probe1/sorters/kilosort3/in_container_sorting/provenance.json",
+                dst_folder + "probe1/sorters/kilosort3/in_container_sorting/si_folder.json"]
 
     def replace_text(obj, to_replace, replace_with):
         if isinstance(obj, dict):
