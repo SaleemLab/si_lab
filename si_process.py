@@ -259,7 +259,7 @@ def si_process(base_folder, mouse, date,dst_folder):
             data = json.load(f)
         
         # replace the text
-        data = replace_text(data, dst_folder, ephys_folder)
+        data = replace_text(data, dst_folder[:-1], ephys_folder[:-1])
         
         # write the updated data back to the JSON file
         with open(files, 'w') as f:
