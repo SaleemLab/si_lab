@@ -1,4 +1,4 @@
-def si_process(base_folder, mouse, date,dst_folder):
+def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
     # get all the recordings on that day
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     # allocate destination folder and move the ephys folder on the server to Beast lab user
@@ -87,7 +87,7 @@ def si_process(base_folder, mouse, date,dst_folder):
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
     #assign parallel processing as job_kwargs
-    job_kwargs = dict(n_jobs=20, chunk_duration='1s', progress_bar=True)
+    
     probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat, preset="nonrigid_accurate",**job_kwargs)
     probe1_nonrigid_accurate = si.correct_motion(recording=probe1_cat, preset="nonrigid_accurate",**job_kwargs)
 
@@ -99,7 +99,7 @@ def si_process(base_folder, mouse, date,dst_folder):
 
     '''save preprocessed bin file before sorting'''
 
-    job_kwargs = dict(n_jobs=20, chunk_duration='1s', progress_bar=True)
+
     #after saving, sorters will read this preprocessed binary file instead
     probe0_preprocessed_corrected = probe0_nonrigid_accurate.save(folder=dst_folder+'probe0_preprocessed', format='binary', **job_kwargs)
     probe1_preprocessed_corrected = probe1_nonrigid_accurate.save(folder=dst_folder+'probe1_preprocessed', format='binary', **job_kwargs)
@@ -156,7 +156,7 @@ def si_process(base_folder, mouse, date,dst_folder):
         This section reads sorter outputs and extract waveforms 
     '''
     #extract waveforms from sorted data
-    #job_kwargs = dict(n_jobs=10, chunk_duration='1s', progress_bar=True)#lower n_jobs here - sometimes too many files open for reading the sorter files
+   
     #probe0_sorting_ks2_5 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe0/sorters/kilosort2_5/', register_recording=True, sorting_info=True, raise_error=True)
     probe0_we_ks2_5 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks2_5, folder=dst_folder +'probe0/waveform/kilosort2_5',
                             sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,

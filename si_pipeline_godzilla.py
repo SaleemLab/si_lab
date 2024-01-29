@@ -13,6 +13,6 @@ base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 mouse = 'M23034'
 dates = ['20230806','20230807']
 dst_folder = "/home/saleem_lab/spikeinterface_sorting/temp_data/"
-
+job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 for date in dates:
-    si_process(base_folder, mouse, date,dst_folder)
+    si_process(base_folder, mouse, date,dst_folder,job_kwargs)
