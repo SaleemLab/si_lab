@@ -25,12 +25,14 @@ def si_process(base_folder, mouse, date,dst_folder):
     print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
     ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
     print('copying ephys data from:' + ephys_folder)
+    g_files = []
     # iterate over all directories in source folder
     for dirname in os.listdir(ephys_folder):
         # check if '_g' is in the directory name
         #only grab recording folders - there might be some other existing folders for analysis or sorted data
         if '_g' in dirname:
             # construct full directory path
+            g_files = g_files.append(dirname)
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
@@ -143,9 +145,9 @@ def si_process(base_folder, mouse, date,dst_folder):
     print(datetime.now() - startTime)
 
     import pandas as pd
-    probe0_segment_frames = pd.DataFrame({'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_sample_frames})
+    probe0_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_sample_frames})
     probe0_segment_frames.to_csv(dst_folder+'probe0/sorters/segment_frames.csv', index=False)
-    probe1_segment_frames = pd.DataFrame({'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_sample_frames})
+    probe1_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_sample_frames})
     probe1_segment_frames.to_csv(dst_folder+'probe1/sorters/segment_frames.csv', index=False)
 
 
