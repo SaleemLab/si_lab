@@ -32,7 +32,7 @@ def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
         #only grab recording folders - there might be some other existing folders for analysis or sorted data
         if '_g' in dirname:
             # construct full directory path
-            g_files = g_files.append(dirname)
+            g_files.append(dirname)
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
