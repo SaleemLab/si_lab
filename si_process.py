@@ -37,8 +37,7 @@ def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
-            if not os.listdir(dst_folder):
-                shutil.copytree(source, destination)
+            shutil.copytree(source, destination)
     print('Start to copying files to Beast:')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
