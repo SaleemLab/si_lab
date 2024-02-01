@@ -268,7 +268,13 @@ def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
         with open(files, 'w') as f:
             json.dump(data, f, indent=4)
 
-
+    #delete temp_wh.dat files
+    dat_files = [ dst_folder + "probe0/sorters/kilosort2_5/sorter_output/temp_wh.dat",
+                dst_folder + "probe0/sorters/kilosort3/sorter_output/temp_wh.dat",
+                dst_folder + "probe1/sorters/kilosort2_5/sorter_output/temp_wh.dat",
+                dst_folder + "probe1/sorters/kilosort3/sorter_output/temp_wh.dat"]
+    for files in dat_files:
+        os.remove(files)
     #move spikeinterface folder on Beast to the server
 
     import shutil
