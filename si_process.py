@@ -41,7 +41,14 @@ def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
     print('Start to copying files to Beast:')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
+    # Define a custom sorting key that extracts the number after 'g'
+    def sorting_key(s):
+        return int(s.split('_g')[-1])
 
+    # Sort the list using the custom sorting key
+    g_files = sorted(g_files, key=sorting_key)
+
+    print(g_files) 
     stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     print(stream_names)
     print(stream_ids)
@@ -51,12 +58,13 @@ def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
     #Load second probe - V1 probe
     probe1_raw = si.read_spikeglx(dst_folder,stream_name = 'imec1.ap')
     print(probe1_raw)
-
-    probe0_sample_frames = [probe0_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
-    probe0_start_sample_frames = [1] + [probe0_sample_frames[i] + 1 for i in range(0, len(probe0_sample_frames)-1)]
-    probe1_sample_frames = [probe1_raw.get_num_frames(segment_index=i) for i in range(probe1_raw.get_num_segments())]
-    probe1_start_sample_frames = [1] + [probe1_sample_frames[i] + 1 for i in range(0, len(probe1_sample_frames)-1)]
-
+    import itertools
+    probe0_num_segments = [probe0_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
+    probe1_num_segments = [probe1_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
+    probe0_end_sample_frames = list(itertools.accumulate(probe0_num_segments))
+    probe0_start_sample_frames = [1] + [probe0_end_sample_frames[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
+    probe1_end_sample_frames = list(itertools.accumulate(probe1_num_segments))
+    probe1_start_sample_frames = [1] + [probe1_end_sample_frames[i] + 1 for i in range(0, len(probe1_num_segments)-1)]
     #several preprocessing steps and concatenation of the recordings
     #highpass filter - threhsold at 300Hz
     probe0_highpass = si.highpass_filter(probe0_raw,freq_min=300.)
@@ -146,11 +154,10 @@ def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
     print(datetime.now() - startTime)
 
     import pandas as pd
-    probe0_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_sample_frames})
-    probe0_segment_frames.to_csv(dst_folder+'probe0/sorters/segment_frames.csv', index=False)
-    probe1_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_sample_frames})
-    probe1_segment_frames.to_csv(dst_folder+'probe1/sorters/segment_frames.csv', index=False)
-
+    probe0_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
+    probe0_segment_frames.to_csv(ephys_folder+'probe0\\sorters\\segment_frames.csv', index=False)
+    probe1_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_end_sample_frames})
+    probe1_segment_frames.to_csv(ephys_folder+'probe1\\sorters\\segment_frames.csv', index=False)
 
 
     ''' read sorters directly from the output folder - so you dont need to worry if something went wrong and you can't access the temp variables
