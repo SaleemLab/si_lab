@@ -17,8 +17,8 @@ import docker
 from datetime import datetime
 
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
-mouse = 'M23034'
-dates = ['20230806','20230807']
+mouse = 'M23087'
+dates = ['20231207','20231212']
 dst_folder = "/home/saleem_lab/spikeinterface_sorting/temp_data/"
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 # get all the recordings on that day
