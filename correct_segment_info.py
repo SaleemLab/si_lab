@@ -17,8 +17,8 @@ import docker
 import pandas as pd
 import itertools
 base_folder = 'Z:\\ibn-vision\\DATA\\SUBJECTS\\'
-mouse = 'M23038'
-dates = ['20230817']
+mouse = 'M23028'
+dates = ['20230705']
 for date in dates:
     ephys_folder = base_folder + mouse + '\\ephys\\' + date +'\\'
     g_files = []
