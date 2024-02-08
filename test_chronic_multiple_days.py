@@ -20,7 +20,7 @@ base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 mouse = 'M23087'
 dates = ['20231207','20231212']
 dst_folder = "/home/lab/spikeinterface_sorting/temp_data/"
-job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
+job_kwargs = dict(n_jobs=20, chunk_duration='1s', progress_bar=True)
 # get all the recordings on that day
 ephys_folder = []
 ephys_folder.append(base_folder + mouse + '/ephys/' + dates[0] +'/')
@@ -32,28 +32,32 @@ print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
 
 g_files = []
+
+# Define a custom sorting key that extracts the number after 'g'
+def sorting_key(s):
+    return int(s.split('_g')[-1])
 # iterate over all directories in source folder
 for d in range(0,len(ephys_folder)):
     print('copying ephys data from:' + ephys_folder[d])
     for dirname in os.listdir(ephys_folder[d]):
-        
+        g_files_temp = []
         # check if '_g' is in the directory name
         #only grab recording folders - there might be some other existing folders for analysis or sorted data
         if '_g' in dirname:
             # construct full directory path
-            g_files.append(dirname)
+            g_files_temp.append(dirname)
             source = os.path.join(ephys_folder[d], dirname)
             destination = os.path.join(dst_folder+dates[d], dirname)
             # copy the directory to the destination folder
-            shutil.copytree(source, destination)
+            #shutil.copytree(source, destination)
+        g_files_temp = sorted(g_files_temp, key=sorting_key)
+        g_files = g_files + g_files_temp
 print('Start to copying files to Beast:')
 print(datetime.now() - startTime)
 ''' read spikeglx recordings and preprocess them'''
-# Define a custom sorting key that extracts the number after 'g'
-def sorting_key(s):
-    return int(s.split('_g')[-1])
+
 # Sort the list using the custom sorting key
-g_files = sorted(g_files, key=sorting_key)
+
 print(g_files) 
 #load first day recordings
 day0_raw = si.read_spikeglx(dst_folder+dates[0],stream_name='imec0.ap')
@@ -96,11 +100,11 @@ print('day1_preprocessed',day1_preprocessed)
 print('day1 concatenated',day1_cat)
 
 cat_all_days = si.concatenate_recordings([day0_cat,day1_cat])
+print('all concatenated',cat_all_days)
 '''Motion Drift Correction'''
 #motion correction if needed
 #this is nonrigid correction - need to do parallel computing to speed up
 #assign parallel processing as job_kwargs
-
 all_cat_nonrigid_accurate = si.correct_motion(recording=cat_all_days, preset="nonrigid_accurate",**job_kwargs)
 
 print('Start to motion correction finished:')
