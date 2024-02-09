@@ -4,7 +4,7 @@
 #import the necessary packages
 
 
-from si_process import si_process_one_probe
+from si_process_one_probe import si_process_one_probe
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 mouse = 'M23087'
