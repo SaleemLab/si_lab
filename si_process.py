@@ -155,9 +155,9 @@ def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
 
     import pandas as pd
     probe0_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
-    probe0_segment_frames.to_csv(ephys_folder+'probe0\\sorters\\segment_frames.csv', index=False)
+    probe0_segment_frames.to_csv(dst_folder+'probe0/sorters/segment_frames.csv', index=False)
     probe1_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_end_sample_frames})
-    probe1_segment_frames.to_csv(ephys_folder+'probe1\\sorters\\segment_frames.csv', index=False)
+    probe1_segment_frames.to_csv(dst_folder+'probe1/sorters/segment_frames.csv', index=False)
 
 
     ''' read sorters directly from the output folder - so you dont need to worry if something went wrong and you can't access the temp variables
