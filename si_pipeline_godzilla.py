@@ -11,7 +11,7 @@ from si_process import si_process
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 mouse = 'M23034'
-dates = ['20230806','20230807']
+dates = ['20230807']
 dst_folder = "/home/saleem_lab/spikeinterface_sorting/temp_data/"
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 for date in dates:
