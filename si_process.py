@@ -287,22 +287,22 @@ def si_process(base_folder, mouse, date,dst_folder,job_kwargs):
     import shutil
     import os
 
-    folders_to_move = ['probe0',
-                    'probe1',
-                    'probe0_preprocessed',
-                    'probe1_preprocessed']
-
-
-    for folder in folders_to_move:
-        # construct the destination path
-        destination = os.path.join(ephys_folder, folder)
-        # copy the folder to the destination
-        shutil.copytree(dst_folder+folder, destination)
-
+#    folders_to_move = ['probe0',
+#                    'probe1',
+#                    'probe0_preprocessed',
+ #                   'probe1_preprocessed']
+##
+#
+ ##   for folder in folders_to_move:
+   #     # construct the destination path
+    #    destination = os.path.join(ephys_folder, folder)
+     #   # copy the folder to the destination
+      #  shutil.copytree(dst_folder+folder, destination)
+#
     #remove all temmp files
-    shutil.rmtree(dst_folder)
+#    shutil.rmtree(dst_folder)
 
     print('All Done! Overall it took:')
 
     print(datetime.now() - startTime)
-    print('to finish')
+    print('to finish! Please move the files to the server as soon as you have time!')

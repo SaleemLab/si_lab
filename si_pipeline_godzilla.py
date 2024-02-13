@@ -8,11 +8,14 @@
 
 
 from si_process import si_process
+import os
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
-mouse = 'M23034'
-dates = ['20230807']
-dst_folder = "/home/saleem_lab/spikeinterface_sorting/temp_data/"
+mouse = 'M23037'
+dates = ['20230810','20230811','20230812','20230813']
+
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 for date in dates:
-    si_process(base_folder, mouse, date,dst_folder,job_kwargs)
+    dst_folder = "/home/saleem_lab/spikeinterface_sorting/temp_data/" + date + '/'
+    os.makedirs(dst_folder, exist_ok=True)
+    si_process(base_folder, mouse, date, dst_folder, job_kwargs)
