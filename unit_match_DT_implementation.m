@@ -14,7 +14,7 @@ UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','
 UMparam.AllDecompPaths = {fullfile(ephys_folder,['probe',num2str(no_probe)-1,'preprocessed'])};  % This is a cell array with info on where to find the decompressed recording (.bin files) --> Necessary when you want UnitMatch to do waveform extraction
 RecordingSites_Recording1 = readNPY(fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters\kilosort3\sorter_output\channel_positions.npy'));
 UMparam.AllChannelPos = {[RecordingSites_Recording1]}; % These are coordinates of every recording channel on the probe (e.g. nRecordingChannels x 2)
-clusinfo = struct; % Note, this can be kilosort input, 
+
 
 %% convert spikeinterface waveforms to unit match version in kilosort folder
 
@@ -28,6 +28,7 @@ fileID = fopen(probe0_ks3_sparsity_path);
 rawData = fread(fileID, inf);
 strData = char(rawData');
 fclose(fileID);
+no_channels = size(UMparam.AllChannelPos{1},1);
 probe0_ks3_sparsity = jsondecode(strData);
 
 unit_ids = probe0_ks3_sparsity.unit_ids;
@@ -42,15 +43,14 @@ for iUnit = 1:length(unit_ids)
     % Loop over the cell array
     for i = 1:numel(waveform_channels)
         % Extract the number from the string using regexp
-        num = str2double(regexp(waveform_channels{i}, '\d*$', 'match'))+1;
-        
-        % Store the number in the matrix
-        waveform_channel_ids(i) = num;
+
+        temp_channel_indices = strcmp(probe0_ks3_sparsity.channel_ids,waveform_channels{i});
+        waveform_channel_ids(i) = find(temp_channel_indices ==1);
     end
     unit_waveform_path = fullfile(probe0_ks3_waveform_path,['waveforms_',num2str(unit_ids(iUnit)),'.npy']);
     unit_waveform = readNPY(unit_waveform_path);
     unit_waveform = permute(unit_waveform,[2 3 1]);
-    spikeMap = nan(size(unit_waveform,1),384,size(unit_waveform,3));
+    spikeMap = zeros(size(unit_waveform,1),no_channels,size(unit_waveform,3));
     spikeMap(:,waveform_channel_ids,:) = unit_waveform;
     nwavs = size(spikeMap,3);
     for cv = 1:2
@@ -63,7 +63,21 @@ for iUnit = 1:length(unit_ids)
      end
         spikeMap = spikeMapAvg;
         
-    % Now 'numMatrix' is a matrix of the same size as 'cellArray', containing the extracted numbers
     %fetch the waveforms of the unit
     writeNPY(spikeMap, [UMparam.KSDir{1,1},'\RawWaveforms\','Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']);
+end
+%%
+clusinfo = struct; % Note, this can be kilosort input, 
+clusinfo.cluster_id = unit_ids;
+clusinfo.Good_ID = zeros(size(unit_ids));
+clusinfo.ProbeID = ones(size(unit_ids)).*no_probe;
+clusinfo.RecSesID = ones(size(unit_ids))
+
+UMparam = DefaultParametersUnitMatch(UMparam);
+UMparam.GoodUnitsOnly = 0;
+UMparam.spikeWidth = 105;
+%%
+[UniqueIDConversion, MatchTable, WaveformInfo, UMparam] = UnitMatch(clusinfo, UMparam);
+if UMparam.AssignUniqueID
+    AssignUniqueID(UMparam.SaveDir);
 end

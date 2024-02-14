@@ -228,21 +228,21 @@ def si_process_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
         os.remove(files)
     #move spikeinterface folder on Beast to the server
 
-    import shutil
-    import os
+   # import shutil
+   # import os
 
-    folders_to_move = ['probe0',
-                    'probe0_preprocessed']
+ #   folders_to_move = ['probe0',
+  #                  'probe0_preprocessed']
 
 
-    for folder in folders_to_move:
+  #  for folder in folders_to_move:
         # construct the destination path
-        destination = os.path.join(ephys_folder, folder)
+  #      destination = os.path.join(ephys_folder, folder)
         # copy the folder to the destination
-        shutil.copytree(dst_folder+folder, destination)
+ #       shutil.copytree(dst_folder+folder, destination)
 
     #remove all temmp files
-    shutil.rmtree(dst_folder)
+   # shutil.rmtree(dst_folder)
 
     print('All Done! Overall it took:')
 

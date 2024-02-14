@@ -9,6 +9,8 @@
 
 from si_process import si_process
 import os
+import subprocess
+subprocess.run('ulimit -n 4096')
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 mouse = 'M23037'
