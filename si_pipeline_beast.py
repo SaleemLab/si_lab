@@ -11,8 +11,8 @@ import subprocess
 subprocess.run('ulimit -n 4096',shell=True)
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
-mouse = 'M23017'
-dates = ['20230629']
+mouse = 'M23028'
+dates = ['20230703','20230704']
 dst_folder = "/home/lab/spikeinterface_sorting/temp_data/"
 job_kwargs = dict(n_jobs=20, chunk_duration='1s', progress_bar=True)
 for date in dates:
