@@ -398,3 +398,52 @@ Compute distance metrics or not
 Number of channels to use for distance metrics	
 
 
+# Unit Match Implementation
+Download UnitMatch and add to your matlab path.
+
+unit_match_xxx scripts show how to do it.
+## Waveform Parameters
+The amplitude of that weighted-average
+waveform (Figure 2E, Equation 10).
+
+• The average centroid (Figure 2F, Equation
+6), defined as the average position weighted
+by the maximum amplitude on each recording site.
+
+• The trajectory of the spatial centroid from
+0.2 ms before the peak to 0.5 ms after the
+peak (Figure 2F, Equation 4).
+
+• The distance travelled at each time point
+(Figure 2F).
+
+• The travel direction of the spatial centroid at
+each time point (Figure 2F, Equation 5). 
+
+## Similarity Scores
+• Decay similarity (𝐷; Equation 14); spatial decay.
+
+• Waveform similarity (𝑊, Equation 18);
+waveform correlation and normalized difference averaged.
+
+• Amplitude similarity (𝐴; Equation 13)
+
+• Centroid similarity (𝐶, Equation 20)
+
+• Volatility similarity (𝑉, Equation 23); captures the stability of the difference between
+centroids over time.
+
+• Route similarity (𝑅; Equation 24): captures
+the overall similarity of the trajectory: direction and distance travelled
+
+## Match Probability After Putative Matches and Drift Correction
+
+ Plotting the
+distributions of the six similarity scores for these
+pairs reveals major differences (Figure 3I). Based
+on these distributions, we defined a naïve Bayes
+classifier (Equation 29), which takes as input the
+values of the six similarity scores for two spike
+waveforms and outputs the ‘match probability’:
+the posterior probability of the two waveforms
+coming from the same unit. 
