@@ -1,49 +1,48 @@
 %% Unitmatch DT implementation
+addpath(genpath('C:\Users\adam.tong\Documents\GitHub\UnitMatch'))
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
-mouse = 'M23087';
-date = ['20231207';'20231212'];
-ephys_folder = cell(1,size(date,1));
-UMparam.KSDir = cell(1,size(date,1));
-UMparam.AllDecompPaths = cell(1,size(date,1));
-UMparam.AllChannelPos = cell(1,size(date,1));
-UMparam.SaveDir = fullfile(base_folder,mouse,'ephys','unit_match_output'); 
+mouse = 'M23034';
+date = ['20230805'];
+ephys_folder = fullfile(base_folder,mouse,'ephys',date);
+no_probe = 1;
+UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort3','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'. 
+% N.B. if you want to use the functional score evaluation of UnitMatch, 'KSDir' should also contain typical 'Kilosort output', (e.g. spike times etc.)
+
+UMparam.SaveDir = fullfile(UMparam.KSDir{1},'UnitMatch'); 
+mkdir(UMparam.SaveDir);
 clusinfo = struct; % Note, this can be kilosort input, 
 clusinfo.cluster_id = [];
 clusinfo.Good_ID = [];
 clusinfo.ProbeID = [];
 clusinfo.RecSesID=[];
-mkdir(UMparam.SaveDir);
-no_probe = 1;
-for iDate = 1:size(date,1)
-ephys_folder{iDate} = fullfile(base_folder,mouse,'ephys',date(iDate,:));
+
+
+
 
 %UMparam.SaveDir = fullfile(ephys_folder{iDate},['probe',num2str(no_probe)-1],'unit_match'); % Recommended to use end this path with \Probe0\IMRO_1\ if more probes/IMRO tables were used or \AllProbes\AllIMRO\ otherwise
 
 
-UMparam.KSDir{iDate} = fullfile(ephys_folder{iDate},['probe',num2str(no_probe)-1],'sorters','kilosort3','sorter_output');  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'. 
-% N.B. if you want to use the functional score evaluation of UnitMatch, 'KSDir' should also contain typical 'Kilosort output', (e.g. spike times etc.)
-
 %% N.B. the following user input can also be automatically extracted and prepared/cleaned up using UMparam = ExtractKilosortData(KiloSortPaths, UMparam) for Kilosorted data of SpikeGLX recorded data (see next section);
 %UMparam.RawDataPaths = {'\\path\to\firstrecording','\\path\to\secondrecording','\\path\to\nthrecording'};  % This is a cell array with info on where to find the compressed recording (.cbin files OR .bin files)
+UMparam.AllRawPaths ={fullfile(ephys_folder,['probe',num2str(no_probe)-1,'preprocessed'])};
+UMparam.AllDecompPaths= {fullfile(ephys_folder,['probe',num2str(no_probe)-1,'preprocessed'])};  % This is a cell array with info on where to find the decompressed recording (.bin files) --> Necessary when you want UnitMatch to do waveform extraction
 
-UMparam.AllDecompPaths{iDate} = fullfile(ephys_folder{iDate},['probe',num2str(no_probe)-1,'preprocessed']);  % This is a cell array with info on where to find the decompressed recording (.bin files) --> Necessary when you want UnitMatch to do waveform extraction
-
-UMparam.AllChannelPos{iDate} = readNPY(fullfile(ephys_folder{iDate},['probe',num2str(no_probe)-1],'sorters\kilosort3\sorter_output\channel_positions.npy')); % These are coordinates of every recording channel on the probe (e.g. nRecordingChannels x 2)
+UMparam.AllChannelPos = {readNPY(fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters\kilosort3\sorter_output\channel_positions.npy'))}; % These are coordinates of every recording channel on the probe (e.g. nRecordingChannels x 2)
 
 
 %% convert spikeinterface waveforms to unit match version in kilosort folder
 
 % Specify the file path
-probe0_ks3_sparsity_path = fullfile(ephys_folder{iDate},['probe',num2str(no_probe)-1],'waveform\kilosort3\sparsity.json');
-probe0_ks3_waveform_path = fullfile(ephys_folder{iDate},['probe',num2str(no_probe)-1],'waveform\kilosort3\waveforms\');
-probe0_ks3_raw_waveform_path =fullfile(UMparam.KSDir{iDate},'RawWaveforms');
-mkdir(probe0_ks3_raw_waveform_path);
+probe0_ks3_sparsity_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform\kilosort3\sparsity.json');
+probe0_ks3_waveform_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform\kilosort3\waveforms\');
+probe0_ks3_raw_waveform_path =fullfile(UMparam.KSDir,'RawWaveforms');
+mkdir(probe0_ks3_raw_waveform_path{1});
 % Load the JSON file
 fileID = fopen(probe0_ks3_sparsity_path);
 rawData = fread(fileID, inf);
 strData = char(rawData');
 fclose(fileID);
-no_channels = size(UMparam.AllChannelPos{iDate},1);
+no_channels = size(UMparam.AllChannelPos,1);
 probe0_ks3_sparsity = jsondecode(strData);
 
 unit_ids = probe0_ks3_sparsity.unit_ids;
@@ -87,16 +86,43 @@ unit_ids = probe0_ks3_sparsity.unit_ids;
 %%
 
 
-clusinfo.cluster_id = [clusinfo.cluster_id;unit_ids];
-clusinfo.Good_ID = [clusinfo.Good_ID;zeros(size(unit_ids))];
-clusinfo.ProbeID = [clusinfo.ProbeID;ones(size(unit_ids)).*no_probe];
-clusinfo.RecSesID = [clusinfo.RecSesID;ones(size(unit_ids))*iDate];
-end
+clusinfo.cluster_id = unit_ids;
+clusinfo.Good_ID = zeros(size(unit_ids));
+clusinfo.ProbeID = ones(size(unit_ids)).*no_probe;
+clusinfo.RecSesID = ones(size(unit_ids));
 UMparam = DefaultParametersUnitMatch(UMparam);
 UMparam.GoodUnitsOnly = 0;
 UMparam.spikeWidth = 105;
+Params = struct;
+Params = DefaultParametersExtractKSData(Params,UMparam.KSDir{1});
+Params.DecompressLocal = 0; Params.RunQualityMetrics = 0;
+ExtractKilosortData(UMparam.KSDir, Params)
+sp = loadKSdir(fullfile(UMparam.KSDir{1}), Params); % Load Spikes with PCs
+    [sp.spikeAmps, sp.spikeDepths, sp.templateDepths, sp.templateXpos, sp.tempAmps, sp.tempsUnW, sp.templateDuration, sp.waveforms] = ...
+        templatePositionsAmplitudes(sp.temps, sp.winv, sp.ycoords, sp.xcoords, sp.spikeTemplates, sp.tempScalingAmps);
+    save(fullfile(UMparam.KSDir{1}, 'PreparedData.mat'), 'clusinfo', 'Params', '-v7.3')
+    save(fullfile(UMparam.KSDir{1}, 'PreparedData.mat'), 'sp', '-append')
 %%
 [UniqueIDConversion, MatchTable, WaveformInfo, UMparam] = UnitMatch(clusinfo, UMparam);
 if UMparam.AssignUniqueID
     AssignUniqueID(UMparam.SaveDir);
 end
+
+%% Visualization
+PlotUnitsOnProbe(clusinfo,UMparam,UniqueIDConversion,WaveformInfo)
+
+%% Automatic evaluation:
+EvaluatingUnitMatch(UMparam.SaveDir); % Within session cross-validation
+ComputeFunctionalScores(UMparam.SaveDir) % Only works when having access to Kilosort output (e.g. spike times etc.) 
+
+%% Curation:
+if UMparam.MakePlotsOfPairs
+    DrawPairsUnitMatch(UMparam.SaveDir);
+    if UMparam.GUI
+        FigureFlick(UMparam.SaveDir)
+        pause
+    end
+end
+
+%% Further evaluation - only works in combination with Bombcell
+QualityMetricsROCs(UMparam.SaveDir); % Only works in combination with BOMBCELL (and is added to path!!)
