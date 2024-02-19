@@ -2,7 +2,7 @@
 addpath(genpath('C:\Users\adam.tong\Documents\GitHub\UnitMatch'))
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
 mouse = 'M23034';
-date = ['20230805'];
+date = ['20230806'];
 ephys_folder = fullfile(base_folder,mouse,'ephys',date);
 no_probe = 1;
 UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort3','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'. 
@@ -42,47 +42,47 @@ fileID = fopen(probe0_ks3_sparsity_path);
 rawData = fread(fileID, inf);
 strData = char(rawData');
 fclose(fileID);
-no_channels = size(UMparam.AllChannelPos,1);
+no_channels = size(UMparam.AllChannelPos{1},1);
 probe0_ks3_sparsity = jsondecode(strData);
 
 unit_ids = probe0_ks3_sparsity.unit_ids;
-% 
-% for iUnit = 1:length(unit_ids)
-%     waveform_channels = probe0_ks3_sparsity.unit_id_to_channel_ids.(['x',num2str(unit_ids(iUnit))]);
-%     % Assume 'cellArray' is your cell array
-%     
-%     
-%     % Initialize an empty matrix of the same size as the cell array
-%     waveform_channel_ids = zeros(size(waveform_channels));
-%     
-%     % Loop over the cell array
-%     for i = 1:numel(waveform_channels)
-%         % Extract the number from the string using regexp
-% 
-%         temp_channel_indices = strcmp(probe0_ks3_sparsity.channel_ids,waveform_channels{i});
-%         waveform_channel_ids(i) = find(temp_channel_indices ==1);
-%     end
-%     unit_waveform_path = fullfile(probe0_ks3_waveform_path,['waveforms_',num2str(unit_ids(iUnit)),'.npy']);
-%     unit_waveform = readNPY(unit_waveform_path);
-%     unit_waveform = permute(unit_waveform,[2 3 1]);
-%     spikeMap = zeros(size(unit_waveform,1),no_channels,size(unit_waveform,3));
-%     
-%     spikeMap(:,waveform_channel_ids,:) = unit_waveform;
-%     spikeMapAvg = zeros(size(unit_waveform,1),no_channels,2);
-%     nwavs = size(spikeMap,3);
-%     for cv = 1:2
-%             if cv==1
-%                 wavidx = floor(1:nwavs/2);
-%             else
-%                 wavidx = floor(nwavs/2+1:nwavs);
-%             end
-%             spikeMapAvg(:,:,cv) = nanmedian(spikeMap(:,:,wavidx),3);
-%      end
-%         spikeMap = spikeMapAvg;
-%         
-%     %fetch the waveforms of the unit
-%     writeNPY(spikeMap, [UMparam.KSDir{iDate,1},'\RawWaveforms\','Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']);
-% end
+
+for iUnit = 1:length(unit_ids)
+    waveform_channels = probe0_ks3_sparsity.unit_id_to_channel_ids.(['x',num2str(unit_ids(iUnit))]);
+    % Assume 'cellArray' is your cell array
+    
+    
+    % Initialize an empty matrix of the same size as the cell array
+    waveform_channel_ids = zeros(size(waveform_channels));
+    
+    % Loop over the cell array
+    for i = 1:numel(waveform_channels)
+        % Extract the number from the string using regexp
+
+        temp_channel_indices = strcmp(probe0_ks3_sparsity.channel_ids,waveform_channels{i});
+        waveform_channel_ids(i) = find(temp_channel_indices ==1);
+    end
+    unit_waveform_path = fullfile(probe0_ks3_waveform_path,['waveforms_',num2str(unit_ids(iUnit)),'.npy']);
+    unit_waveform = readNPY(unit_waveform_path);
+    unit_waveform = permute(unit_waveform,[2 3 1]);
+    spikeMap = zeros(size(unit_waveform,1),no_channels,size(unit_waveform,3));
+    
+    spikeMap(:,waveform_channel_ids,:) = unit_waveform;
+    spikeMapAvg = zeros(size(unit_waveform,1),no_channels,2);
+    nwavs = size(spikeMap,3);
+    for cv = 1:2
+            if cv==1
+                wavidx = floor(1:nwavs/2);
+            else
+                wavidx = floor(nwavs/2+1:nwavs);
+            end
+            spikeMapAvg(:,:,cv) = nanmedian(spikeMap(:,:,wavidx),3);
+     end
+        spikeMap = spikeMapAvg;
+        
+    %fetch the waveforms of the unit
+    writeNPY(spikeMap, [UMparam.KSDir{1},'\RawWaveforms\','Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']);
+end
 %%
 
 
@@ -93,15 +93,15 @@ clusinfo.RecSesID = ones(size(unit_ids));
 UMparam = DefaultParametersUnitMatch(UMparam);
 UMparam.GoodUnitsOnly = 0;
 UMparam.spikeWidth = 105;
-Params = struct;
-Params = DefaultParametersExtractKSData(Params,UMparam.KSDir{1});
-Params.DecompressLocal = 0; Params.RunQualityMetrics = 0;
-ExtractKilosortData(UMparam.KSDir, Params)
-sp = loadKSdir(fullfile(UMparam.KSDir{1}), Params); % Load Spikes with PCs
-    [sp.spikeAmps, sp.spikeDepths, sp.templateDepths, sp.templateXpos, sp.tempAmps, sp.tempsUnW, sp.templateDuration, sp.waveforms] = ...
-        templatePositionsAmplitudes(sp.temps, sp.winv, sp.ycoords, sp.xcoords, sp.spikeTemplates, sp.tempScalingAmps);
-    save(fullfile(UMparam.KSDir{1}, 'PreparedData.mat'), 'clusinfo', 'Params', '-v7.3')
-    save(fullfile(UMparam.KSDir{1}, 'PreparedData.mat'), 'sp', '-append')
+% Params = struct;
+% Params = DefaultParametersExtractKSData(Params,UMparam.KSDir{1});
+% Params.DecompressLocal = 0; Params.RunQualityMetrics = 0;
+% ExtractKilosortData(UMparam.KSDir, Params)
+% sp = loadKSdir(fullfile(UMparam.KSDir{1}), Params); % Load Spikes with PCs
+%     [sp.spikeAmps, sp.spikeDepths, sp.templateDepths, sp.templateXpos, sp.tempAmps, sp.tempsUnW, sp.templateDuration, sp.waveforms] = ...
+%         templatePositionsAmplitudes(sp.temps, sp.winv, sp.ycoords, sp.xcoords, sp.spikeTemplates, sp.tempScalingAmps);
+%     save(fullfile(UMparam.KSDir{1}, 'PreparedData.mat'), 'clusinfo', 'Params', '-v7.3')
+%     save(fullfile(UMparam.KSDir{1}, 'PreparedData.mat'), 'sp', '-append')
 %%
 [UniqueIDConversion, MatchTable, WaveformInfo, UMparam] = UnitMatch(clusinfo, UMparam);
 if UMparam.AssignUniqueID
@@ -126,3 +126,20 @@ end
 
 %% Further evaluation - only works in combination with Bombcell
 QualityMetricsROCs(UMparam.SaveDir); % Only works in combination with BOMBCELL (and is added to path!!)
+
+
+
+
+%% temp merge clusters based on match probaility > 0.5
+no_unit = length(unique(MatchTable.ID1));
+match_probability = reshape(MatchTable.MatchProb,[no_unit no_unit]);
+match_index = match_probability >= 0.5;
+id_count = 0;
+
+for id = unit_ids
+    id_count = id_count + 1;
+    current_id_ind = find(MatchTable.ID1 == id);
+
+
+
+end
