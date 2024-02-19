@@ -11,12 +11,12 @@ import subprocess
 subprocess.run('ulimit -n 4096',shell=True)
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
-mouse = 'M23029'
-dates = ['20230706']
+mouse = 'M23087'
+dates = ['20231208']
 dst_folder = "/home/lab/spikeinterface_sorting/temp_data/"
 job_kwargs = dict(n_jobs=20, chunk_duration='1s', progress_bar=True)
 for date in dates:
     dst_folder = "/home/lab/spikeinterface_sorting/temp_data/" + date + '/'
     os.makedirs(dst_folder, exist_ok=True)
-    si_process(base_folder, mouse, date, dst_folder, job_kwargs)
+    si_process_one_probe(base_folder, mouse, date, dst_folder, job_kwargs)
 
