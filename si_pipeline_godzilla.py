@@ -14,8 +14,8 @@ import subprocess
 subprocess.run('ulimit -n 4096',shell=True)
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
-mouse = 'M23031'
-dates = ['20230714']
+mouse = 'M23017'
+dates = ['20230628','20230630','20230701']
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 for date in dates:

@@ -13,22 +13,21 @@ upperTri = triu(MatchProb, 1);
 lowerTri = tril(MatchProb, -1);
 a= lowerTri';
 avgMatrix = (upperTri + lowerTri') / 2;
-merged_id = unit_id; %pre-allocate the unit id to the merged id
+merged_id =repmat(unit_id,[1 length(unit_id)]); %pre-allocate the unit id to the merged id
 
 for id_count = 1:length(unit_id)
     id = unit_id(id_count);
     
-    match_id = find(avgMatrix(id_count,:) >= 0.85);
-    if ~isempty(match_id)
-        if merged_id(id_count) == id
-            merged_id(match_id) = id;
-        else
-            merged_id(match_id) = merged_id(id_count);
-        end
-    end
+    match_id = find(avgMatrix(id_count,:) >= 0.5);
+    
+    merged_id(match_id,id_count) = id;
+    
 
 end
-original_id = unit_id;
-savepath = fullfile(base_folder,mouse,'analysis',date,['probe',num2str(no_probe)-1,'um_merge_suggestion.mat']);
 
-save(savepath,'original_id','merged_id');
+for id_count = 1:length(unit_id)
+    id = unit_id(id_count);
+    
+
+
+end
