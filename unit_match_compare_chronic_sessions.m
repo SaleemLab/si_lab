@@ -1,7 +1,7 @@
 %% Unitmatch DT implementation
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
 mouse = 'M23087';
-date = ['20231207';'20231212'];
+date = ['20231207';'20231208';'20231212'];
 ephys_folder = cell(1,size(date,1));
 UMparam.KSDir = cell(1,size(date,1));
 UMparam.AllDecompPaths = cell(1,size(date,1));
@@ -82,9 +82,9 @@ unit_ids = probe0_ks3_sparsity.unit_ids;
 %         spikeMap = spikeMapAvg;
 %         
 %     %fetch the waveforms of the unit
-%     writeNPY(spikeMap, [UMparam.KSDir{iDate,1},'\RawWaveforms\','Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']);
+%     writeNPY(spikeMap, [UMparam.KSDir{iDate},'\RawWaveforms\','Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']);
 % end
-%%
+%
 
 
 clusinfo.cluster_id = [clusinfo.cluster_id;unit_ids];

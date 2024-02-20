@@ -96,7 +96,7 @@ UMparam.spikeWidth = 105;
 % Params = struct;
 % Params = DefaultParametersExtractKSData(Params,UMparam.KSDir{1});
 % Params.DecompressLocal = 0; Params.RunQualityMetrics = 0;
-% ExtractKilosortData(UMparam.KSDir, Params)
+ExtractKilosortData(UMparam.KSDir, Params)
 % sp = loadKSdir(fullfile(UMparam.KSDir{1}), Params); % Load Spikes with PCs
 %     [sp.spikeAmps, sp.spikeDepths, sp.templateDepths, sp.templateXpos, sp.tempAmps, sp.tempsUnW, sp.templateDuration, sp.waveforms] = ...
 %         templatePositionsAmplitudes(sp.temps, sp.winv, sp.ycoords, sp.xcoords, sp.spikeTemplates, sp.tempScalingAmps);
