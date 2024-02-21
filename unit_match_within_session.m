@@ -1,8 +1,8 @@
 %% Unitmatch DT implementation
 addpath(genpath('C:\Users\adam.tong\Documents\GitHub\UnitMatch'))
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
-mouse = 'M23032';
-dates = ['20230718';'20230719';'20230720';'20230721';'20230722'];
+mouse = 'M23028';
+dates = ['20230704';'20230705';'20230706'];
 for iDate = 1:size(dates,1)
     date = dates(iDate,:);
     for no_probe = 1:2
@@ -116,8 +116,10 @@ for iDate = 1:size(dates,1)
         lowerTri = tril(MatchProb, -1);
         a= lowerTri';
         avgMatrix = (upperTri + lowerTri') / 2;
+        self_match_prob = spdiags(MatchProb,0);
+        unstable_id = self_match_prob < 0.5;
         merged_id = unit_id; %pre-allocate the unit id to the merged id
-
+        
         for id_count = 1:length(unit_id)
             id = unit_id(id_count);
 
@@ -134,7 +136,7 @@ for iDate = 1:size(dates,1)
         original_id = unit_id;
         savepath = fullfile(base_folder,mouse,'analysis',date,['probe',num2str(no_probe)-1,'um_merge_suggestion.mat']);
 
-        save(savepath,'original_id','merged_id');
+        save(savepath,'original_id','merged_id','unstable_id');
     end
 end
 
