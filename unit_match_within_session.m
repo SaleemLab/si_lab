@@ -2,7 +2,7 @@
 addpath(genpath('C:\Users\adam.tong\Documents\GitHub\UnitMatch'))
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
 mouse = 'M23028';
-dates = ['20230704';'20230705';'20230706'];
+dates = ['20230705';'20230706'];
 for iDate = 1:size(dates,1)
     date = dates(iDate,:);
     for no_probe = 1:2
