@@ -169,3 +169,5 @@ end
 
         match_ids{iSes} = [original_id,merged_id,unstable_id,unique_id'];
 end
+
+save('Z:\ibn-vision\DATA\SUBJECTS\M23087\analysis\openfield_unit_match.mat','match_ids')
