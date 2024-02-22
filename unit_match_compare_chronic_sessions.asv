@@ -104,8 +104,7 @@ UMparam.spikeWidth = 105;
 if UMparam.AssignUniqueID
     AssignUniqueID(UMparam.SaveDir);
 end
-MatchTable.ID1 = MatchTable.ID1+1;
-MatchTable.ID2 = MatchTable.ID2+1;
+MatchTable.ID1 = MatchTable
 no_session = length(unique(MatchTable.RecSes1));
 match_ids = cell(no_session,1);
 unit_id_no = zeros([no_session 1]);
