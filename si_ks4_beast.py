@@ -26,13 +26,13 @@ import spikeinterface.curation
 import spikeinterface.widgets 
 import docker
 from datetime import datetime
-mouse = 'M23032'
-dates = ['20230719','20230720','20230721','20230722']
+mouse = 'M23034'
+dates = ['20230804','20230805','20230806','20230807']
 for date in dates:
     
     # get all the recordings on that day
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
-    dst_folder = "/home/saleem_lab/spikeinterface_sorting/temp_data/" + date + '/'
+    dst_folder = "/home/lab/spikeinterface_sorting/temp_data/" + date + '/'
     startTime = datetime.now()
     print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
     ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
