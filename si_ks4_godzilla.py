@@ -66,6 +66,8 @@ for date in dates:
     #remove duplicates
     probe0_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks4, censored_period_ms=0.3,method='keep_first')
     probe1_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks4, censored_period_ms=0.3,method='keep_first')
+    #probe0_sorting_ks4 = si.remove_excess_spikes(probe0_sorting_ks4 , probe0_preprocessed_corrected)
+    #probe1_sorting_ks4 = si.remove_excess_spikes(probe1_sorting_ks4 , probe1_preprocessed_corrected)
     print(probe0_sorting_ks4)
     print(probe1_sorting_ks4)
     print('Start to all sorting done:')
