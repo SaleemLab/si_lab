@@ -1,6 +1,33 @@
 # si_lab
 Developed implementation of spikeinterface on Beast and Godzilla
 
+
+# Batch Processing in Background
+For batch processing, copy si_pipeline.py and modify the specified animal and date
+Before you run it in python, please enter the following command line on Beast:
+
+`ulimit -n 4096`
+
+The waveform extraction process sometimes opens too many files and Linux has a default limit of 1024.
+
+For testing, do the following(remember to change the mouse and date in 'si_pipeline_beast.py' or 'si_pipeline_godzilla.py'):
+
+`cd si_lab`
+
+`conda activate si_env`
+
+You should see (si_env) lab@saleem07: in your terminal.
+
+`ipython`
+
+`run si_pipeline_beast.py`
+
+For background processing:
+
+`nohup python si_pipeline_beast.py&`
+
+You can check the messages/errors of the script in the ouput file. Please kill the process when you finish
+
 # Jupyter Notebook - Live Processes with Plotting
 On Beast:
 
@@ -17,23 +44,6 @@ Copy jupyter notebook link to your local PC browser
 Open Jupyter notebook: 
 
 `si_with_visualisation_offline_beast.ipy`
-
-
-
-# Batch Processing in Background
-For batch processing, copy si_pipeline.py and modify the specified animal and date
-Before you run it in python, please enter the following command line on Beast:
-
-`ulimit -n 4096`
-
-The waveform extraction process sometimes opens too many files and Linux has a default limit of 1024.
-
-For background processing:
-
-`nohup python si_pipeline.py&`
-
-You can check the messages/errors of the script in the ouput file. Please kill the process when you finish
-
 # What Does This Pipeline Do?
 
 1. Files are moved to local linux machine for offline processing.
