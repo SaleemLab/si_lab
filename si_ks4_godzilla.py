@@ -26,8 +26,10 @@ import spikeinterface.curation
 import spikeinterface.widgets 
 import docker
 from datetime import datetime
-mouse = 'M23032'
-dates = ['20230719','20230720','20230721','20230722']
+#mouse = 'M23032'
+#dates = ['20230719','20230720','20230721','20230722']
+mouse = 'M23034'
+dates = ['20230807']
 for date in dates:
     
     # get all the recordings on that day
@@ -107,7 +109,7 @@ for date in dates:
     print('The following quality metrics are computed:')
     print(qm_list)
     probe0_ks4_metrics = si.compute_quality_metrics(probe0_we_ks4, metric_names=qm_list,**job_kwargs)
-    probe0_ks4_metrics = si.compute_quality_metrics(probe0_we_ks4, metric_names=qm_list,**job_kwargs)
+    probe1_ks4_metrics = si.compute_quality_metrics(probe1_we_ks4, metric_names=qm_list,**job_kwargs)
     '''minor corrections to the folder path of files before moving the files to server'''
     #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
     file_list = [
