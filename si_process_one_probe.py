@@ -112,6 +112,7 @@ def si_process_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
     '''
     probe0_sorting_ks2_5 = si.run_sorter(sorter_name= 'kilosort2_5',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort2_5/',docker_image="spikeinterface/kilosort2_5-compiled-base:latest",do_correction=False)
     probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort3/',docker_image="spikeinterface/kilosort3-compiled-base:latest",do_correction=False)
+    probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort4/',docker_image=True,do_correction=False)
     #job_list = [
     # {'sorter_name':'kilosort2_5','recording':probe0_preprocessed_corrected,'output_folder':dst_folder+'/probe0/sorters/kilosort2_5/','docker_image':'spikeinterface/kilosort2_5-compiled-base','do_correction':False},
     #  {'sorter_name':'kilosort3','recording':probe0_preprocessed_corrected,'output_folder':dst_folder+'/probe0/sorters/kilosort3/','docker_image':True,'do_correction':False},
@@ -125,7 +126,7 @@ def si_process_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
     #remove duplicates
     probe0_sorting_ks2_5 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks2_5, censored_period_ms=0.3,method='keep_first')
     probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks3, censored_period_ms=0.3,method='keep_first')
-
+    probe0_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks4, censored_period_ms=0.3,method='keep_first')
     print(probe0_sorting_ks2_5)
     print(probe0_sorting_ks3)
 
@@ -150,40 +151,46 @@ def si_process_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
     probe0_we_ks3 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks3, folder=dst_folder +'probe0/waveform/kilosort3',
                             sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
                             **job_kwargs)
+    probe0_we_ks4 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks4, folder=dst_folder +'probe0/waveform/kilosort4',
+                            sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
+                            **job_kwargs)
     del probe0_sorting_ks3
 
     ''' Compute quality metrics on the extracted waveforms'''
     template_metric_probe0_ks2_5 = si.compute_template_metrics(probe0_we_ks2_5)
     template_metric_probe0_ks3 = si.compute_template_metrics(probe0_we_ks3)
-
+    template_metric_probe0_ks4 = si.compute_template_metrics(probe0_we_ks4)
 
     noise_levels_probe0_ks2_5 = si.compute_noise_levels(probe0_we_ks2_5)
     noise_levels_probe0_ks3 = si.compute_noise_levels(probe0_we_ks3)
-
+    noise_levels_probe0_ks4 = si.compute_noise_levels(probe0_we_ks4)
 
     PCA_probe0_ks2_5 = si.compute_principal_components(probe0_we_ks2_5,**job_kwargs)
     PCA_probe0_ks3 = si.compute_principal_components(probe0_we_ks3,**job_kwargs)
-
+    PCA_probe0_ks4 = si.compute_principal_components(probe0_we_ks4,**job_kwargs)
 
     template_similarity_probe0_ks2_5 = si.compute_template_similarity(probe0_we_ks2_5)
     template_similarity_probe0_ks3 = si.compute_template_similarity(probe0_we_ks3)
-
+    template_similarity_probe0_ks4 = si.compute_template_similarity(probe0_we_ks4)
 
     correlograms_probe0_ks2_5 = si.compute_correlograms(probe0_we_ks2_5)
     correlograms_probe0_ks3 = si.compute_correlograms(probe0_we_ks3)
-
+    correlograms_probe0_ks4 = si.compute_correlograms(probe0_we_ks4)
+    
     amplitudes_probe0_ks2_5 = si.compute_spike_amplitudes(probe0_we_ks2_5,**job_kwargs)
     amplitudes_probe0_ks3 = si.compute_spike_amplitudes(probe0_we_ks3,**job_kwargs)
-
+    amplitudes_probe0_ks4 = si.compute_spike_amplitudes(probe0_we_ks4,**job_kwargs)
+    
     isi_histograms_probe0_ks2_5 = si.compute_isi_histograms(probe0_we_ks2_5)
     isi_histograms_probe0_ks3 = si.compute_isi_histograms(probe0_we_ks3)
-
+    isi_histograms_probe0_ks4 = si.compute_isi_histograms(probe0_we_ks4)
+    
     qm_list = si.get_quality_metric_list()
     print('The following quality metrics are computed:')
     print(qm_list)
     probe0_ks2_5_metrics = si.compute_quality_metrics(probe0_we_ks2_5, metric_names=qm_list,**job_kwargs)
     probe0_ks3_metrics = si.compute_quality_metrics(probe0_we_ks3, metric_names=qm_list,**job_kwargs)
-
+    probe0_ks4_metrics = si.compute_quality_metrics(probe0_we_ks4, metric_names=qm_list,**job_kwargs)
 
     '''minor corrections to the folder path of files before moving the files to server'''
     #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
@@ -192,10 +199,14 @@ def si_process_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
                 dst_folder + "probe0/waveform/kilosort2_5/sorting.json",
                 dst_folder + "probe0/waveform/kilosort3/recording.json",
                 dst_folder + "probe0/waveform/kilosort3/sorting.json",
+                dst_folder + "probe0/waveform/kilosort4/recording.json",
+                dst_folder + "probe0/waveform/kilosort4/sorting.json",
                 dst_folder + "probe0/sorters/kilosort2_5/in_container_sorting/provenance.json",
                 dst_folder + "probe0/sorters/kilosort2_5/in_container_sorting/si_folder.json",
                 dst_folder + "probe0/sorters/kilosort3/in_container_sorting/provenance.json",
-                dst_folder + "probe0/sorters/kilosort3/in_container_sorting/si_folder.json"]
+                dst_folder + "probe0/sorters/kilosort3/in_container_sorting/si_folder.json",
+                dst_folder + "probe0/sorters/kilosort4/in_container_sorting/provenance.json",
+                dst_folder + "probe0/sorters/kilosort4/in_container_sorting/si_folder.json"]
 
     def replace_text(obj, to_replace, replace_with):
         if isinstance(obj, dict):
@@ -228,21 +239,21 @@ def si_process_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
         os.remove(files)
     #move spikeinterface folder on Beast to the server
 
-   # import shutil
-   # import os
+    import shutil
+    import os
 
- #   folders_to_move = ['probe0',
-  #                  'probe0_preprocessed']
+    folders_to_move = ['probe0',
+                    'probe0_preprocessed']
 
 
-  #  for folder in folders_to_move:
-        # construct the destination path
-  #      destination = os.path.join(ephys_folder, folder)
+    for folder in folders_to_move:
+        #construct the destination path
+        destination = os.path.join(ephys_folder, folder)
         # copy the folder to the destination
- #       shutil.copytree(dst_folder+folder, destination)
+        shutil.copytree(dst_folder+folder, destination)
 
     #remove all temmp files
-   # shutil.rmtree(dst_folder)
+    shutil.rmtree(dst_folder)
 
     print('All Done! Overall it took:')
 
