@@ -21,6 +21,7 @@ def si_process_fabio_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
 
 
     from datetime import datetime
+    '''
     startTime = datetime.now()
     print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
     ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
@@ -44,6 +45,7 @@ def si_process_fabio_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
     # Define a custom sorting key that extracts the number after 'g'
     def sorting_key(s):
         return int(s.split('_g')[-1])
+        '''
 
     # Sort the list using the custom sorting key
     g_files = sorted(g_files, key=sorting_key)
