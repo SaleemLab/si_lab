@@ -55,16 +55,12 @@ def si_process_fabio(base_folder, mouse, date,dst_folder,job_kwargs):
     #load first probe from beast folder - this is the V1 probe
     probe0_raw = si.read_spikeglx(dst_folder,stream_name='imec0.ap')
     print(probe0_raw)
-    #Load second probe - PFC probe, it may not exist
-    probe1_raw = si.read_spikeglx(dst_folder,stream_name = 'imec1.ap')
-    print(probe1_raw)
+    
     import itertools
     probe0_num_segments = [probe0_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
     probe1_num_segments = [probe1_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
     probe0_end_sample_frames = list(itertools.accumulate(probe0_num_segments))
-    probe0_start_sample_frames = [1] + [probe0_end_sample_frames[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
-    probe1_end_sample_frames = list(itertools.accumulate(probe1_num_segments))
-    probe1_start_sample_frames = [1] + [probe1_end_sample_frames[i] + 1 for i in range(0, len(probe1_num_segments)-1)]
+    probe0_start_sample_frames = [1] + [probe0_end_sample_frames[i] + 1 for i in range(0, len(probe0_num_segments)-1)]   
     #several preprocessing steps and concatenation of the recordings
     #highpass filter - threhsold at 300Hz
     probe0_highpass = si.highpass_filter(probe0_raw,freq_min=300.)
@@ -80,25 +76,13 @@ def si_process_fabio(base_folder, mouse, date,dst_folder,job_kwargs):
     probe0_cat = si.concatenate_recordings([probe0_preprocessed])
     print('probe0_preprocessed',probe0_preprocessed)
     print('probe0 concatenated',probe0_cat)
-
-    probe1_highpass = si.highpass_filter(probe1_raw,freq_min=300.)
-    bad_channel_ids, channel_labels = si.detect_bad_channels(probe1_highpass)
-    probe1_remove_channels = probe1_highpass.remove_channels(bad_channel_ids)
-    print('probe1_bad_channel_ids',bad_channel_ids)
-    probe1_phase_shift = si.phase_shift(probe1_remove_channels)
-    probe1_common_reference = si.common_reference(probe1_phase_shift,operator='median',reference='global')
-    probe1_preprocessed = probe1_common_reference
-    probe1_cat = si.concatenate_recordings([probe1_preprocessed])
-    print('probe1_preprocessed',probe1_preprocessed)
-    print('probe1 concatenated',probe1_cat)
-
+   
     '''Motion Drift Correction'''
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
     #assign parallel processing as job_kwargs
     
     probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat, preset="nonrigid_accurate",**job_kwargs)
-    probe1_nonrigid_accurate = si.correct_motion(recording=probe1_cat, preset="nonrigid_accurate",**job_kwargs)
 
     print('Start to motion correction finished:')
     print(datetime.now() - startTime)
@@ -111,7 +95,6 @@ def si_process_fabio(base_folder, mouse, date,dst_folder,job_kwargs):
 
     #after saving, sorters will read this preprocessed binary file instead
     probe0_preprocessed_corrected = probe0_nonrigid_accurate.save(folder=dst_folder+'probe0_preprocessed', format='binary', **job_kwargs)
-    probe1_preprocessed_corrected = probe1_nonrigid_accurate.save(folder=dst_folder+'probe1_preprocessed', format='binary', **job_kwargs)
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
     #probe0_preprocessed_corrected = si.load_extractor(dst_folder+'/probe0_preprocessed')
@@ -127,7 +110,6 @@ def si_process_fabio(base_folder, mouse, date,dst_folder,job_kwargs):
     Beware that moutainsort5 is commented out as the sorter somehow stops midway with no clue - currently raising this issue on their github page
     '''
     probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort4/',docker_image=True,do_correction=False)
-    probe1_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort4/',docker_image=True,do_correction=False)
     #job_list = [
     # {'sorter_name':'kilosort2_5','recording':probe0_preprocessed_corrected,'output_folder':dst_folder+'/probe0/sorters/kilosort2_5/','docker_image':'spikeinterface/kilosort2_5-compiled-base','do_correction':False},
     #  {'sorter_name':'kilosort3','recording':probe0_preprocessed_corrected,'output_folder':dst_folder+'/probe0/sorters/kilosort3/','docker_image':True,'do_correction':False},
@@ -140,18 +122,14 @@ def si_process_fabio(base_folder, mouse, date,dst_folder,job_kwargs):
     #sortings = si.run_sorter_jobs(job_list = job_list,engine = 'joblib',engine_kwargs = {'n_jobs': 2})
     #remove duplicates
     probe0_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks4, censored_period_ms=0.3,method='keep_first')
-    probe1_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks4, censored_period_ms=0.3,method='keep_first')
     print(probe0_sorting_ks4)
-    print(probe1_sorting_ks4)
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
 
     import pandas as pd
     probe0_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
     probe0_segment_frames.to_csv(dst_folder+'probe0/sorters/segment_frames.csv', index=False)
-    probe1_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_end_sample_frames})
-    probe1_segment_frames.to_csv(dst_folder+'probe1/sorters/segment_frames.csv', index=False)
-
+   
 
     ''' read sorters directly from the output folder - so you dont need to worry if something went wrong and you can't access the temp variables
         This section reads sorter outputs and extract waveforms 
@@ -162,53 +140,37 @@ def si_process_fabio(base_folder, mouse, date,dst_folder,job_kwargs):
     #probe1_sorting_ks2_5 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe1/sorters/kilosort2_5/', register_recording=True, sorting_info=True, raise_error=True)
     probe0_we_ks4 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks4, folder=dst_folder +'probe0/waveform/kilosort4',
                             sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
-                            **job_kwargs)
-    probe1_we_ks4 = si.extract_waveforms(probe1_preprocessed_corrected, probe1_sorting_ks4, folder=dst_folder +'probe1/waveform/kilosort4',
-                            sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
-                            **job_kwargs)
+                            **job_kwargs)   
 
     ''' Compute quality metrics on the extracted waveforms'''
     template_metric_probe0_ks4 = si.compute_template_metrics(probe0_we_ks4)
-    template_metric_probe1_ks4 = si.compute_template_metrics(probe1_we_ks4)
 
     noise_levels_probe0_ks4 = si.compute_noise_levels(probe0_we_ks4)
-    noise_levels_probe1_ks4 = si.compute_noise_levels(probe1_we_ks4)
 
     PCA_probe0_ks4 = si.compute_principal_components(probe0_we_ks4,**job_kwargs)
-    PCA_probe1_ks4 = si.compute_principal_components(probe1_we_ks4,**job_kwargs)
 
 
     template_similarity_probe0_ks4 = si.compute_template_similarity(probe0_we_ks4)
-    template_similarity_probe1_ks4 = si.compute_template_similarity(probe1_we_ks4)
 
     correlograms_probe0_ks4 = si.compute_correlograms(probe0_we_ks4)
-    correlograms_probe1_ks4 = si.compute_correlograms(probe1_we_ks4)
 
     amplitudes_probe0_ks4 = si.compute_spike_amplitudes(probe0_we_ks4,**job_kwargs)
-    amplitudes_probe1_ks4 = si.compute_spike_amplitudes(probe1_we_ks4,**job_kwargs)
     
 
     isi_histograms_probe0_ks4 = si.compute_isi_histograms(probe0_we_ks4)
-    isi_histograms_probe1_ks4 = si.compute_isi_histograms(probe1_we_ks4)
 
     qm_list = si.get_quality_metric_list()
     print('The following quality metrics are computed:')
     print(qm_list)
     probe0_ks4_metrics = si.compute_quality_metrics(probe0_we_ks4, metric_names=qm_list,**job_kwargs)
-    probe1_ks4_metrics = si.compute_quality_metrics(probe1_we_ks4, metric_names=qm_list,**job_kwargs)
 
     '''minor corrections to the folder path of files before moving the files to server'''
     #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
     file_list = [dst_folder + "probe0_preprocessed/provenance.json",
-                dst_folder + "probe1_preprocessed/provenance.json",
                 dst_folder + "probe0/waveform/kilosort4/recording.json",
                 dst_folder + "probe0/waveform/kilosort4/sorting.json",
                 dst_folder + "probe0/sorters/kilosort4/in_container_sorting/provenance.json",
-                dst_folder + "probe0/sorters/kilosort4/in_container_sorting/si_folder.json",
-                dst_folder + "probe1/waveform/kilosort4/recording.json",
-                dst_folder + "probe1/waveform/kilosort4/sorting.json",
-                dst_folder + "probe1/sorters/kilosort4/in_container_sorting/provenance.json",
-                dst_folder + "probe1/sorters/kilosort4/in_container_sorting/si_folder.json"]
+                dst_folder + "probe0/sorters/kilosort4/in_container_sorting/si_folder.json"]
 
     def replace_text(obj, to_replace, replace_with):
         if isinstance(obj, dict):
@@ -239,10 +201,8 @@ def si_process_fabio(base_folder, mouse, date,dst_folder,job_kwargs):
     import shutil
     import os
 
-    folders_to_move = ['probe0',
-                    'probe1',
-                    'probe0_preprocessed',
-                    'probe1_preprocessed']
+    folders_to_move = ['probe0',                    
+                    'probe0_preprocessed']
 ##
 #
     for folder in folders_to_move:
