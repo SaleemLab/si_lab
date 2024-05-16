@@ -3,11 +3,9 @@
 #import the necessary packages
 
 
-from si_process_fabio import si_process_fabio
 import os
 import subprocess
 
-from si_process_fabio_oneprobe import si_process_fabio_oneprobe
 subprocess.run('ulimit -n 4096',shell=True)
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
