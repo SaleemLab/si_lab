@@ -24,7 +24,7 @@ def si_process_fabio_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
     '''
     startTime = datetime.now()
     print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
-    ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
+    #this section defines the animal and dates and fetch the recordings from the server to Beast
     print('copying ephys data from:' + ephys_folder)
     g_files = []
     # iterate over all directories in source folder
@@ -41,7 +41,7 @@ def si_process_fabio_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
             shutil.copytree(source, destination)
     print('Start to copying files to Beast:')
     print(datetime.now() - startTime)
-    ''' read spikeglx recordings and preprocess them'''
+    # read spikeglx recordings and preprocess them
     # Define a custom sorting key that extracts the number after 'g'
     def sorting_key(s):
         return int(s.split('_g')[-1])
