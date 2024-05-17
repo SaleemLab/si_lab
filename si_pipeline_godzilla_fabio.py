@@ -11,8 +11,8 @@ from si_process_fabio_one_probe import si_process_fabio_one_probe
 subprocess.run('ulimit -n 4096',shell=True)
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
-mouse = 'M24028'
-dates = ['20240427']
+mouse = 'M24029'
+dates = ['20240424, M20240426']
 
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
