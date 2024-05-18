@@ -1,4 +1,5 @@
 def si_process_fabio_2(base_folder, mouse, date,dst_folder,job_kwargs):
+    
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     
     # allocate destination folder and move the ephys folder on the server to Beast lab user
