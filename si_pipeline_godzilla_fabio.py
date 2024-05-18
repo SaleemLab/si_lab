@@ -3,7 +3,7 @@
 #import the necessary packages
 
 
-from si_process_fabio import si_process_fabio
+from si_process_fabio_2 import si_process_fabio_2
 import os
 import subprocess
 from si_process_fabio_one_probe import si_process_fabio_one_probe
@@ -22,6 +22,6 @@ for date in dates:
     os.makedirs(dst_folder, exist_ok=True)
     import os.path
     # if os.path.isdir(pathforprobe):
-    si_process_fabio(base_folder, mouse, date, dst_folder, job_kwargs)
+    si_process_fabio_2(base_folder, mouse, date, dst_folder, job_kwargs)
     #else:
     #si_process_fabio_one_probe(base_folder, mouse, date,dst_folder,job_kwargs)
