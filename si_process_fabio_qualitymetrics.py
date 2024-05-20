@@ -16,8 +16,8 @@ import spikeinterface.curation
 import spikeinterface.widgets 
 import docker
 from datetime import datetime
-mouse = 'M24029'
-date = '20240424'
+mouse = 'M24030'
+date = '20240507'
 
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
