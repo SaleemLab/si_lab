@@ -21,8 +21,10 @@ for date in dates:
 
     import os.path
     if os.path.isdir(pathforprobe):
+        print('Running dual probe pipeline')
         si_process_fabio(base_folder, mouse, date, dst_folder, job_kwargs)
     else:
+        print('Running single probe pipeline')
         si_process_fabio_one_probe(base_folder, mouse, date,dst_folder,job_kwargs)
 
 

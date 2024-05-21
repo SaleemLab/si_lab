@@ -28,7 +28,7 @@ ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
 
 probe0_preprocessed_corrected = si.load_extractor(dst_folder + 'probe0_preprocessed')
 probe1_preprocessed_corrected = si.load_extractor(dst_folder + 'probe1_preprocessed')
-probe0_sorting_ks4 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe0/sorters/kilosort4/', register_recording=True, sorting_info=True, raise_error=True)
+probe0_sorting_ks4 = spikeinterface.sorters.read_sorter_foldexiter(dst_folder+'/probe0/sorters/kilosort4/', register_recording=True, sorting_info=True, raise_error=True)
 probe1_sorting_ks4 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe1/sorters/kilosort4/', register_recording=True, sorting_info=True, raise_error=True)
 #probe1_sorting_ks2_5 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe1/sorters/kilosort2_5/', register_recording=True, sorting_info=True, raise_error=True)
 probe0_we_ks4 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks4, folder=dst_folder +'probe0/waveform/kilosort4',
