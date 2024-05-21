@@ -1,14 +1,14 @@
 %% Unitmatch DT implementation
 addpath(genpath('C:\Users\adam.tong\Documents\GitHub\UnitMatch'))
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
-% mouses = ['M23034';'M23037';'M23038'];
-% SESSION = {
-%     ['20230804';'20230805';'20230806'];
-%     ['20230811';'20230812';'20230813'];
+mouses = ['M23032';'M23034';'M23037';'M23038'];
+SESSION = {['20230718';'20230719';'20230720';'20230721';'20230722'];
+    ['20230804';'20230805';'20230806';'20230807'];
+    ['20230810';'20230811';'20230812';'20230813']};
 %     ['20230816';'20230817']};
-mouses = ['M23032'];
-SESSION = {['20230718']};
-for iMouse = 1:2
+% mouses = ['M23032'];
+% SESSION = {['20230718']};
+for iMouse = 1:3
     mouse = mouses(iMouse,:);
     dates = SESSION{iMouse};
 for iDate = 1:size(dates,1)
@@ -145,7 +145,7 @@ for iDate = 1:size(dates,1)
 
         end
         original_id = unit_id;
-        savepath = fullfile(base_folder,mouse,'analysis',date,['probe',num2str(no_probe)-1,'um_merge_suggestion_ks4.mat']);
+        savepath = fullfile(base_folder,mouse,'analysis',date,['probe',num2str(no_probe)-1,'um_merge_suggestion.mat']);
         match_ids =[original_id,merged_id,unstable_id];
         save(savepath,'match_ids');
     end

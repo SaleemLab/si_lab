@@ -86,7 +86,7 @@ for date in dates:
                             **job_kwargs)
 
     #probe0_sorting_ks4 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe0/sorters/kilosort3/', register_recording=True, sorting_info=True, raise_error=True)
-    probe1_we_ks4 = si.extract_waveforms(probe0_preprocessed_corrected, probe1_sorting_ks4, folder=dst_folder +'probe1/waveform/kilosort4',
+    probe1_we_ks4 = si.extract_waveforms(probe1_preprocessed_corrected, probe1_sorting_ks4, folder=dst_folder +'probe1/waveform/kilosort4',
                             sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
                             **job_kwargs)
 
