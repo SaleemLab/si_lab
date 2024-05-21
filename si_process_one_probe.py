@@ -11,7 +11,7 @@ def si_process_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
     import matplotlib.pyplot as plt
     import spikeinterface.sorters
     import spikeinterface.full as si
-    import  scipy.signal
+    import scipy.signal
     import spikeinterface.extractors as se
     import spikeinterface.comparison
     import spikeinterface.exporters
