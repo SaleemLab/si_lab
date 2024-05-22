@@ -27,7 +27,7 @@ import spikeinterface.widgets
 import docker
 from datetime import datetime
 mouse = 'M23031'
-dates = ['20230713','20230714']
+dates = ['20230714']
 for date in dates:
     
     # get all the recordings on that day
@@ -76,7 +76,7 @@ for date in dates:
         This section reads sorter outputs and extract waveforms 
     '''
     #extract waveforms from sorted data
-
+    probe0_sorting_ks4 = si.remove_excess_spikes(probe0_sorting_ks4 , probe0_preprocessed_corrected)
     #probe0_sorting_ks4 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe0/sorters/kilosort2_5/', register_recording=True, sorting_info=True, raise_error=True)
     probe0_we_ks4 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks4, folder=dst_folder +'probe0/waveform/kilosort4',
                             sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
