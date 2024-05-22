@@ -27,7 +27,7 @@ import spikeinterface.widgets
 import docker
 from datetime import datetime
 mouse = 'M23031'
-dates = ['20230711','20230712','20230713','20230714']
+dates = ['20230713','20230714']
 for date in dates:
     
     # get all the recordings on that day
