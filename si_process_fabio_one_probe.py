@@ -35,10 +35,10 @@ def si_process_fabio_one_probe(base_folder, mouse, date,dst_folder,job_kwargs):
         if '_g' in dirname:
             # construct full directory path
             g_files.append(dirname)
-            source = os.path.join(ephys_folder, dirname)
-            destination = os.path.join(dst_folder, dirname)
+            #source = os.path.join(ephys_folder, dirname)
+            #destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
-            shutil.copytree(source, destination)
+            #shutil.copytree(source, destination)
     print('Start to copying files to Beast:')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
