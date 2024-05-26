@@ -16,8 +16,8 @@ import spikeinterface.curation
 import spikeinterface.widgets 
 import docker
 from datetime import datetime
-mouse = 'M24030'
-date = '20240507'
+mouse = 'M24032'
+date = '20240515'
 
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
@@ -27,59 +27,59 @@ ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
 
 
 probe0_preprocessed_corrected = si.load_extractor(dst_folder + 'probe0_preprocessed')
-probe1_preprocessed_corrected = si.load_extractor(dst_folder + 'probe1_preprocessed')
+#probe1_preprocessed_corrected = si.load_extractor(dst_folder + 'probe1_preprocessed')
 probe0_sorting_ks4 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe0/sorters/kilosort4/', register_recording=True, sorting_info=True, raise_error=True)
-probe1_sorting_ks4 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe1/sorters/kilosort4/', register_recording=True, sorting_info=True, raise_error=True)
+#probe1_sorting_ks4 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe1/sorters/kilosort4/', register_recording=True, sorting_info=True, raise_error=True)
 #probe1_sorting_ks2_5 = spikeinterface.sorters.read_sorter_folder(dst_folder+'/probe1/sorters/kilosort2_5/', register_recording=True, sorting_info=True, raise_error=True)
 probe0_we_ks4 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks4, folder=dst_folder +'probe0/waveform/kilosort4',
                         sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
                         **job_kwargs)
-probe1_we_ks4 = si.extract_waveforms(probe1_preprocessed_corrected, probe1_sorting_ks4, folder=dst_folder +'probe1/waveform/kilosort4',
-                        sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
-                        **job_kwargs)
+#probe1_we_ks4 = si.extract_waveforms(probe1_preprocessed_corrected, probe1_sorting_ks4, folder=dst_folder +'probe1/waveform/kilosort4',
+                       # sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
+                       # **job_kwargs)
 
 ''' Compute quality metrics on the extracted waveforms'''
 template_metric_probe0_ks4 = si.compute_template_metrics(probe0_we_ks4)
-template_metric_probe1_ks4 = si.compute_template_metrics(probe1_we_ks4)
+#template_metric_probe1_ks4 = si.compute_template_metrics(probe1_we_ks4)
 
 noise_levels_probe0_ks4 = si.compute_noise_levels(probe0_we_ks4)
-noise_levels_probe1_ks4 = si.compute_noise_levels(probe1_we_ks4)
+#noise_levels_probe1_ks4 = si.compute_noise_levels(probe1_we_ks4)
 
 PCA_probe0_ks4 = si.compute_principal_components(probe0_we_ks4,**job_kwargs)
-PCA_probe1_ks4 = si.compute_principal_components(probe1_we_ks4,**job_kwargs)
+#PCA_probe1_ks4 = si.compute_principal_components(probe1_we_ks4,**job_kwargs)
 
 
 template_similarity_probe0_ks4 = si.compute_template_similarity(probe0_we_ks4)
-template_similarity_probe1_ks4 = si.compute_template_similarity(probe1_we_ks4)
+#template_similarity_probe1_ks4 = si.compute_template_similarity(probe1_we_ks4)
 
 correlograms_probe0_ks4 = si.compute_correlograms(probe0_we_ks4)
-correlograms_probe1_ks4 = si.compute_correlograms(probe1_we_ks4)
+#correlograms_probe1_ks4 = si.compute_correlograms(probe1_we_ks4)
 
 amplitudes_probe0_ks4 = si.compute_spike_amplitudes(probe0_we_ks4,**job_kwargs)
-amplitudes_probe1_ks4 = si.compute_spike_amplitudes(probe1_we_ks4,**job_kwargs)
+#amplitudes_probe1_ks4 = si.compute_spike_amplitudes(probe1_we_ks4,**job_kwargs)
 
 
 isi_histograms_probe0_ks4 = si.compute_isi_histograms(probe0_we_ks4)
-isi_histograms_probe1_ks4 = si.compute_isi_histograms(probe1_we_ks4)
+#isi_histograms_probe1_ks4 = si.compute_isi_histograms(probe1_we_ks4)
 
 qm_list = si.get_quality_metric_list()
 print('The following quality metrics are computed:')
 print(qm_list)
 probe0_ks4_metrics = si.compute_quality_metrics(probe0_we_ks4, metric_names=qm_list,**job_kwargs)
-probe1_ks4_metrics = si.compute_quality_metrics(probe1_we_ks4, metric_names=qm_list,**job_kwargs)
+#probe1_ks4_metrics = si.compute_quality_metrics(probe1_we_ks4, metric_names=qm_list,**job_kwargs)
 
 '''minor corrections to the folder path of files before moving the files to server'''
 #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
 file_list = [dst_folder + "probe0_preprocessed/provenance.json",
-            dst_folder + "probe1_preprocessed/provenance.json",
+            #dst_folder + "probe1_preprocessed/provenance.json",
             dst_folder + "probe0/waveform/kilosort4/recording.json",
             dst_folder + "probe0/waveform/kilosort4/sorting.json",
             dst_folder + "probe0/sorters/kilosort4/in_container_sorting/provenance.json",
-            dst_folder + "probe0/sorters/kilosort4/in_container_sorting/si_folder.json",
-            dst_folder + "probe1/waveform/kilosort4/recording.json",
-            dst_folder + "probe1/waveform/kilosort4/sorting.json",
-            dst_folder + "probe1/sorters/kilosort4/in_container_sorting/provenance.json",
-            dst_folder + "probe1/sorters/kilosort4/in_container_sorting/si_folder.json"]
+            dst_folder + "probe0/sorters/kilosort4/in_container_sorting/si_folder.json"]
+            #dst_folder + "probe1/waveform/kilosort4/recording.json",
+            #dst_folder + "probe1/waveform/kilosort4/sorting.json",
+            #dst_folder + "probe1/sorters/kilosort4/in_container_sorting/provenance.json",
+            #dst_folder + "probe1/sorters/kilosort4/in_container_sorting/si_folder.json"]
 
 def replace_text(obj, to_replace, replace_with):
     if isinstance(obj, dict):
@@ -111,9 +111,9 @@ import shutil
 import os
 
 folders_to_move = ['probe0',
-                'probe1',
-                'probe0_preprocessed',
-                'probe1_preprocessed']
+                #'probe1',
+                'probe0_preprocessed']
+                #'probe1_preprocessed']
 ##
 #
 for folder in folders_to_move:
