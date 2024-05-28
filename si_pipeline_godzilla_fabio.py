@@ -12,7 +12,7 @@ subprocess.run('ulimit -n 10000',shell=True)
 #grab recordings from the server to local machine (Beast)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 mouse = 'M24034'
-dates = ['202405216','20240517']
+dates = ['20240516','20240517']
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 for date in dates:
