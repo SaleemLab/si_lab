@@ -89,12 +89,9 @@ for date in dates:
     #highpass filter - threhsold at 300Hz
     probe0_highpass = si.highpass_filter(probe0_raw,freq_min=300.)
     #detect bad channels
-    bad_channel_ids, channel_labels = si.detect_bad_channels(probe0_highpass)
-    #remove bad channels if wanted
-    probe0_remove_channels = probe0_highpass.remove_channels(bad_channel_ids)
-    print('probe0_bad_channel_ids',bad_channel_ids)
+
     #phase shift correction - equivalent to T-SHIFT in catGT
-    probe0_phase_shift = si.phase_shift(probe0_remove_channels)
+    probe0_phase_shift = si.phase_shift(probe0_highpass)
     probe0_common_reference = si.common_reference(probe0_phase_shift,operator='median',reference='global')
     probe0_preprocessed = probe0_common_reference
     probe0_cat = si.concatenate_recordings([probe0_preprocessed])
@@ -102,10 +99,7 @@ for date in dates:
     print('probe0 concatenated',probe0_cat)
 
     probe1_highpass = si.highpass_filter(probe1_raw,freq_min=300.)
-    bad_channel_ids, channel_labels = si.detect_bad_channels(probe1_highpass)
-    probe1_remove_channels = probe1_highpass.remove_channels(bad_channel_ids)
-    print('probe1_bad_channel_ids',bad_channel_ids)
-    probe1_phase_shift = si.phase_shift(probe1_remove_channels)
+    probe1_phase_shift = si.phase_shift(probe1_highpass)
     probe1_common_reference = si.common_reference(probe1_phase_shift,operator='median',reference='global')
     probe1_preprocessed = probe1_common_reference
     probe1_cat = si.concatenate_recordings([probe1_preprocessed])
@@ -118,14 +112,19 @@ for date in dates:
     else:
         probe0_cat_all = si.concatenate_recordings([probe0_cat_all,probe0_cat])
         probe1_cat_all = si.concatenate_recordings([probe1_cat_all,probe1_cat])
-
+bad_channel_ids, channel_labels = si.detect_bad_channels(probe0_cat_all)
+probe0_cat_all = probe0_cat_all.remove_channels(bad_channel_ids)
+print('probe0_bad_channel_ids',bad_channel_ids)
+bad_channel_ids, channel_labels = si.detect_bad_channels(probe1_cat_all)
+probe1_cat_all = probe1_cat_all.remove_channels(bad_channel_ids)
+print('probe1_bad_channel_ids',bad_channel_ids)
 '''Motion Drift Correction'''
 #motion correction if needed
 #this is nonrigid correction - need to do parallel computing to speed up
 #assign parallel processing as job_kwargs
 
-probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat, preset="nonrigid_accurate",**job_kwargs)
-probe1_nonrigid_accurate = si.correct_motion(recording=probe1_cat, preset="nonrigid_accurate",**job_kwargs)
+probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",**job_kwargs)
+probe1_nonrigid_accurate = si.correct_motion(recording=probe1_cat_all, preset="nonrigid_accurate",**job_kwargs)
 
 print('Start to motion correction finished:')
 print(datetime.now() - startTime)
