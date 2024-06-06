@@ -23,12 +23,15 @@ startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
 mouse = 'M24017'
-dates = ['20240601/20240601_0','20240601/20240601_1']
+dates = ['20240601/20240603_0','20240601/20240601_1']
+save_date = '20240601'
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
+save_folder = '/home/lab/spikeinterface_sorting/temp_data/'+save_date+'/'
 # get all the recordings on that day
-probe0_start_sample_frames = [1]
-probe1_start_sample_frames = [1]
-
+probe0_start_sample_frames = []
+probe1_start_sample_frames = []
+probe0_end_sample_frames = []
+probe1_end_sample_frames = []
 import os
 import subprocess
 subprocess.run('ulimit -n 4096',shell=True)
@@ -41,7 +44,7 @@ def sorting_key(s):
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 
 
-g_files = []
+g_files_all = []
 # iterate over all directories in source folder
 date_count = 0
 for date in dates:
@@ -49,12 +52,13 @@ for date in dates:
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     dst_folder = "/home/lab/spikeinterface_sorting/temp_data/" + date + '/'
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
-    print('copying ephys data from:' + ephys_folder)
+    g_files = []
+    # print('copying ephys data from:' + ephys_folder)
     for dirname in os.listdir(ephys_folder):
-        # check if '_g' is in the directory name
-        #only grab recording folders - there might be some other existing folders for analysis or sorted data
+    #     # check if '_g' is in the directory name
+    #     #only grab recording folders - there might be some other existing folders for analysis or sorted data
         if '_g' in dirname:
-            # construct full directory path
+    #         # construct full directory path
             g_files.append(dirname)
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
@@ -67,8 +71,9 @@ for date in dates:
 
     # Sort the list using the custom sorting key
     g_files = sorted(g_files, key=sorting_key)
-
-    print(g_files) 
+    g_files_all = g_files_all + g_files
+    print(g_files)
+    print('all g files:',g_files_all) 
     stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     print(stream_names)
     print(stream_ids)
@@ -78,13 +83,29 @@ for date in dates:
     #Load second probe - V1 probe
     probe1_raw = si.read_spikeglx(dst_folder,stream_name = 'imec1.ap')
     print(probe1_raw)
-    no_segments_previous = len(probe0_start_sample_frames)
+
     probe0_num_segments = [probe0_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
     probe1_num_segments = [probe1_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
-    probe0_end_sample_frames = list(itertools.accumulate(probe0_num_segments))
-    probe0_start_sample_frames = probe0_start_sample_frames + [probe0_start_sample_frames[no_segments_previous-1]+probe0_end_sample_frames[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
-    probe1_end_sample_frames = list(itertools.accumulate(probe1_num_segments))
-    probe1_start_sample_frames = probe1_start_sample_frames + [probe1_start_sample_frames[no_segments_previous-1]+probe1_end_sample_frames[i] + 1 for i in range(0, len(probe1_num_segments)-1)]
+    
+    probe0_end_sample_frames_tmp = list(itertools.accumulate(probe0_num_segments))
+    if date_count == 1:
+        probe0_start_sample_frames = [1] + [probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
+        probe0_end_sample_frames = probe0_end_sample_frames + probe0_end_sample_frames_tmp
+    else:
+        probe0_start_sample_frames = probe0_start_sample_frames + [probe0_end_sample_frames[-1]+1] + \
+        [probe0_end_sample_frames[-1]+probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
+        probe0_end_sample_frames = probe0_end_sample_frames + [probe0_end_sample_frames_tmp[i] + probe0_end_sample_frames[-1] for i in range(0, len(probe0_num_segments))]
+
+        
+    probe1_end_sample_frames_tmp = list(itertools.accumulate(probe1_num_segments))
+    if date_count == 1:
+        probe1_start_sample_frames = [1] + [probe1_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe1_num_segments)-1)]
+        probe1_end_sample_frames = probe1_end_sample_frames + probe1_end_sample_frames_tmp
+    else:
+        probe1_start_sample_frames = probe1_start_sample_frames + [probe1_end_sample_frames[-1]+1] + \
+        [probe1_end_sample_frames[-1]+probe1_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe1_num_segments)-1)]
+        probe1_end_sample_frames = probe1_end_sample_frames + [probe1_end_sample_frames_tmp[i] + probe1_end_sample_frames[-1] for i in range(0, len(probe1_num_segments))]
+
     #several preprocessing steps and concatenation of the recordings
     #highpass filter - threhsold at 300Hz
     probe0_highpass = si.highpass_filter(probe0_raw,freq_min=300.)
@@ -129,15 +150,15 @@ probe1_nonrigid_accurate = si.correct_motion(recording=probe1_cat_all, preset="n
 print('Start to motion correction finished:')
 print(datetime.now() - startTime)
 #kilosort like to mimic kilosort - no need if you are just running kilosort
-#probe0_kilosort_like = correct_motion(recording=probe0_cat, preset="kilosort_like")
-#probe1_kilosort_like = correct_motion(recording=probe1_cat, preset="kilosort_like")
+# probe0_kilosort_like = correct_motion(recording=probe0_cat, preset="kilosort_like")
+# probe1_kilosort_like = correct_motion(recording=probe1_cat, preset="kilosort_like")
 
 '''save preprocessed bin file before sorting'''
 
 
 #after saving, sorters will read this preprocessed binary file instead
-probe0_preprocessed_corrected = probe0_nonrigid_accurate.save(folder=dst_folder+'probe0_preprocessed', format='binary', **job_kwargs)
-probe1_preprocessed_corrected = probe1_nonrigid_accurate.save(folder=dst_folder+'probe1_preprocessed', format='binary', **job_kwargs)
+probe0_preprocessed_corrected = probe0_nonrigid_accurate.save(folder=save_folder+'probe0_preprocessed', format='binary', **job_kwargs)
+probe1_preprocessed_corrected = probe1_nonrigid_accurate.save(folder=save_folder+'probe1_preprocessed', format='binary', **job_kwargs)
 print('Start to prepocessed files saved:')
 print(datetime.now() - startTime)
 #probe0_preprocessed_corrected = si.load_extractor(dst_folder+'/probe0_preprocessed')
@@ -156,8 +177,8 @@ Beware that moutainsort5 is commented out as the sorter somehow stops midway wit
 #probe1_sorting_ks2_5 = si.run_sorter(sorter_name= 'kilosort2_5',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort2_5/',docker_image="spikeinterface/kilosort2_5-compiled-base:latest",do_correction=False)
 #probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort3/',docker_image="spikeinterface/kilosort3-compiled-base:latest",do_correction=False)
 #probe1_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort3/',docker_image="spikeinterface/kilosort3-compiled-base:latest",do_correction=False)
-probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort4/',docker_image=True,do_correction=False)
-probe1_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort4/',docker_image=True,do_correction=False)
+probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe0/sorters/kilosort4/',docker_image=True,do_correction=False)
+probe1_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe1_preprocessed_corrected,output_folder=save_folder+'probe1/sorters/kilosort4/',docker_image=True,do_correction=False)
 #job_list = [
 # {'sorter_name':'kilosort2_5','recording':probe0_preprocessed_corrected,'output_folder':dst_folder+'/probe0/sorters/kilosort2_5/','docker_image':'spikeinterface/kilosort2_5-compiled-base','do_correction':False},
 #  {'sorter_name':'kilosort3','recording':probe0_preprocessed_corrected,'output_folder':dst_folder+'/probe0/sorters/kilosort3/','docker_image':True,'do_correction':False},
@@ -181,10 +202,10 @@ print('Start to all sorting done:')
 print(datetime.now() - startTime)
 
 import pandas as pd
-probe0_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
-probe0_segment_frames.to_csv(dst_folder+'probe0/sorters/segment_frames.csv', index=False)
-probe1_segment_frames = pd.DataFrame({'segment_info':g_files,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_end_sample_frames})
-probe1_segment_frames.to_csv(dst_folder+'probe1/sorters/segment_frames.csv', index=False)
+probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
+probe0_segment_frames.to_csv(save_folder+'probe0/sorters/segment_frames.csv', index=False)
+probe1_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_end_sample_frames})
+probe1_segment_frames.to_csv(save_folder+'probe1/sorters/segment_frames.csv', index=False)
 
 
 ''' read sorters directly from the output folder - so you dont need to worry if something went wrong and you can't access the temp variables
@@ -202,7 +223,7 @@ probe1_segment_frames.to_csv(dst_folder+'probe1/sorters/segment_frames.csv', ind
 #                         sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
 #                         **job_kwargs)
 # del probe0_sorting_ks3
-probe0_we_ks4 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks4, folder=dst_folder +'probe0/waveform/kilosort4',
+probe0_we_ks4 = si.extract_waveforms(probe0_preprocessed_corrected, probe0_sorting_ks4, folder=save_folder +'probe0/waveform/kilosort4',
                         sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
                         **job_kwargs)
 del probe0_sorting_ks4
@@ -216,7 +237,7 @@ del probe0_sorting_ks4
 #                         sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
 #                         **job_kwargs)
 # del probe1_sorting_ks3
-probe1_we_ks4 = si.extract_waveforms(probe1_preprocessed_corrected, probe1_sorting_ks4, folder=dst_folder +'probe1/waveform/kilosort4',
+probe1_we_ks4 = si.extract_waveforms(probe1_preprocessed_corrected, probe1_sorting_ks4, folder=save_folder +'probe1/waveform/kilosort4',
                         sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
                         **job_kwargs)
 del probe1_sorting_ks4
@@ -284,16 +305,19 @@ probe1_ks4_metrics = si.compute_quality_metrics(probe1_we_ks4, metric_names=qm_l
 
 '''minor corrections to the folder path of files before moving the files to server'''
 #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
-file_list = [dst_folder + "probe0_preprocessed/provenance.json",
-            dst_folder + "probe1_preprocessed/provenance.json",
-            dst_folder + "probe0/waveform/kilosort4/recording.json",
-            dst_folder + "probe0/waveform/kilosort4/sorting.json",
-            dst_folder + "probe0/sorters/kilosort4/in_container_sorting/provenance.json",
-            dst_folder + "probe0/sorters/kilosort4/in_container_sorting/si_folder.json",
-            dst_folder + "probe1/waveform/kilosort4/recording.json",
-            dst_folder + "probe1/waveform/kilosort4/sorting.json",
-            dst_folder + "probe1/sorters/kilosort4/in_container_sorting/provenance.json",
-            dst_folder + "probe1/sorters/kilosort4/in_container_sorting/si_folder.json"]
+file_list = [save_folder + "probe0_preprocessed/provenance.json",
+            save_folder + "probe1_preprocessed/provenance.json",
+            save_folder + "probe0/waveform/kilosort4/recording.json",
+            save_folder + "probe0/waveform/kilosort4/sorting.json",
+            save_folder + 'probe0/sorters/kilosort4/spikeinterface_recording.json',
+            save_folder + "probe0/sorters/kilosort4/in_container_sorting/provenance.json",
+            save_folder + "probe0/sorters/kilosort4/in_container_sorting/si_folder.json",
+            
+            save_folder + "probe1/waveform/kilosort4/recording.json",
+            save_folder + "probe1/waveform/kilosort4/sorting.json",
+            save_folder + 'probe1/sorters/kilosort4/spikeinterface_recording.json',
+            save_folder + "probe1/sorters/kilosort4/in_container_sorting/provenance.json",
+            save_folder + "probe1/sorters/kilosort4/in_container_sorting/si_folder.json"]
 
 def replace_text(obj, to_replace, replace_with):
     if isinstance(obj, dict):
@@ -313,7 +337,7 @@ for files in file_list:
         data = json.load(f)
     
     # replace the text
-    data = replace_text(data, dst_folder[:-1], ephys_folder[:-1])
+    data = replace_text(data, save_folder[:-1], ephys_folder[:-1])
     
     # write the updated data back to the JSON file
     with open(files, 'w') as f:
@@ -341,10 +365,10 @@ for folder in folders_to_move:
     # construct the destination path
     destination = os.path.join(ephys_folder, folder)
     # copy the folder to the destination
-    shutil.copytree(dst_folder+folder, destination)
+    shutil.copytree(save_folder+folder, destination)
 #
 #remove all temmp files
-#    shutil.rmtree(dst_folder)
+shutil.rmtree(save_folder)
 
 print('All Done! Overall it took:')
 

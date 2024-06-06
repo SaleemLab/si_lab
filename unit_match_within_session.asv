@@ -2,7 +2,7 @@
 addpath(genpath('C:\Users\adam.tong\Documents\GitHub\UnitMatch'))
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
 mouses = ['M23031';'M23032';'M23034';'M23037';'M23038'];
-SESSION = {['20230711';'20230712';'20230713';'20230714'];
+SESSION = {['20230713';'20230714'];
     ['20230718';'20230719';'20230720';'20230721';'20230722'];
     ['20230804';'20230805';'20230806';'20230807'];
     ['20230810';'20230811';'20230812';'20230813'];
@@ -15,7 +15,7 @@ for iMouse = 1
     dates = SESSION{iMouse};
 for iDate = 1:size(dates,1)
     date = dates(iDate,:);
-    for no_probe = 1
+    for no_probe = 1:2
         ephys_folder = fullfile(base_folder,mouse,'ephys',date);
 
          UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
@@ -61,42 +61,42 @@ for iDate = 1:size(dates,1)
 
         unit_ids = ks3_sparsity.unit_ids;
 
-%         for iUnit = 1:length(unit_ids)
-%             waveform_channels = ks3_sparsity.unit_id_to_channel_ids.(['x',num2str(unit_ids(iUnit))]);
-%             % Assume 'cellArray' is your cell array
-% 
-% 
-%             % Initialize an empty matrix of the same size as the cell array
-%             waveform_channel_ids = zeros(size(waveform_channels));
-% 
-%             % Loop over the cell array
-%             for i = 1:numel(waveform_channels)
-%                 % Extract the number from the string using regexp
-% 
-%                 temp_channel_indices = strcmp(ks3_sparsity.channel_ids,waveform_channels{i});
-%                 waveform_channel_ids(i) = find(temp_channel_indices ==1);
-%             end
-%             unit_waveform_path = fullfile(ks3_waveform_path,['waveforms_',num2str(unit_ids(iUnit)),'.npy']);
-%             unit_waveform = readNPY(unit_waveform_path);
-%             unit_waveform = permute(unit_waveform,[2 3 1]);
-%             spikeMap = zeros(size(unit_waveform,1),no_channels,size(unit_waveform,3));
-% 
-%             spikeMap(:,waveform_channel_ids,:) = unit_waveform;
-%             spikeMapAvg = zeros(size(unit_waveform,1),no_channels,2);
-%             nwavs = size(spikeMap,3);
-%             for cv = 1:2
-%                 if cv==1
-%                     wavidx = floor(1:nwavs/2);
-%                 else
-%                     wavidx = floor(nwavs/2+1:nwavs);
-%                 end
-%                 spikeMapAvg(:,:,cv) = nanmedian(spikeMap(:,:,wavidx),3);
-%             end
-%             spikeMap = spikeMapAvg;
-% 
-%             %fetch the waveforms of the unit
-%             writeNPY(spikeMap, [UMparam.KSDir{1},'\RawWaveforms\','Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']);
-%         end
+        for iUnit = 1:length(unit_ids)
+            waveform_channels = ks3_sparsity.unit_id_to_channel_ids.(['x',num2str(unit_ids(iUnit))]);
+            % Assume 'cellArray' is your cell array
+
+
+            % Initialize an empty matrix of the same size as the cell array
+            waveform_channel_ids = zeros(size(waveform_channels));
+
+            % Loop over the cell array
+            for i = 1:numel(waveform_channels)
+                % Extract the number from the string using regexp
+
+                temp_channel_indices = strcmp(ks3_sparsity.channel_ids,waveform_channels{i});
+                waveform_channel_ids(i) = find(temp_channel_indices ==1);
+            end
+            unit_waveform_path = fullfile(ks3_waveform_path,['waveforms_',num2str(unit_ids(iUnit)),'.npy']);
+            unit_waveform = readNPY(unit_waveform_path);
+            unit_waveform = permute(unit_waveform,[2 3 1]);
+            spikeMap = zeros(size(unit_waveform,1),no_channels,size(unit_waveform,3));
+
+            spikeMap(:,waveform_channel_ids,:) = unit_waveform;
+            spikeMapAvg = zeros(size(unit_waveform,1),no_channels,2);
+            nwavs = size(spikeMap,3);
+            for cv = 1:2
+                if cv==1
+                    wavidx = floor(1:nwavs/2);
+                else
+                    wavidx = floor(nwavs/2+1:nwavs);
+                end
+                spikeMapAvg(:,:,cv) = nanmedian(spikeMap(:,:,wavidx),3);
+            end
+            spikeMap = spikeMapAvg;
+
+            %fetch the waveforms of the unit
+            writeNPY(spikeMap, [UMparam.KSDir{1},'\RawWaveforms\','Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']);
+        end
         
 
 
@@ -141,18 +141,17 @@ for iDate = 1:size(dates,1)
         for id_count = 1:length(unit_id)
             id = unit_id(id_count);
 
-            match_id = avgMatrix(id_count,:) >= 0.9;
+            match_id = avgMatrix(id_count,:) >= 0.85;
             if ~isnan(unit_peak_depths(id_count))
-                nearby_id = unit_peak_depths <= unit_peak_depths(id_count)+150 & unit_peak_depths>= unit_peak_depths(id_count) -150;
+            nearby_id = unit_peak_depths <= unit_peak_depths+200 & unit_peak_depths -200;
             else
-                nearby_id = false(size(unit_peak_depths));
-            end
+                nearby_id = false(size)
 
             if sum(match_id) > 0 
                 if merged_id(id_count) == id
-                    merged_id(match_id' & nearby_id) = id;
+                    merged_id(match_id) = id;
                 else
-                    merged_id(match_id' & nearby_id) = merged_id(id_count);
+                    merged_id(match_id) = merged_id(id_count);
                 end
             end
 
