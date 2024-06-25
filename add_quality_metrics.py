@@ -33,3 +33,6 @@ for date in dates:
     print(qm_list)
 
     probe1_ks4_metrics = si.compute_quality_metrics(probe1_we_ks4, metric_names=qm_list,**job_kwargs)
+    
+    
+    

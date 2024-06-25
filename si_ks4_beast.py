@@ -26,7 +26,7 @@ import spikeinterface.curation
 import spikeinterface.widgets 
 import docker
 from datetime import datetime
-mouse = 'M23028'
+mouse = 'M24019'
 dates = ['20230703','20230704','20230705','20230706']
 for date in dates:
     

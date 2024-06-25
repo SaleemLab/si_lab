@@ -145,7 +145,7 @@ for no_probe = 1:2
 
     end
     original_id = unit_id;
-    savepath = fullfile(base_folder,mouse,'analysis',date,['probe',num2str(no_probe)-1,'um_merge_suggestion.mat']);
+    savepath = fullfile(base_folder,mouse,'analysis',date,['probe',num2str(no_probe)-1,'um_merge_suggestion_ks4.mat']);
     match_ids =[original_id,merged_id,unstable_id];
     save(savepath,'match_ids');
 end
