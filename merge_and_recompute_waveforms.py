@@ -26,9 +26,9 @@ from datetime import datetime
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 mouse = 'M23034'
 dates = ['20230804','20230805','20230806','20230807']
-ephys_folder = base_folder + mouse + '/ephys/' + dates[3] +'/'
-analysis_folder = base_folder + mouse + '/analysis/' + dates[3] +'/'
-save_folder = base_folder + mouse + '/ephys/' + dates[3] +'/'
+ephys_folder = base_folder + mouse + '/ephys/' + dates[2] +'/'
+analysis_folder = base_folder + mouse + '/analysis/' + dates[2] +'/'
+save_folder = base_folder + mouse + '/ephys/' + dates[2] +'/'
 #awarkwardly, the path in the JSON file is different from the path in the folder
 #we need to replace the path in the JSON file to match the path in the folder
 def replace_text(obj, to_replace, replace_with):
@@ -60,7 +60,7 @@ for files in file_list:
     matching_strings = folder_path[start:end] + 'temp_data/'
 
     # replace the text
-    data = replace_text(data, matching_strings, ephys_folder)
+    data = replace_text(data, matching_strings, base_folder + mouse + '/ephys/')
     
     # write the updated data back to the JSON file
     with open(files, 'w') as f:
@@ -79,7 +79,7 @@ probe0_preprocessed_corrected = si.load_extractor(ephys_folder + 'probe0_preproc
 
 
 
-cs_probe0 = si.CurationSorting(parent_sorting=probe0_sorting_ks4)
+cs_probe0 = si.CurationSorting(probe0_sorting_ks4)
 unique_ids = np.unique(merge_ids)
 for id in unique_ids:
     id_count = np.count_nonzero(merge_ids == id)
@@ -91,14 +91,18 @@ for id in unique_ids:
 probe0_sorting_ks4_merged = cs_probe0.sorting
 probe0_sorting_ks4_merged.save(folder = ephys_folder + 'probe0/sorters/kilosort4_merged/')
 
-job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
+
+merge_suggestions = sio.loadmat(analysis_folder + 'probe1um_merge_suggestion.mat')
+match_ids = merge_suggestions['match_ids']
+merge_ids = match_ids[:,1]
+original_ids = match_ids[:,0]
 probe1_sorting_ks4 = si.read_sorter_folder(ephys_folder + 'probe1/sorters/kilosort4/')
 probe1_we_ks4 = si.load_waveforms(ephys_folder + 'probe1/waveform/kilosort4/') 
 probe1_preprocessed_corrected = si.load_extractor(ephys_folder + 'probe1_preprocessed/')
 #merge units
 
 
-cs_probe1 = si.CurationSorting(parent_sorting=probe1_sorting_ks4)
+cs_probe1 = si.CurationSorting(probe1_sorting_ks4)
 unique_ids = np.unique(merge_ids)
 for id in unique_ids:
     id_count = np.count_nonzero(merge_ids == id)
@@ -110,37 +114,32 @@ for id in unique_ids:
 probe1_sorting_ks4_merged = cs_probe1.sorting
 probe1_sorting_ks4_merged.save(folder = ephys_folder + 'probe1/sorters/kilosort4_merged/')
 ''' Compute quality metrics on the extracted waveforms'''
-probe0_we_ks4_merged = si.create_sorting_analyzer(probe0_preprocessed_corrected, probe0_sorting_ks4_merged, folder=save_folder +'probe0/waveform/kilosort4_merged',
-                        sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
+probe0_we_ks4_merged = si.create_sorting_analyzer(probe0_sorting_ks4_merged, probe0_preprocessed_corrected, 
+                        format = 'binary_folder',folder=save_folder +'probe0/waveform/kilosort4_merged',
+                        sparse = True,overwrite = True,
                         **job_kwargs)
 
-probe1_we_ks4_merged = si.create_sorting_analyzer(probe1_preprocessed_corrected, probe1_sorting_ks4_merged, folder=save_folder +'probe1/waveform/kilosort4_merged',
-                        sparse=True, max_spikes_per_unit=500, ms_before=1.5,ms_after=2.,
+probe1_we_ks4_merged = si.create_sorting_analyzer(probe1_sorting_ks4_merged, probe1_preprocessed_corrected, 
+                        format = 'binary_folder',folder=save_folder +'probe1/waveform/kilosort4_merged',
+                        sparse = True,overwrite = True,
                         **job_kwargs)
+extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
+probe0_we_ks4_merged.compute('random_spikes',**job_kwargs)
+probe1_we_ks4_merged.compute('random_spikes',**job_kwargs)
 
-probe0_we_ks4_merged.compute('waveforms')
-probe1_we_ks4_merged.compute('waveforms')
-
-probe0_we_ks4_merged.compute('template_metrics')
-probe1_we_ks4_merged.compute('template_metrics')
-
-probe0_we_ks4_merged.compute('noise_levels')
-probe1_we_ks4_merged.compute('noise_levels')
+probe0_we_ks4_merged.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
+probe1_we_ks4_merged.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
+probe0_we_ks4_merged.compute(extensions,**job_kwargs)
+probe1_we_ks4_merged.compute(extensions,**job_kwargs)
 
 probe0_we_ks4_merged.compute('principal_components',**job_kwargs)
 probe1_we_ks4_merged.compute('principal_components',**job_kwargs)
 
-probe0_we_ks4_merged.compute('template_similarity')
-probe1_we_ks4_merged.compute('template_similarity')
-
-probe0_we_ks4_merged.compute('correlograms')
-probe1_we_ks4_merged.compute('correlograms')
 
 probe0_we_ks4_merged.compute('spike_amplitudes',**job_kwargs)
 probe1_we_ks4_merged.compute('spike_amplitudes',**job_kwargs)
 
-probe0_we_ks4_merged.compute('isi_histograms')
-probe1_we_ks4_merged.compute('isi_histograms')
+
 
 qm_list = si.get_default_qm_params()
 print('The following quality metrics are computed:')
