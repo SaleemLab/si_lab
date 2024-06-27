@@ -25,12 +25,12 @@ startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
 mouse = 'M24017'
-dates = ['20240605/20240605_0']
-save_date = '20240605'
+dates = ['20240608/20240608_0','20240608/20240608_1']
+save_date = '20240608'
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = '/home/lab/spikeinterface_sorting/temp_data/'+save_date+'/'
 # get all the recordings on that day
-probe0_start_sample_frames = []
+probe0_start_sample_fames = []
 probe1_start_sample_frames = []
 probe0_end_sample_frames = []
 probe1_end_sample_frames = []
