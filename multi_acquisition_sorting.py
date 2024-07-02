@@ -24,11 +24,12 @@ import scipy.io as sio
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
-mouse = 'M24019'
-dates = ['20240626/20240626_0','20240608/20240626_2']
-save_date = '20240626'
+mouse = 'M24017'
+dates = ['20240608/20240608_0','20240608/20240608_1']
+save_date = '20240608'
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
-save_folder = '/home/lab/spikeinterface_sorting/temp_data/'+save_date+'/'
+save_base_folder = "/home/lab/spikeinterface_sorting/temp_data/"
+save_folder = save_base_folder +save_date+'/'
 # get all the recordings on that day
 probe0_start_sample_fames = []
 probe1_start_sample_frames = []
@@ -52,7 +53,7 @@ date_count = 0
 for date in dates:
     date_count = date_count + 1
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
-    dst_folder = "/home/lab/spikeinterface_sorting/temp_data/" + date + '/'
+    dst_folder =  save_base_folder + date + '/'
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     g_files = []
     # print('copying ephys data from:' + ephys_folder)
