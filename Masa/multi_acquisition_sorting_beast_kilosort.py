@@ -16,7 +16,6 @@ import spikeinterface.comparison
 import spikeinterface.exporters
 import spikeinterface.curation
 import spikeinterface.widgets 
-import docker
 from datetime import datetime
 import itertools
 
@@ -201,6 +200,11 @@ print(datetime.now() - startTime)
 
 '''save preprocessed bin file before sorting'''
 
+import pandas as pd
+probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
+probe0_segment_frames.to_csv(save_folder+'probe0/sorters/segment_frames.csv', index=False)
+probe1_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_end_sample_frames})
+probe1_segment_frames.to_csv(save_folder+'probe1/sorters/segment_frames.csv', index=False)
 
 #after saving, sorters will read this preprocessed binary file instead
 probe0_preprocessed_corrected = probe0_nonrigid_accurate.save(folder=save_folder+'probe0_preprocessed', format='binary', **job_kwargs)
@@ -241,11 +245,6 @@ print(probe1_sorting_ks4)
 print('Start to all sorting done:')
 print(datetime.now() - startTime)
 
-import pandas as pd
-probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
-probe0_segment_frames.to_csv(save_folder+'probe0/sorters/segment_frames.csv', index=False)
-probe1_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_end_sample_frames})
-probe1_segment_frames.to_csv(save_folder+'probe1/sorters/segment_frames.csv', index=False)
 
 
 ''' read sorters directly from the output folder - so you dont need to worry if something went wrong and you can't access the temp variables
