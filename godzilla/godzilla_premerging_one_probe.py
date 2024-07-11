@@ -25,9 +25,12 @@ startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
 import sys
+# The first command-line argument after the script name is the mouse identifier.
 mouse = sys.argv[1]
-dates = sys.argv[2] 
-save_date = sys.argv[3]
+# All command-line arguments after `mouse` and before `save_date` are considered dates.
+dates = sys.argv[2:-1]  # This captures all dates as a list.
+# The last command-line argument is `save_date`.
+save_date = sys.argv[-1]
 print(mouse)
 print(dates)
 print(save_date)
