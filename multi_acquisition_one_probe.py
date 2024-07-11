@@ -251,7 +251,7 @@ probe0_we_ks4_merged = si.create_sorting_analyzer(probe0_sorting_ks4_merged, pro
                         **job_kwargs)
 
 probe0_we_ks3_merged = si.create_sorting_analyzer(probe0_sorting_ks3_merged, probe0_preprocessed_corrected, 
-                        format = 'binary_folder',folder=save_folder +'probe1/waveform/kilosort4_merged',
+                        format = 'binary_folder',folder=save_folder +'probe0/waveform/kilosort3_merged',
                         sparse = True,overwrite = True,
                         **job_kwargs)
 extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
