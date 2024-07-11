@@ -61,7 +61,7 @@ for date in dates:
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     g_files = []
     print('copying ephys data from:' + ephys_folder)
-    for dirname in os.listdir(dst_folder):
+    for dirname in os.listdir(ephys_folder):
     #     # check if '_g' is in the directory name
     #     #only grab recording folders - there might be some other existing folders for analysis or sorted data
         if '_g' in dirname:
@@ -70,7 +70,7 @@ for date in dates:
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
-            #shutil.copytree(source, destination)
+            shutil.copytree(source, destination)
     print('Start to copying files to Beast:')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
