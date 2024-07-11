@@ -3,7 +3,7 @@
 # Define variables
 mouse='M24019'
 save_date='20240703'
-dates = ['20240703/20240703_0']
+dates = '20240703/20240703_0'
 base_folder='/home/saleem_lab/spikeinterface_sorting/temp_data/'  # Adjust this path if necessary
 
 # Navigate to the script directory
