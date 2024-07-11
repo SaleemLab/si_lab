@@ -70,7 +70,7 @@ for date in dates:
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
-            shutil.copytree(source, destination)
+            #shutil.copytree(source, destination)
     print('Start to copying files to Beast:')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
@@ -81,9 +81,9 @@ for date in dates:
     g_files_all = g_files_all + g_files
     print(g_files)
     print('all g files:',g_files_all) 
-    stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
-    print(stream_names)
-    print(stream_ids)
+    # stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
+    # print(stream_names)
+    # print(stream_ids)
     #load first probe from beast folder - MEC probe for Diao
     probe0_raw = si.read_spikeglx(dst_folder,stream_name='imec0.ap')
     print(probe0_raw)
