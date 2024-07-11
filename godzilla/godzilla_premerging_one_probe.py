@@ -25,10 +25,12 @@ startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
 import sys
-mouse = sys.argv[0]
-dates = sys.argv[1] 
-save_date = sys.argv[2]
-
+mouse = sys.argv[1]
+dates = sys.argv[2] 
+save_date = sys.argv[3]
+print(mouse)
+print(dates)
+print(save_date)
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = '/home/saleem_lab/spikeinterface_sorting/temp_data/'+save_date+'/'
 # get all the recordings on that day
@@ -45,7 +47,7 @@ def sorting_key(s):
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 
-
+print(dates)
 g_files_all = []
 # iterate over all directories in source folder
 date_count = 0
