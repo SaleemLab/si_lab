@@ -130,7 +130,7 @@ print('probe0_bad_channel_ids',bad_channel_ids)
 #this is nonrigid correction - need to do parallel computing to speed up
 #assign parallel processing as job_kwargs
 
-probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",**job_kwargs)
+probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat_all, preset="kilosort_like",**job_kwargs)
 
 print('Start to motion correction finished:')
 print(datetime.now() - startTime)
