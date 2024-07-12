@@ -130,7 +130,7 @@ print('probe0_bad_channel_ids',bad_channel_ids)
 #this is nonrigid correction - need to do parallel computing to speed up
 #assign parallel processing as job_kwargs
 
-probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat_all, preset="kilosort_like",**job_kwargs)
+#probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat_all, preset="kilosort_like",**job_kwargs)
 
 print('Start to motion correction finished:')
 print(datetime.now() - startTime)
@@ -142,7 +142,7 @@ print(datetime.now() - startTime)
 
 
 #after saving, sorters will read this preprocessed binary file instead
-probe0_preprocessed_corrected = probe0_nonrigid_accurate.save(folder=save_folder+'probe0_preprocessed', format='binary', **job_kwargs)
+probe0_preprocessed_corrected = probe0_cat_all.save(folder=save_folder+'probe0_preprocessed', format='binary', **job_kwargs)
 print('Start to prepocessed files saved:')
 print(datetime.now() - startTime)
 #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe0_preprocessed')
@@ -161,8 +161,8 @@ Beware that moutainsort5 is commented out as the sorter somehow stops midway wit
 #probe1_sorting_ks2_5 = si.run_sorter(sorter_name= 'kilosort2_5',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort2_5/',docker_image="spikeinterface/kilosort2_5-compiled-base:latest",do_correction=False)
 #probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort3/',docker_image="spikeinterface/kilosort3-compiled-base:latest",do_correction=False)
 #probe1_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort3/',docker_image="spikeinterface/kilosort3-compiled-base:latest",do_correction=False)
-probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe0/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False)
-probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe0/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest',do_correction=False)
+probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe0/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest')
+probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe0/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest')
 
 # probe0_sorting_ks2_5 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks2_5, censored_period_ms=0.3,method='keep_first')
 # probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks3, censored_period_ms=0.3,method='keep_first')
