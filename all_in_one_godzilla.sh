@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # Define variables
-mouse='M24019' #mouse id
-save_date='20240703' #date of recording
-dates='20240703/20240703_0' #acquisition date and session
+mouse='M24016' #mouse id
+save_date='20240709' #date of recording
+dates='20240709/20240709_0' #acquisition date and session
 base_folder='/home/saleem_lab/spikeinterface_sorting/temp_data/'  # local folder of godzilla
-no_probe=1 #number of probes you have in this session
+no_probe=2 #number of probes you have in this session
 
 # Run the first Python script with inputs
 python premerging.py $mouse $dates $save_date $base_folder $no_probe
