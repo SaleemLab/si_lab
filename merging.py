@@ -51,12 +51,12 @@ def sorting_key(s):
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 for probe in range(int(no_probe)):
     probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe'+str(probe)+'_preprocessed')
-    probe0_sorting_ks4 = si.load_sorting(save_folder + 'probe'+str(probe)+'/sorters/kilosort4')
-    probe0_sorting_ks3 = si.load_sorting(save_folder + 'probe'+str(probe)+'/sorters/kilosort3')
+    probe0_sorting_ks4 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort4')
+    probe0_sorting_ks3 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort3')
 
     merge_suggestions = sio.loadmat(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat')
     match_ids = merge_suggestions['match_ids']
-    merge_ids = match_ids[:,1]
+    merge_ids = match_ids[:,1] - 1
     cs_probe0 = si.CurationSorting(probe0_sorting_ks4)
     unique_ids = np.unique(merge_ids)
     original_ids = probe0_sorting_ks4.get_unit_ids()
@@ -72,7 +72,7 @@ for probe in range(int(no_probe)):
 
     merge_suggestions = sio.loadmat(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks3.mat')
     match_ids = merge_suggestions['match_ids']
-    merge_ids = match_ids[:,1]
+    merge_ids = match_ids[:,1] - 1
     cs_probe0 = si.CurationSorting(probe0_sorting_ks3)
     unique_ids = np.unique(merge_ids)
     original_ids = probe0_sorting_ks3.get_unit_ids()
