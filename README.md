@@ -3,30 +3,36 @@ Developed implementation of spikeinterface on Beast and Godzilla
 
 
 # Batch Processing in Background
-For batch processing, copy si_pipeline.py and modify the specified animal and date
 Before you run it in python, please enter the following command line on Beast:
 
-`ulimit -n 4096`
+`ulimit -n 10000`
 
 The waveform extraction process sometimes opens too many files and Linux has a default limit of 1024.
 
-For testing, do the following(remember to change the mouse and date in 'si_pipeline_beast.py' or 'si_pipeline_godzilla.py'):
+When you are in the terminal, activate the spikeinterface environment:
 
 `cd si_lab`
 
 `conda activate si_env`
 
-You should see (si_env) lab@saleem07: in your terminal.
+You should see **(si_env) lab@saleem07:** in your terminal.
 
-`ipython`
+Open ***all_in_one_xxx.sh*** shell script on github repo corresponding to the machine you will use.
 
-`run si_pipeline_beast.py`
 
-For background processing:
+First modify the pre-set variables, mouse, dates, save_date, kilosort versions, number of probes in the github repo.
 
-`nohup python si_pipeline_beast.py&`
 
-You can check the messages/errors of the script in the ouput file. Please kill the process when you finish
+Push your modifications and pull on the linux machines:
+
+`git pull`
+
+Now you can run the shell script in si_lab repo:
+
+`chmod +x all_in_one_godzilla.sh
+all_in_one_godzilla.sh > output.log 2> error.log`
+
+You can check the messages/errors of the script in the ouput + error files. Please kill the process when you finish.
 
 # Jupyter Notebook - Live Processes with Plotting
 On Beast:
@@ -45,7 +51,7 @@ Open Jupyter notebook:
 
 `si_with_visualisation_offline_beast.ipy`
 # What Does This Pipeline Do?
-
+Steps 1-10 are in premerging.py file and step 11 uses unitmatch matlab scripts and laters steps in merging.py
 1. Files are moved to local linux machine for offline processing.
 2. Apply several steps of preprocessing:
      Highpass filter at 300Hz
@@ -63,7 +69,9 @@ Open Jupyter notebook:
 8. Remove duplicate units from sortings
 9. Compare sorters - generate agreement score matrix and a plot inside ~/probe0/sorters/
 10. Extract waveforms from individual sorting output folder (under folders ~/probe0/waveform/kilosort3/)
-11. Compute metrics under folders ~/probe0/waveform/kilosort3/:
+11. Compute possible to-be-merged units using Unitmatch.
+12. Merge units and recompute waveforms.
+13. Compute metrics under folders ~/probe0/waveform/kilosort3_merged/extensions/:
       template metrics - peak_to_valley; peak_trough_ratio; halfwidth; repolarization_slope; recovery_slope; num_positive_peaks; num_negative_peaks
       noise levels
       PCA
@@ -74,8 +82,8 @@ Open Jupyter notebook:
       spike locations
       isi histograms
 
-12. Compute quality metrics same as 11
-13. Auto + manual curation based on metrics and phy (to be decided and developed)
+14. Compute quality metrics same as 11
+15. Auto + manual curation based on metrics and phy (to be decided and developed)
 
 # Post-Sorting Analysis Keypoints
 
