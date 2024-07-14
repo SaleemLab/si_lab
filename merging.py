@@ -102,7 +102,7 @@ for probe in range(int(no_probe)):
         ''' Compute quality metrics on the extracted waveforms'''
 
         probe0_we_ks3_merged = si.create_sorting_analyzer(probe0_sorting_ks3_merged, probe0_preprocessed_corrected, 
-                                format = 'binary_folder',folder=save_folder +'probe0'+str(probe)+'waveform/kilosort3_merged',
+                                format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort3_merged',
                                 sparse = True,overwrite = True,
                                 **job_kwargs)
         probe0_we_ks3_merged.compute('random_spikes')
