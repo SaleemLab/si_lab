@@ -36,7 +36,7 @@ no_probe = sys.argv[5]
 print(mouse)
 print(dates)
 print(save_date)
-use_ks4 = False
+use_ks4 = True
 use_ks3 = True
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + save_date +'/'
