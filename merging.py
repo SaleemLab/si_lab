@@ -34,6 +34,8 @@ dates = sys.argv[2:3]  # This captures all dates as a list.
 save_date = sys.argv[3]
 local_folder = sys.argv[4]
 no_probe = sys.argv[5]
+use_ks4 = False
+use_ks3 = True
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder +save_date+'/'
 # get all the recordings on that day
@@ -47,78 +49,71 @@ def sorting_key(s):
 
 #grab recordings from the server to local machine (Beast)
 
-
+extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 for probe in range(int(no_probe)):
     probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe'+str(probe)+'_preprocessed')
-    probe0_sorting_ks4 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort4')
-    probe0_sorting_ks3 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort3')
-
-    merge_suggestions = sio.loadmat(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat')
-    match_ids = merge_suggestions['match_ids']
-    merge_ids = match_ids[:,1] - 1
-    cs_probe0 = si.CurationSorting(probe0_sorting_ks4)
-    unique_ids = np.unique(merge_ids)
-    original_ids = probe0_sorting_ks4.get_unit_ids()
-    for id in unique_ids:
-        id_count = np.count_nonzero(merge_ids == id)
-        if id_count > 1:
-            unit_index = merge_ids == id
-            cs_probe0.merge(original_ids[unit_index])
-            
-    probe0_sorting_ks4_merged = cs_probe0.sorting
-    probe0_sorting_ks4_merged.save(folder = save_folder + 'probe'+str(probe)+'/sorters/kilosort4_merged/')
-
-
-    merge_suggestions = sio.loadmat(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks3.mat')
-    match_ids = merge_suggestions['match_ids']
-    merge_ids = match_ids[:,1] - 1
-    cs_probe0 = si.CurationSorting(probe0_sorting_ks3)
-    unique_ids = np.unique(merge_ids)
-    original_ids = probe0_sorting_ks3.get_unit_ids()
-    for id in unique_ids:
-        id_count = np.count_nonzero(merge_ids == id)
-        if id_count > 1:
-            unit_index = merge_ids == id
-            cs_probe0.merge(original_ids[unit_index])
-            
-    probe0_sorting_ks3_merged = cs_probe0.sorting
-    probe0_sorting_ks3_merged.save(folder = save_folder + 'probe'+str(probe)+'/sorters/kilosort3_merged/')
-
-
-    ''' Compute quality metrics on the extracted waveforms'''
-    probe0_we_ks4_merged = si.create_sorting_analyzer(probe0_sorting_ks4_merged, probe0_preprocessed_corrected, 
+    if use_ks4:
+        probe0_sorting_ks4 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort4')
+        merge_suggestions = sio.loadmat(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat')
+        match_ids = merge_suggestions['match_ids']
+        merge_ids = match_ids[:,1] - 1
+        cs_probe0 = si.CurationSorting(probe0_sorting_ks4)
+        unique_ids = np.unique(merge_ids)
+        original_ids = probe0_sorting_ks4.get_unit_ids()
+        for id in unique_ids:
+            id_count = np.count_nonzero(merge_ids == id)
+            if id_count > 1:
+                unit_index = merge_ids == id
+                cs_probe0.merge(original_ids[unit_index])
+                
+        probe0_sorting_ks4_merged = cs_probe0.sorting
+        probe0_sorting_ks4_merged.save(folder = save_folder + 'probe'+str(probe)+'/sorters/kilosort4_merged/')
+        probe0_we_ks4_merged = si.create_sorting_analyzer(probe0_sorting_ks4_merged, probe0_preprocessed_corrected, 
                             format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4_merged',
                             sparse = True,overwrite = True,
                             **job_kwargs)
+        probe0_we_ks4_merged.compute('random_spikes')
+        probe0_we_ks4_merged.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
+        probe0_we_ks4_merged.compute(extensions,**job_kwargs)
+        probe0_we_ks4_merged.compute('principal_components',**job_kwargs)
+        probe0_we_ks4_merged.compute('spike_amplitudes',**job_kwargs)
+        qm_list = si.get_default_qm_params()
+        print(qm_list)
+        probe0_we_ks4_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        
+        
+    if use_ks3:
+        probe0_sorting_ks3 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort3')
+        merge_suggestions = sio.loadmat(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks3.mat')
+        match_ids = merge_suggestions['match_ids']
+        merge_ids = match_ids[:,1] - 1
+        cs_probe0 = si.CurationSorting(probe0_sorting_ks3)
+        unique_ids = np.unique(merge_ids)
+        original_ids = probe0_sorting_ks3.get_unit_ids()
+        for id in unique_ids:
+            id_count = np.count_nonzero(merge_ids == id)
+            if id_count > 1:
+                unit_index = merge_ids == id
+                cs_probe0.merge(original_ids[unit_index])
+                
+        probe0_sorting_ks3_merged = cs_probe0.sorting
+        probe0_sorting_ks3_merged.save(folder = save_folder + 'probe'+str(probe)+'/sorters/kilosort3_merged/')
+        ''' Compute quality metrics on the extracted waveforms'''
 
-    probe0_we_ks3_merged = si.create_sorting_analyzer(probe0_sorting_ks3_merged, probe0_preprocessed_corrected, 
-                            format = 'binary_folder',folder=save_folder +'probe0'+str(probe)+'waveform/kilosort3_merged',
-                            sparse = True,overwrite = True,
-                            **job_kwargs)
-    extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
-    probe0_we_ks4_merged.compute('random_spikes')
-    probe0_we_ks3_merged.compute('random_spikes')
-
-    probe0_we_ks4_merged.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-    probe0_we_ks3_merged.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-    probe0_we_ks4_merged.compute(extensions,**job_kwargs)
-    probe0_we_ks3_merged.compute(extensions,**job_kwargs)
-
-    probe0_we_ks4_merged.compute('principal_components',**job_kwargs)
-    probe0_we_ks3_merged.compute('principal_components',**job_kwargs)
-
-
-    probe0_we_ks4_merged.compute('spike_amplitudes',**job_kwargs)
-    probe0_we_ks3_merged.compute('spike_amplitudes',**job_kwargs)
-
-
-
-    qm_list = si.get_default_qm_params()
-    print('The following quality metrics are computed:')
-    print(qm_list)
-    probe0_we_ks4_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
-    probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        probe0_we_ks3_merged = si.create_sorting_analyzer(probe0_sorting_ks3_merged, probe0_preprocessed_corrected, 
+                                format = 'binary_folder',folder=save_folder +'probe0'+str(probe)+'waveform/kilosort3_merged',
+                                sparse = True,overwrite = True,
+                                **job_kwargs)
+        probe0_we_ks3_merged.compute('random_spikes')
+        probe0_we_ks3_merged.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
+        probe0_we_ks3_merged.compute(extensions,**job_kwargs)
+        probe0_we_ks3_merged.compute('principal_components',**job_kwargs)  
+        probe0_we_ks3_merged.compute('spike_amplitudes',**job_kwargs)
+        qm_list = si.get_default_qm_params()
+        print('The following quality metrics are computed:')
+        print(qm_list)
+        probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
 
 
 
