@@ -2,7 +2,7 @@
 addpath(genpath('~/si_lab'))
 %base_folder = '/home/saleem_lab/spikeinterface_sorting/temp_data/';
 
-for no_probe = 1:noprobe
+for no_probe = 1:str2doulbe(noprobe)
     ephys_folder = fullfile(base_folder,date);
 
     UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
