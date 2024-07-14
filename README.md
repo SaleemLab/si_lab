@@ -29,8 +29,9 @@ Push your modifications and pull on the linux machines:
 
 Now you can run the shell script in si_lab repo:
 
-`chmod +x all_in_one_godzilla.sh
-all_in_one_godzilla.sh > output.log 2> error.log`
+`chmod +x all_in_one_godzilla.sh`
+
+`all_in_one_godzilla.sh > output.log 2> error.log`
 
 You can check the messages/errors of the script in the ouput + error files. Please kill the process when you finish.
 
