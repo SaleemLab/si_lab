@@ -34,8 +34,8 @@ dates = sys.argv[2:3]  # This captures all dates as a list.
 save_date = sys.argv[3]
 local_folder = sys.argv[4]
 no_probe = sys.argv[5]
-use_ks4 = True
-use_ks3 = True
+use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
+use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder +save_date+'/'
 # get all the recordings on that day

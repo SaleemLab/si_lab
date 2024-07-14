@@ -36,8 +36,8 @@ no_probe = sys.argv[5]
 print(mouse)
 print(dates)
 print(save_date)
-use_ks4 = True
-use_ks3 = True
+use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
+use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + save_date +'/'
 # get all the recordings on that day
@@ -155,7 +155,7 @@ for probe in range(int(no_probe)):
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
     #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe0_preprocessed')
-    #probe1_preprocessed_corrected = si.load_extractor(save_folder+'/probe1_preprocessed')
+    #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe1_preprocessed')
     ''' prepare sorters - currently using the default parameters and motion correction is turned off as it was corrected already above
         you can check if the parameters using:
         params = get_default_sorter_params('kilosort3')
@@ -173,7 +173,7 @@ for probe in range(int(no_probe)):
         sample_index = spikes['sample_index']
         spikes_df = pd.DataFrame({'unit_index':unit_index,'segment_index':segment_index,'sample_index':sample_index})
         spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
-        
+
     #probe0_sorting_ks2_5 = si.run_sorter(sorter_name= 'kilosort2_5',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort2_5/',docker_image="spikeinterface/kilosort2_5-compiled-base:latest",do_correction=False)
     #probe1_sorting_ks2_5 = si.run_sorter(sorter_name= 'kilosort2_5',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort2_5/',docker_image="spikeinterface/kilosort2_5-compiled-base:latest",do_correction=False)
     #probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort3/',docker_image="spikeinterface/kilosort3-compiled-base:latest",do_correction=False)
