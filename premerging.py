@@ -41,8 +41,7 @@ use_ks3 = True
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + save_date +'/'
 # get all the recordings on that day
-probe0_start_sample_fames = []
-probe0_end_sample_frames = []
+
 import os
 import subprocess
 subprocess.run('ulimit -n 4096',shell=True)
@@ -90,6 +89,8 @@ for date in dates:
     # print(stream_ids)
 for probe in range(int(no_probe)):
     date_count = 0
+    probe0_start_sample_fames = []
+    probe0_end_sample_frames = []
     for date in dates:
         date_count = date_count + 1
         probe_name = 'imec' + str(probe) + '.ap'
