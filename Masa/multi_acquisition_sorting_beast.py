@@ -60,47 +60,6 @@ for date in dates:
     g_files = []
     # print('copying ephys data from:' + ephys_folder)
     for dirname in os.listdir(ephys_folder):
-        # ignore some folders or files includiing tcat and other G files (such as checkerboard recordings)
-        if any(ignore_str in dirname for ignore_str in g_files_to_ignore):
-            continue
-        # check if '_g' is in the directory name
-        # only grab recording folders - there might be some other existing folders for analysis or sorted data
-        if '_g' in dirname:
-            # construct full directory path
-            g_files.append(dirname)
-            source = os.path.join(ephys_folder, dirname)
-            destination = os.path.join(dst_folder, dirname)
-            # copy the directory to the destination folder
-            # shutil.copytree(source, destination)
-    print('Start to copying files to Beast:')
-    print(datetime.now() - startTime)
-    ''' read spikeglx recordings and preprocess them'''
-    # Define a custom sorting key that extracts the number after 'g'
-
-    # Sort the list using the custom sorting key
-    g_files = sorted(g_files, key=sorting_key)
-    g_files_all = g_files_all + g_files
-    print(g_files)
-    print('all g files:', g_files_all)
-    stream_names, stream_ids = si.get_neo_streams('spikeglx', dst_folder)
-    print(stream_names)
-    print(stream_ids)
-    # load first probe from beast folder - MEC probe for Diao
-    probe0_raw = si.read_spikeglx(dst_folder, stream_name='imec0.ap')
-    print(probe0_raw)
-    # Load second probe - V1 probe
-    probe1_raw = si.read_spikeglx(dst_folder, stream_name='imec1.ap')
-    print(probe1_raw)
-
-    probe0_num_segments = [probe0_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
-    probe1_num_segments = [probe1_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
-
-    probe0_end_sample_frames_tmp = list(itertools.accumulate(probe0_num_segments))
-    if date_count == 1:
-        probe0_start_sample_frames = [1] + [probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments) - 1)]
-        probe0_end_sample_frames = probe0_end_sample_frames + probe0_end_sample_frames_tmp
-    else:
-        probe0_start_sample_frames = probe0_start_sample_frames + [probe0_end_sample_frames[-1] + 1] +
     #     # check if '_g' is in the directory name
     #     #only grab recording folders - there might be some other existing folders for analysis or sorted data
         if '_g' in dirname:
@@ -207,6 +166,7 @@ probe0_segment_frames.to_csv(save_folder+'probe0/sorters/segment_frames.csv', in
 probe1_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe1_start_sample_frames, 'segment end frame': probe1_end_sample_frames})
 probe1_segment_frames.to_csv(save_folder+'probe1/sorters/segment_frames.csv', index=False)
 
+
 #after saving, sorters will read this preprocessed binary file instead
 probe0_preprocessed_corrected = probe0_nonrigid_accurate.save(folder=save_folder+'probe0_preprocessed', format='binary', **job_kwargs)
 probe1_preprocessed_corrected = probe1_nonrigid_accurate.save(folder=save_folder+'probe1_preprocessed', format='binary', **job_kwargs)
@@ -245,7 +205,6 @@ print(probe0_sorting_ks4)
 print(probe1_sorting_ks4)
 print('Start to all sorting done:')
 print(datetime.now() - startTime)
-
 
 
 ''' read sorters directly from the output folder - so you dont need to worry if something went wrong and you can't access the temp variables
