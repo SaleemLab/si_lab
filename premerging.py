@@ -217,3 +217,4 @@ for probe in range(int(no_probe)):
         This section reads sorter outputs and extract waveforms 
     '''
 
+sys.exit(0)

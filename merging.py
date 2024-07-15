@@ -191,3 +191,5 @@ print('All Done! Overall it took:')
 
 print(datetime.now() - startTime)
 print('to finish! Please move the files to the server as soon as you have time!')
+
+sys.exit(0)
