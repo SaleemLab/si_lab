@@ -28,7 +28,7 @@ import sys
 # The first command-line argument after the script name is the mouse identifier.
 mouse = sys.argv[1]
 # All command-line arguments after `mouse` and before `save_date` are considered dates.
-dates = sys.argv[2:3]  # This captures all dates as a list.
+dates = sys.argv[2].split(',')   # This captures all dates as a list.
 # The last command-line argument is `save_date`.
 save_date = sys.argv[3]
 local_folder = sys.argv[4]
