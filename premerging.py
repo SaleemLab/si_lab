@@ -34,7 +34,7 @@ save_date = sys.argv[3]
 local_folder = sys.argv[4]
 no_probe = sys.argv[5]
 print(mouse)
-print(dates)
+print('acquisition folder: ',dates)
 print(save_date)
 use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
@@ -58,6 +58,7 @@ g_files_all = []
 # iterate over all directories in source folder
 date_count = 0
 for date in dates:
+    print('acquisition folder:',date)
     date_count = date_count + 1
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     dst_folder = local_folder + date + '/'
