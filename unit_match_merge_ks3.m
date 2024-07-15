@@ -1,9 +1,9 @@
 %% Unitmatch DT implementation
 addpath(genpath('~/si_lab'))
-base_folder = 'mnt/rds01/ibn-vision/DATA/SUBJECTS/';
 
-for no_probe = 1:2
-    ephys_folder = fullfile(base_folder,mouse,'ephys',date);
+
+for no_probe = 1:str2double(noprobe)
+    ephys_folder = fullfile(base_folder,date);
 
     UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort3','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
     % N.B. if you want to use the functional score evaluation of UnitMatch, 'KSDir' should also contain typical 'Kilosort output', (e.g. spike times etc.)
@@ -33,42 +33,28 @@ for no_probe = 1:2
     %% convert spikeinterface waveforms to unit match version in kilosort folder
 
     % Specify the file path
-    ks_sparsity_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform','kilosort3','sparsity.json');
-    ks_waveform_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform','kilosort3','waveforms');
-
+    ks_random_spikes = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform','kilosort3','extensions','random_spikes','random_spikes_indices.npy');
+    ks_waveform_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform','kilosort3','extensions','waveforms','waveforms.npy');
+    ks_spikes_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort3','in_container_sorting','spikes.csv');
+    ks_sparsity_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform','kilosort3','sparsity_mask.npy');
+    ks_sparsity = readNPY(ks_sparsity_path);
     ks_raw_waveform_path =fullfile(UMparam.KSDir,'RawWaveforms');
     mkdir(ks_raw_waveform_path{1});
-    % Load the JSON file
-    fileID = fopen(ks_sparsity_path);
-    rawData = fread(fileID, inf);
-    strData = char(rawData');
-    fclose(fileID);
-    no_channels = size(UMparam.AllChannelPos{1},1);
-    ks_sparsity = jsondecode(strData);
-
-    unit_ids = ks_sparsity.unit_ids;
-
+    random_spikes = readNPY(ks_random_spikes);
+    waveforms = readNPY(ks_waveform_path);
+    spikes = readmatrix(ks_spikes_path);
+    random_spike_ids = spikes(random_spikes+1,1);
+    unit_ids = unique(spikes(:,1));
+    no_channels = size(ks_sparsity,2);
     for iUnit = 1:length(unit_ids)
-        waveform_channels = ks_sparsity.unit_id_to_channel_ids.(['x',num2str(unit_ids(iUnit))]);
+        waveform_channel_ids = ks_sparsity(iUnit,:);
         % Assume 'cellArray' is your cell array
-
-
-        % Initialize an empty matrix of the same size as the cell array
-        waveform_channel_ids = zeros(size(waveform_channels));
-
-        % Loop over the cell array
-        for i = 1:numel(waveform_channels)
-            % Extract the number from the string using regexp
-
-            temp_channel_indices = strcmp(ks_sparsity.channel_ids,waveform_channels{i});
-            waveform_channel_ids(i) = find(temp_channel_indices ==1);
-        end
-        unit_waveform_path = fullfile(ks_waveform_path,['waveforms_',num2str(unit_ids(iUnit)),'.npy']);
-        unit_waveform = readNPY(unit_waveform_path);
+        unit_random_spikes = random_spike_ids == unit_ids(iUnit);
+        unit_waveform = waveforms(unit_random_spikes,:,:);
         unit_waveform = permute(unit_waveform,[2 3 1]);
         spikeMap = zeros(size(unit_waveform,1),no_channels,size(unit_waveform,3));
 
-        spikeMap(:,waveform_channel_ids,:) = unit_waveform;
+        spikeMap(:,waveform_channel_ids,:) = unit_waveform(:,1:sum(waveform_channel_ids),:);
         spikeMapAvg = zeros(size(unit_waveform,1),no_channels,2);
         nwavs = size(spikeMap,3);
         for cv = 1:2
@@ -93,7 +79,7 @@ for no_probe = 1:2
     clusinfo.RecSesID = ones(size(unit_ids));
     UMparam = DefaultParametersUnitMatch(UMparam);
     UMparam.GoodUnitsOnly = 0;
-    UMparam.spikeWidth = 105;
+    UMparam.spikeWidth = 90;
     % Params = struct;
     % Params = DefaultParametersExtractKSData(Params,UMparam.KSDir{1});
     % Params.DecompressLocal = 0; Params.RunQualityMetrics = 0;
@@ -145,7 +131,7 @@ for no_probe = 1:2
 
     end
     original_id = unit_id;
-    savepath = fullfile(base_folder,mouse,'analysis',date,['probe',num2str(no_probe)-1,'um_merge_suggestion_ks3.mat']);
+    savepath = fullfile(base_folder,date,['probe',num2str(no_probe)-1,'um_merge_suggestion_ks3.mat']);
     match_ids =[original_id,merged_id,unstable_id];
     save(savepath,'match_ids');
 end
