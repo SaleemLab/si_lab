@@ -203,3 +203,14 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+#sorter_folder = save_folder+'probe1/sorters/'
+# check whether directory already exists
+#if not os.path.exists(sorter_folder):
+#  os.mkdir(save_folder+'probe0/sorters/)
+#  os.mkdir(save_folder+'probe1/sorters/)
+#  print("Folder %s created!" % path)
+#else:
+#  print("Folder %s already exists" % path)
