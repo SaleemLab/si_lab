@@ -19,6 +19,7 @@ import spikeinterface.widgets
 import docker
 from datetime import datetime
 import itertools
+from spikeinterface.exporters import export_report
 
 import scipy.io as sio
 startTime = datetime.now()
@@ -81,6 +82,7 @@ for probe in range(int(no_probe)):
         qm_list = si.get_default_qm_params()
         print(qm_list)
         probe0_we_ks4_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        export_report(sorting_analyzer=probe0_we_ks4_merged, output_folder=save_folder +'probe'+str(probe)+'/report/kilosort4_merged')
         
         
     if use_ks3:
@@ -114,7 +116,7 @@ for probe in range(int(no_probe)):
         print('The following quality metrics are computed:')
         print(qm_list)
         probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
-
+        export_report(sorting_analyzer=probe0_we_ks3_merged, output_folder=save_folder +'probe'+str(probe)+'/report/kilosort3_merged')
 
 
     '''minor corrections to the folder path of files before moving the files to server'''
