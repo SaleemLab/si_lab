@@ -79,7 +79,7 @@ for no_probe = 1:str2double(noprobe)
     clusinfo.RecSesID = ones(size(unit_ids));
     UMparam = DefaultParametersUnitMatch(UMparam);
     UMparam.GoodUnitsOnly = 0;
-    UMparam.spikeWidth = 90;
+    UMparam.spikeWidth = size(spikeMap,1);
     % Params = struct;
     % Params = DefaultParametersExtractKSData(Params,UMparam.KSDir{1});
     % Params.DecompressLocal = 0; Params.RunQualityMetrics = 0;
