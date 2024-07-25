@@ -1,56 +1,78 @@
 
-import shutil
+
+
 import os
-import subprocess
+import shutil
 from datetime import datetime
-
-#subprocess.run('ulimit -n 4096',shell=True)
-def sorting_key(s):
-    return int(s.split('_g')[-1])
-
-mouse='M24019' #mouse id
-save_date='20240710' #date of recording
-dates='20240716/20240716_0,20240716/20240716_2' #acquisition date and session, e.g. dates='20240624/20240624_0,20240624/20240624_1'
-dates = dates.split(',')   # This captures all dates as a list.
-
-base_folder='D:/TestData/'  # local folder of godzilla
-local_folder = base_folder
-print(mouse)
-print('acquisition folder: ',dates)
-print(save_date)
 
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
+import sys
 
+# The first command-line argument after the script name is the mouse identifier.
+mouse='M24019' #mouse id
+save_date='20240626' #date of recording
+dates='20240626/20240626_0,20240626/20240626_2' #acquisition date and session e.g. dates='20240624/20240624_0,20240624/20240624_1'
+base_folder='/home/lab/spikeinterface_sorting/temp_data/'  # Adjust this path if necessary
+local_folder = base_folder
+no_probe=1 #number of probes you have in this session
 
+# The first command-line argument after the script name is the mouse identifier.
+#ouse = sys.argv[1]
+# All command-line arguments after `mouse` and before `save_date` are considered dates.
+#dates = sys.argv[2].split(',')   # This captures all dates as a list.
+# The last command-line argument is `save_date`.
+#save_date = sys.argv[3]
+#local_folder = sys.argv[4]
+#no_probe = sys.argv[5]
+print(mouse)
+print('acquisition folder: ',dates)
+#use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
+#use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
+base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 
+print(mouse)
 print(dates)
-g_files_all = []
-# iterate over all directories in source folder
+print(save_date)
+
+save_folder = local_folder+ mouse +"/"
+print('save folder: ',save_folder)
+dates = dates.split(',')
 date_count = 0
+
 for date in dates:
     print('acquisition folder:',date)
     date_count = date_count + 1
-    ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
-    dst_folder = local_folder + date + '/'
-    ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
-    g_files = []
-    print('copying ephys data from:' + ephys_folder)
-    for dirname in os.listdir(ephys_folder):
-    #     # check if '_g' is in the directory name
-    #     #only grab recording folders - there might be some other existing folders for analysis or sorted data
-        if '_g' in dirname:
-    #         # construct full directory path
-            g_files.append(dirname)
-            source = os.path.join(ephys_folder, dirname)
-            destination = os.path.join(dst_folder, dirname)
-            # copy the directory to the destination folder
-            #shutil.copytree(source, destination)
+    ephys_folder = save_folder + date
+    print('dirtet: ',ephys_folder)
 
-            g_files = sorted(g_files, key=sorting_key)
-            g_files_all = g_files_all + g_files
-            print(g_files)
-            print('all g files:', g_files_all)
+    runName = date.split('/')
+    runName = mouse + '_' +runName[1]
+    print('rn: ', runName)
+
+    cmdStr = 'runit.bat ' + "'" \
+             + '-dir=' + ephys_folder + ' -run=' + runName  \
+             + ' -g0,100' + ' -t=0' + ' -t_miss_ok' \
+             + ' -prb_fld' + ' -out_prb_fld' + ' -ap' + ' -ni' + ' -prb=0:1' + ' -prb_miss_ok' \
+             + ' -dest=' + save_folder + "'"
 
 
+    print(cmdStr)
+
+
+
+
+# get all the recordings on that day
+
+# pass 1 - run CatGT with minimal params on each acquisition (parallel)
+# pass 2 - run CatGT supercat on catGT outputs
+
+
+
+#.\runit.bat
+#-dir=D:\TestData\M24019\ephys\20240716\20240716_0
+#-run=M24019_20240716_0
+#-g='0,100' -t=0 -t_miss_ok
+#-prb_fld -out_prb_fld -ap -ni -prb='0:1' -prb_miss_ok
+#-dest=D:\TestData\
 

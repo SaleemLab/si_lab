@@ -2,7 +2,7 @@
 
 # Define variables
 mouse='M24019' #mouse id
-save_date='20240624' #date of recording
+save_date='20240626' #date of recording
 dates='20240626/20240626_0,20240626/20240626_2' #acquisition date and session e.g. dates='20240624/20240624_0,20240624/20240624_1'
 base_folder='/home/lab/spikeinterface_sorting/temp_data/'  # Adjust this path if necessary
 no_probe=1 #number of probes you have in this session
