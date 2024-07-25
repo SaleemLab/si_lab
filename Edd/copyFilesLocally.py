@@ -58,7 +58,7 @@ for date in dates:
     print('acquisition folder:',date)
     date_count = date_count + 1
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
-    dst_folder = local_folder + date + '/'
+    dst_folder = save_folder
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     g_files = []
     print('copying ephys data from:' + ephys_folder)
