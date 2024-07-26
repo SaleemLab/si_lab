@@ -46,7 +46,7 @@ pathToRunit = 'home/lab/CatGT-linux/runit.sh'
 pathToRunit = 'C:/Users/edward.horrocks/Documents/Code/CatGT-win/runit.bat'
 
 
-osCommands = [];
+osCommands = []
 
 for date in dates:
     print('acquisition folder:',date)
