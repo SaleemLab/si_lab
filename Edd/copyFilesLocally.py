@@ -31,6 +31,7 @@ date_count = 0
 for date in dates:
     date_count = date_count + 1
     ephys_folder = server_path + mouse + '/ephys/' + date + '/'
+    save_folder = local_folder + mouse + "/" + date + '/'
     print('copying ephys data from: ', ephys_folder, ' to: ', save_folder)
     copy_tree(ephys_folder, save_folder)
 
