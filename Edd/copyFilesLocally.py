@@ -3,6 +3,7 @@
 import shutil
 from datetime import datetime
 import sys
+from distutils.dir_util import copy_tree
 
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
@@ -25,16 +26,13 @@ save_folder = local_folder + mouse + "/" + save_date + "/"
 print('Local directory location: ', save_folder)
 
 
-#grab recordings from the server to local machine
-print(dates)
-g_files_all = []
-# iterate over all directories in source folder
+# move requeted acquisition directories to local machine
 date_count = 0
 for date in dates:
     date_count = date_count + 1
     ephys_folder = server_path + mouse + '/ephys/' + date + '/'
     print('copying ephys data from: ', ephys_folder, ' to: ', save_folder)
-    shutil.copytree(ephys_folder, save_folder)
+    copy_tree(ephys_folder, save_folder)
 
 print('Time to copy files to local folder: ')
 print(datetime.now() - startTime)
