@@ -13,5 +13,6 @@ use_ks3=true #use kilosort3
 # Copy files from server to local drive
 #python copyFilesLocally.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
 
-python runCatGT.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
+#python runCatGT.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
 
+python runSpikeSorting.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
