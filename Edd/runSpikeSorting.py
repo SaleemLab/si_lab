@@ -28,7 +28,8 @@ import sys
 
 import os
 import subprocess
-
+print('import time:')
+print(datetime.now()-startTime)
 subprocess.run('ulimit -n 4096', shell=True)
 
 
@@ -100,73 +101,56 @@ if nAcq > 1:
     print(outDir)
     save_folder = outDir
 
+
 for probe in range(int(no_probe)):
 
-    # load the probe
-    print('probe #: ', probe)
-    probe_name = 'imec' + str(probe) + '.ap'
-    probe_raw = si.read_spikeglx(outDir, stream_name=probe_name)
-    print(probe_raw)
-
-    # pre-processing steps
-    # highpass filter - threhsold at 300Hz
-    probe_highpass = si.highpass_filter(probe_raw, freq_min=300.)
-
-    # detect and remove bad channels
-    bad_channel_ids, channel_labels = si.detect_bad_channels(probe_highpass)
-    probe_bad_channels = probe_highpass.remove_channels(bad_channel_ids)
-    print('probe_bad_channel_ids', bad_channel_ids)
-
-    # phase shift correction - equivalent to T-SHIFT in catGT
-    probe_phase_shift = si.phase_shift(probe_bad_channels)
-    probe_common_reference = si.common_reference(probe_phase_shift, operator='median', reference='global')
-
-    probe0_preprocessed_corrected = probe_common_reference
-    probe0_preprocessed_corrected = probe_raw
-    # print(probe0_preprocessed_corrected)
-
-    # save pre-processed catenated file
-    # probe0_preprocessed_corrected = probe_common_reference.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
+    # load the pre-processed probe
+    probe_processed = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+    print(probe_processed)
 
     # do the spike sorting
 
     if use_ks4:
+        # set params
+        ks4params = si.get_default_sorter_params(sorter_name_or_class='kilosort4')
+        ks4params['do_CAR'] = False
+
+        print("ks4 params: \n", ks4params)
+
         print('Running kilosort 4 on probe ', probe)
-        probe0_sorting_ks4 = si.run_sorter(sorter_name='kilosort4', recording=probe0_preprocessed_corrected,
+        probe_sorting_ks4 = si.run_sorter(sorter_name='kilosort4', recording=probe_processed,
                                            folder=save_folder + 'probe' + str(probe) + '/sorters/kilosort4/',
                                            docker_image='spikeinterface/kilosort4-base:latest')
-        probe0_sorting_ks4 = si.remove_duplicated_spikes(sorting=probe0_sorting_ks4, censored_period_ms=0.3,
+        probe_sorting_ks4 = si.remove_duplicated_spikes(sorting=probe_sorting_ks4, censored_period_ms=0.3,
                                                          method='keep_first')
-        probe0_we_ks4 = si.create_sorting_analyzer(probe0_sorting_ks4, probe0_preprocessed_corrected,
+        probe_we_ks4 = si.create_sorting_analyzer(probe_sorting_ks4, probe_processed,
                                                    format='binary_folder',
                                                    folder=save_folder + 'probe' + str(probe) + '/waveform/kilosort4',
                                                    sparse=True, overwrite=True,
                                                    **job_kwargs)
-        probe0_we_ks4.compute('random_spikes')
-        probe0_we_ks4.compute('waveforms', ms_before=1.0, ms_after=2.0, **job_kwargs)
-        probe0_ks4_spikes = np.load(
+        probe_we_ks4.compute('random_spikes')
+        probe_we_ks4.compute('waveforms', ms_before=1.0, ms_after=2.0, **job_kwargs)
+        probe_ks4_spikes = np.load(
             save_folder + 'probe' + str(probe) + '/sorters/kilosort4/in_container_sorting/spikes.npy')
-        save_spikes_to_csv(probe0_ks4_spikes,
+        save_spikes_to_csv(probe_ks4_spikes,
                            save_folder + 'probe' + str(probe) + '/sorters/kilosort4/in_container_sorting/')
     if use_ks3:
         print('Running kilosort 3 on probe ', probe)
-        # probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest')
-        probe0_sorting_ks3 = si.run_sorter(sorter_name='kilosort3', recording=probe0_preprocessed_corrected,
-                                           folder=save_folder + 'probe' + str(probe) + '/sorters/kilosort3/',
-                                           docker_image=True, verbose=True)
-
-        probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting=probe0_sorting_ks3, censored_period_ms=0.3,
+        probe_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe_processed,
+                                           folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',
+                                           docker_image='spikeinterface/kilosort3-compiled-base:latest')
+        probe_sorting_ks3 = si.remove_duplicated_spikes(sorting=probe_sorting_ks3, censored_period_ms=0.3,
                                                          method='keep_first')
-        probe0_we_ks3 = si.create_sorting_analyzer(probe0_sorting_ks3, probe0_preprocessed_corrected,
+        probe_we_ks3 = si.create_sorting_analyzer(probe_sorting_ks3, probe_processed,
                                                    format='binary_folder',
                                                    folder=save_folder + 'probe' + str(probe) + '/waveform/kilosort3',
                                                    sparse=True, overwrite=True,
                                                    **job_kwargs)
-        probe0_we_ks3.compute('random_spikes')
-        probe0_we_ks3.compute('waveforms', ms_before=1.0, ms_after=2.0, **job_kwargs)
-        probe0_ks3_spikes = np.load(
+        probe_we_ks3.compute('random_spikes')
+        probe_we_ks3.compute('waveforms', ms_before=1.0, ms_after=2.0, **job_kwargs)
+        probe_ks3_spikes = np.load(
             save_folder + 'probe' + str(probe) + '/sorters/kilosort3/in_container_sorting/spikes.npy')
-        save_spikes_to_csv(probe0_ks3_spikes,
+        save_spikes_to_csv(probe_ks3_spikes,
                            save_folder + 'probe' + str(probe) + '/sorters/kilosort3/in_container_sorting/')
 
 sys.exit(0)

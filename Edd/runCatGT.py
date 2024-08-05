@@ -58,7 +58,7 @@ for date in dates:
 
     cmdStr = pathToRunit + " '" \
              + '-dir=' + ephys_folder + ' -run=' + runName  \
-             + ' -g=0,100' + ' -t=0' + ' -t_miss_ok' \
+             + ' -g=0,100' + ' -t=0' + ' -t_miss_ok' + ' --zerofillmax=50' \
              + ' -prb_fld' + ' -out_prb_fld' + ' -ap' + ' -ni' + ' -prb=0:1' + ' -prb_miss_ok' \
              + ' -dest=' + ephys_folder + "'"
 
