@@ -82,13 +82,10 @@ print('save folder: ', save_folder)
 nAcq = (len(dates))
 
 if nAcq == 1:
-    date = dates[0]
+    date=dates[0]
     runName = date.split('/')
-    baseDate = runName[0]
     tempDates = dates[0].split('/')
-    outDir = save_folder + 'ephys' + '/' + dates[0] + '/' + 'catgt_' + runName[1] + '_g0/'
-    print('Final concatenated file: ')
-    print(outDir)
+    outDir = save_folder +  save_date + '/' + tempDates[1] + '/' + 'catgt_' + mouse + '_' + runName[1] + '_g0/'
     save_folder = outDir
 
 if nAcq > 1:
@@ -97,8 +94,6 @@ if nAcq > 1:
     baseDate = runName[0]
     tempDates = dates[0].split('/')
     outDir = save_folder + baseDate + '/' + 'supercat_' + mouse + '_' + tempDates[1] + '_g0/'
-    print('Final concatenated file: ')
-    print(outDir)
     save_folder = outDir
 
 

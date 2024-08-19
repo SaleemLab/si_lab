@@ -24,7 +24,9 @@ if nAcq==1
     baseDate = runName{1};
     tempDates = split(dates{1},'/');
     save_folder = [local_folder, mouse, '/'];
-    outDir = [save_folder, 'ephys', '/', dates{1}, '/', 'catgt_', runName{2}, '_g0/'];
+    %outDir = [save_folder, 'ephys', '/', dates{1}, '/', 'catgt_', runName{2}, '_g0/'];
+
+    outDir = [save_folder, baseDate,'/', tempDates{2}, '/', 'catgt_', mouse, '_', runName{2}, '_g0/']
 end
 
 if nAcq>1

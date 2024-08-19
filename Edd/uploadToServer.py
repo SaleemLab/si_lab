@@ -1,17 +1,13 @@
 
 # get all the recordings on that day
 # allocate destination folder and move the ephys folder on the server to Beast lab user
-from pathlib import Path
 
 import os
-import shutil
-
-import numpy as np
-import json
+import os.path
+from shutil import copytree, ignore_patterns
 
 
 from datetime import datetime
-import itertools
 import sys
 
 
@@ -20,16 +16,6 @@ import scipy.io as sio
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
-
-def replace_text(obj, to_replace, replace_with):
-        if isinstance(obj, dict):
-            return {k: replace_text(v, to_replace, replace_with) for k, v in obj.items()}
-        elif isinstance(obj, list):
-            return [replace_text(elem, to_replace, replace_with) for elem in obj]
-        elif isinstance(obj, str):
-            return obj.replace(to_replace, replace_with)
-        else:
-            return obj
 
 # The first command-line argument after the script name is the mouse identifier.
 mouse = sys.argv[1]
@@ -41,20 +27,18 @@ local_folder = sys.argv[4]
 no_probe = sys.argv[5]
 use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
-base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
+server_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + mouse + "/"
+save_folder2=save_folder+save_date
 
 # get the final output folder of CatGT
 nAcq = (len(dates))
 
 if nAcq == 1:
-    date = dates[0]
+    date=dates[0]
     runName = date.split('/')
-    baseDate = runName[0]
     tempDates = dates[0].split('/')
-    outDir = save_folder + 'ephys' + '/' + dates[0] + '/' + 'catgt_' + runName[1] + '_g0/'
-    print('Final concatenated file: ')
-    print(outDir)
+    outDir = save_folder +  save_date + '/' + tempDates[1] + '/' + 'catgt_' + mouse + '_' + runName[1] + '_g0/'
     save_folder = outDir
 
 if nAcq > 1:
@@ -68,79 +52,25 @@ if nAcq > 1:
     save_folder = outDir
 
 
+# Copy files
+destDir = server_folder + mouse + '/ephys/' + save_date
+nidqDir = save_folder2 + '/nidq_processed/'
+print('Copying files to server...')
+print('server destination: ', destDir)
+print('Copying nidq files to ', destDir+'/nidq_processed/')
+copytree(nidqDir, destDir+'/nidq_processed/') 
+print('Copying spike-sorting files to ', destDir+'/spike_sorting/')
 
-import os
-import subprocess
-subprocess.run('ulimit -n 10000',shell=True)
+for probe in range(int(no_probe)): 
+    folders_to_move = ['probe'+str(probe), 'probe'+str(probe)+'_preprocessed']
 
-for probe in range(int(no_probe)):
-    '''minor corrections to the folder path of files before moving the files to server'''
-    #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
-    import os
-    import glob
-
-    # Define the folder list
-    folder_list = [save_folder + 'probe'+str(probe)+'_preprocessed', 
-                save_folder + 'probe'+str(probe)+'/waveform/',
-                save_folder + 'probe'+str(probe)+'/sorters/']
-
-    # Initialize an empty list to store the paths of JSON files
-    json_file_list = []
-    
-    # Go through each folder in the folder list
-    for folder in folder_list:
-        # Recursively find all JSON files in the folder and its subfolders
-        for json_file in glob.glob(os.path.join(folder, '**', '*.json'), recursive=True):
-            # Append the found JSON file path to the list
-            json_file_list.append(json_file)
-
-    for files in json_file_list:
-        
-        # open the JSON file and load the data
-        with open(files, 'r') as f:
-            data = json.load(f)
-        
-        # replace the text
-        data = replace_text(data, save_folder[:-1], base_folder + mouse + '/ephys/' +save_date)
-        
-        # write the updated data back to the JSON file
-        with open(files, 'w') as f:
-            json.dump(data, f, indent=4)
-            
-    # find ks temp_wh.dat files and delete
-    temp_wh_files = []
-    for folder in folder_list:
-        # Recursively find all JSON files in the folder and its subfolders
-        for temp_wh_file in glob.glob(os.path.join(folder, '**', 'temp_wh.dat'), recursive=True):
-            # Append the found JSON file path to the list
-            temp_wh_files.append(temp_wh_file)
-    for files in temp_wh_files:
-        os.remove(files)
-    
-    
-    
-    #move spikeinterface folder on Beast to the server
-
-    import shutil
-    import os
-
-    folders_to_move = ['probe'+str(probe),
-
-                    'probe'+str(probe)+'_preprocessed']
-    ##
-    #
     for folder in folders_to_move:
-        # construct the destination path
-        destination = os.path.join(base_folder + mouse + '/ephys/' +save_date, folder)
-        # copy the folder to the destination
-        shutil.copytree(save_folder+folder, destination)
-#
-#remove all temmp files
-#shutil.rmtree(save_folder)
+            copytree(outDir + folder, destDir+'/spike_sorting/' + folder, ignore=ignore_patterns('*bin', '*.raw', '*.dat'))
+
 
 print('All Done! Overall it took:')
 
 print(datetime.now() - startTime)
-print('to finish! Please move the files to the server as soon as you have time!')
+print('Please delete local files!')
 
 sys.exit(0)

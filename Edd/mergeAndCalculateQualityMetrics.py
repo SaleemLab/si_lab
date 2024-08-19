@@ -46,13 +46,10 @@ save_folder = local_folder + mouse + "/"
 nAcq = (len(dates))
 
 if nAcq == 1:
-    date = dates[0]
+    date=dates[0]
     runName = date.split('/')
-    baseDate = runName[0]
     tempDates = dates[0].split('/')
-    outDir = save_folder + 'ephys' + '/' + dates[0] + '/' + 'catgt_' + runName[1] + '_g0/'
-    print('Final concatenated file: ')
-    print(outDir)
+    outDir = save_folder +  save_date + '/' + tempDates[1] + '/' + 'catgt_' + mouse + '_' + runName[1] + '_g0/'
     save_folder = outDir
 
 if nAcq > 1:
@@ -90,7 +87,7 @@ for probe in range(int(no_probe)):
                 
         # Create a sorting object and compute quality metrics
         probe_sorting_ks4_merged = cs_probe.sorting
-        probe_sorting_ks4_merged.save(folder = save_folder + 'probe'+str(probe)+'/sorters/kilosort4_merged/')
+        probe_sorting_ks4_merged.save(folder = save_folder + 'probe'+str(probe)+'/sorters/kilosort4_merged/',overwrite=True)
         probe_we_ks4_merged = si.create_sorting_analyzer(probe_sorting_ks4_merged, probe_preprocessed, 
                             format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4_merged',
                             sparse = True,overwrite = True,
@@ -122,7 +119,7 @@ for probe in range(int(no_probe)):
                 cs_probe.merge(original_ids[unit_index])
                 
         probe_sorting_ks3_merged = cs_probe.sorting
-        probe_sorting_ks3_merged.save(folder = save_folder + 'probe'+str(probe)+'/sorters/kilosort3_merged/')
+        probe_sorting_ks3_merged.save(folder = save_folder + 'probe'+str(probe)+'/sorters/kilosort3_merged/',overwrite=True)
         ''' Compute quality metrics on the extracted waveforms'''
 
         probe_we_ks3_merged = si.create_sorting_analyzer(probe_sorting_ks3_merged, probe_preprocessed, 
