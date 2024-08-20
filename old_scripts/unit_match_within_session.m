@@ -10,7 +10,7 @@ SESSION = {['20230711';'20230712';'20230713';'20230714'];
 %     ['20230816';'20230817']};
 % mouses = ['M23032'];
 % SESSION = {['20230718']};
-for iMouse = 1
+for iMouse = [3,2,4,5]
     mouse = mouses(iMouse,:);
     dates = SESSION{iMouse};
 for iDate = 1:size(dates,1)
@@ -18,7 +18,7 @@ for iDate = 1:size(dates,1)
     for no_probe = 1:2
         ephys_folder = fullfile(base_folder,mouse,'ephys',date);
 
-         UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
+         UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort3','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
         % N.B. if you want to use the functional score evaluation of UnitMatch, 'KSDir' should also contain typical 'Kilosort output', (e.g. spike times etc.)
 %         UMparam.KSDir = {fullfile('Z:\ibn-vision\DATA\SUBJECTS\M23028\ephys\20230703\kilosort_probe_',num2str(no_probe))};
         UMparam.SaveDir = fullfile(UMparam.KSDir{1},'UnitMatch');
@@ -40,14 +40,14 @@ for iDate = 1:size(dates,1)
         UMparam.AllRawPaths ={fullfile(ephys_folder,['probe',num2str(no_probe)-1,'preprocessed'])};
         UMparam.AllDecompPaths= {fullfile(ephys_folder,['probe',num2str(no_probe)-1,'preprocessed'])};  % This is a cell array with info on where to find the decompressed recording (.bin files) --> Necessary when you want UnitMatch to do waveform extraction
 
-         UMparam.AllChannelPos = {readNPY(fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters\kilosort4\sorter_output\channel_positions.npy'))}; % These are coordinates of every recording channel on the probe (e.g. nRecordingChannels x 2)
+         UMparam.AllChannelPos = {readNPY(fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters\kilosort3\sorter_output\channel_positions.npy'))}; % These are coordinates of every recording channel on the probe (e.g. nRecordingChannels x 2)
 %         UMparam.AllChannelPos = {readNPY(fullfile(ephys_folder,['kilosort_probe_',num2str(no_probe)-1],'channel_positions.npy'))};
 
         %% convert spikeinterface waveforms to unit match version in kilosort folder
 
         % Specify the file path
-         ks3_sparsity_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform\kilosort4\sparsity.json');
-         ks3_waveform_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform\kilosort4\waveforms\');
+         ks3_sparsity_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform\kilosort3\sparsity.json');
+         ks3_waveform_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform\kilosort3\waveforms\');
 
         ks3_raw_waveform_path =fullfile(UMparam.KSDir,'RawWaveforms');
         mkdir(ks3_raw_waveform_path{1});

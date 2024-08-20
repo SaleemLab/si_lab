@@ -24,8 +24,8 @@ import docker
 from datetime import datetime
 #load mat file with merge suggestions
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
-mouse = 'M23034'
-dates = ['20230804','20230805','20230806','20230807']
+mouse = 'M23032'
+dates = ['20230718','20230719','20230720','20230721','20230722']
 for date in dates:
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     analysis_folder = base_folder + mouse + '/analysis/' + date +'/'
@@ -86,7 +86,17 @@ for date in dates:
     probe0_sorting_ks3_merged = cs_probe0.sorting
     probe0_sorting_ks3_merged.save(folder = ephys_folder + 'probe0/sorters/kilosort3_merged/')
 
-
+    # probe1_raw = si.read_spikeglx(ephys_folder,stream_name = 'imec1.ap')
+    # probe1_highpass = si.highpass_filter(probe1_raw,freq_min=300.)
+    # bad_channel_ids, channel_labels = si.detect_bad_channels(probe1_highpass)
+    # probe1_remove_channels = probe1_highpass.remove_channels(bad_channel_ids)
+    # print('probe1_bad_channel_ids',bad_channel_ids)
+    # probe1_phase_shift = si.phase_shift(probe1_remove_channels)
+    # probe1_common_reference = si.common_reference(probe1_phase_shift,operator='median',reference='global')
+    # probe1_preprocessed = probe1_common_reference
+    # probe1_cat = si.concatenate_recordings([probe1_preprocessed])
+    # probe1_nonrigid_accurate = si.correct_motion(recording=probe1_cat, preset="nonrigid_accurate",**job_kwargs)
+    # probe1_preprocessed_corrected = probe1_nonrigid_accurate.save(folder=ephys_folder+'probe1_preprocessed', format='binary', **job_kwargs)
     merge_suggestions = sio.loadmat(analysis_folder + 'probe1um_merge_suggestion.mat')
     probe1_sorting_ks3 = si.read_sorter_folder(ephys_folder + 'probe1/sorters/kilosort3/')
     probe1_we_ks3 = si.load_waveforms(ephys_folder + 'probe1/waveform/kilosort3/') 
@@ -124,9 +134,6 @@ for date in dates:
     probe1_we_ks3_merged.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
     probe0_we_ks3_merged.compute(extensions,**job_kwargs)
     probe1_we_ks3_merged.compute(extensions,**job_kwargs)
-
-    probe0_we_ks3_merged.compute('principal_components',**job_kwargs)
-    probe1_we_ks3_merged.compute('principal_components',**job_kwargs)
 
 
     probe0_we_ks3_merged.compute('spike_amplitudes',**job_kwargs)
