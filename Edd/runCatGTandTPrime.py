@@ -71,6 +71,10 @@ for date in dates:
     firstg = sorting_key(g_files[0])
     lastg = sorting_key(g_files[-1])
 
+    # at least 2 gfiles need to be requested for nidq.tcat to be produced?
+    if lastg<1:
+        lastg=1
+
 
     #print('dirtest: ',ephys_folder)
 
@@ -97,9 +101,9 @@ print('CatGT OS commands:')
 for cmd in catGTcommands:
     print(cmd)
 
-procs = [Popen(shlex.split(i)) for i in catGTcommands]
-for p in procs:
-    p.wait()
+#procs = [Popen(shlex.split(i)) for i in catGTcommands]
+#for p in procs:
+#    p.wait()
 print('CatGT finished! Time taken: ', datetime.now() - catgt_start_time)
 print(' ')
 
@@ -109,19 +113,17 @@ if nAcq == 1:  # get the output of catGT file and finish
     date=dates[0]
     runName = date.split('/')
     tempDates = dates[0].split('/')
-    outDir = save_folder +  save_date + '/' + tempDates[1] + '/' + 'catgt_' + mouse + '_' + runName[1] + '_g0/'
+    outDir = save_folder +  save_date + '/' + tempDates[1] + '/' + 'catgt_' + mouse + '_' + runName[1] + '_g' + str(firstg) + '/'
     print('Final concatenated file: ')
     print(outDir)
 
     # if we're not running supercat we need to move some catGT files to a parent directory
-    sourceDir = outDir + '/' + mouse + '_' + tempDates[1] + '_g0_imec0/'
+    sourceDir = outDir + '/' + mouse + '_' + tempDates[1] + '_g' + str(firstg) +'_imec0/'
     file_names = os.listdir(sourceDir)
     for file_name in file_names:
         #print(file_name)
         shutil.move(os.path.join(sourceDir, file_name), outDir)
     
-
-
 
 if nAcq > 1:  # we also want to run supercat
     
@@ -135,7 +137,7 @@ if nAcq > 1:  # we also want to run supercat
 
         runName = date.split('/')
         runName = mouse + '_' + runName[1]
-        cmdStr = cmdStr + '{' + ephys_folder + ',' + 'catgt_' + runName + '_g0' + '}'
+        cmdStr = cmdStr + '{' + ephys_folder + ',' + 'catgt_' + runName + '_g' + str(firstg) + '}'
 
     cmdStr = cmdStr +  ' -prb_fld -ap -ni' + ' -prb=' + catGTprobeStr + ' -prb_miss_ok -supercat_trim_edges' \
              + ' -xa=0,0,0,1,1,500 -xa=0,0,1,0.2,0.2,0, -xia=0,0,1,0.2,0.2,0 -xa=0,0,2,1,1,0 -xia=0,0,2,4,4,0 -xa=0,0,3,1,1,0 -xia=0,0,3,4,4,0' \
@@ -148,20 +150,29 @@ if nAcq > 1:  # we also want to run supercat
     supercatCommands =[]
     supercatCommands.append(cmdStr)
     supercat_start_time = datetime.now()
-    procs = [Popen(shlex.split(i)) for i in supercatCommands]
-    for p in procs:
-        p.wait()
+    #procs = [Popen(shlex.split(i)) for i in supercatCommands]
+    #for p in procs:
+    #    p.wait()
     print('Supercat finished! Time taken: ', datetime.now() - supercat_start_time)
 
     # get diretory of final concatenated file
     tempDates = dates[0].split('/')
-    outDir = save_folder + save_date + '/' + 'supercat_' + mouse + '_' + tempDates[1] + '_g0'
+    outDir = save_folder + save_date + '/' + 'supercat_' + mouse + '_' + tempDates[1] + '_g' + str(firstg)
     print(' ')
     print('Final concatenated file: ')
     print(outDir)
 
 
+catGTDir = save_folder + '/' + save_date + '/CatGToutput/'
+if not os.path.exists(catGTDir):
+    os.mkdir(catGTDir)
 
+# move files to generic CatGT directory
+sourceDir = outDir
+file_names = os.listdir(sourceDir)
+for file_name in file_names:
+    #print(file_name)
+    shutil.move(os.path.join(sourceDir, file_name), catGTDir)
 
 # run TPrime
 # create tprime command line - map nidaq signals to imec0
@@ -177,44 +188,44 @@ print(' ')
 print("Running TPrime...")
 cmdStr = pathToTPrimeRunit + " '" \
         + ' -syncperiod=1.0' \
-        + ' -tostream=' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.imec0.ap.xd_384_6_500.txt' \
-        + ' -fromstream=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xd_8_3_500.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xd_8_3_500.txt'\
+        + ' -tostream=' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.imec0.ap.xd_384_6_500.txt' \
+        + ' -fromstream=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xd_8_3_500.txt' \
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xd_8_3_500.txt'\
         + ',' + nidq_output_path + 'nidq_sync_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_0_500.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_0_500.txt'\
         + ',' + nidq_output_path  + 'async_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_1_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_1_0.txt'\
         + ',' + nidq_output_path  + 'photodiode_up_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_1_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_1_0.txt'\
         + ',' + nidq_output_path  + 'photodiode_down_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_2_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_2_0.txt'\
         + ',' + nidq_output_path  + 'wheel_a_up_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_3_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_3_0.txt'\
         + ',' + nidq_output_path  + 'wheel_b_up_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_2_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_2_0.txt'\
         + ',' + nidq_output_path  + 'wheel_a_down_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_3_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_3_0.txt'\
         + ',' + nidq_output_path  + 'wheel_b_down_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_6_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_6_0.txt'\
         + ',' + nidq_output_path  + 'valveL_open_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_7_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xa_7_0.txt'\
         + ',' + nidq_output_path  + 'valveR_open_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_6_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_6_0.txt'\
         + ',' + nidq_output_path  + 'valveL_close_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_7_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_7_0.txt'\
         + ',' + nidq_output_path  + 'valveR_close_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_4_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_4_0.txt'\
         + ',' + nidq_output_path  + 'lickL_tprime.txt' \
-        + ' -events=7,' + outDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_5_0.txt'\
+        + ' -events=7,' + catGTDir + '/' + mouse + '_' + tempDates[1] + '_g0' + '_tcat.nidq.xia_5_0.txt'\
         + ',' + nidq_output_path +  'lickR_tprime.txt' \
         +  "'"
 
 
 TPrimeCommands.append(cmdStr)
 tprime_start_time = datetime.now()
-procs = [Popen(shlex.split(i)) for i in TPrimeCommands]
-for p in procs:
-    p.wait()
+#procs = [Popen(shlex.split(i)) for i in TPrimeCommands]
+#for p in procs:
+#    p.wait()
 print("TPrime finshed! Time taken: ", datetime.now() - tprime_start_time)
 print(' ')
 
@@ -226,12 +237,12 @@ for dirpath, dirnames, filenames in os.walk(save_folder + save_date):
         nidq_files_to_move.append(os.path.join(dirpath, filename))
         print(os.path.join(dirpath, filename))
 
-for dirpath, dirnames, filenames in os.walk(outDir):
+for dirpath, dirnames, filenames in os.walk(catGTDir):
     for filename in [f for f in filenames if f.endswith("tcat.nidq.bin")]:
         nidq_files_to_move.append(os.path.join(dirpath, filename))
         print(os.path.join(dirpath, filename))
 
-for dirpath, dirnames, filenames in os.walk(outDir):
+for dirpath, dirnames, filenames in os.walk(catGTDir):
     for filename in [f for f in filenames if f.endswith("tcat.nidq.meta")]:
         nidq_files_to_move.append(os.path.join(dirpath, filename))
         print(os.path.join(dirpath, filename))

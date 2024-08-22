@@ -48,41 +48,22 @@ dates = sys.argv[2].split(',')  # This captures all dates as a list.
 save_date = sys.argv[3]
 local_folder = sys.argv[4]
 no_probe = sys.argv[5]
-print(mouse)
-print('acquisition folder: ', dates)
 use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 
 save_folder = local_folder + mouse + "/"
-print('save folder: ', save_folder)
 
 # get the output folder of CatGT for SI to read
-nAcq = (len(dates))
-
-if nAcq == 1:
-    date=dates[0]
-    runName = date.split('/')
-    tempDates = dates[0].split('/')
-    outDir = save_folder +  save_date + '/' + tempDates[1] + '/' + 'catgt_' + mouse + '_' + runName[1] + '_g0/'
-    save_folder = outDir
-
-if nAcq > 1:
-    date = dates[0]
-    runName = date.split('/')
-    baseDate = runName[0]
-    tempDates = dates[0].split('/')
-    outDir = save_folder + baseDate + '/' + 'supercat_' + mouse + '_' + tempDates[1] + '_g0/'
-    print('Final concatenated file: ')
-    print(outDir)
-    save_folder = outDir
+catGTDir = save_folder + '/' + save_date + '/CatGToutput/'
+outputDir = save_folder + '/' + save_date + '/'
 
 for probe in range(int(no_probe)):
 
     # load the probe
     print('probe #: ', probe)
     probe_name = 'imec' + str(probe) + '.ap'
-    probe_raw = si.read_spikeglx(outDir, stream_name=probe_name)
+    probe_raw = si.read_spikeglx(catGTDir, stream_name=probe_name)
     print(probe_raw)
 
     # pre-processing steps
@@ -102,7 +83,7 @@ for probe in range(int(no_probe)):
     # print(probe0_preprocessed_corrected)
 
     # save pre-processed catenated file
-    probe_processed = probe_processed.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
+    probe_processed = probe_processed.save(folder=outputDir+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
     #probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
 
 

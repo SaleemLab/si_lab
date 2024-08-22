@@ -32,11 +32,6 @@ print('import time:')
 print(datetime.now()-startTime)
 subprocess.run('ulimit -n 4096', shell=True)
 
-
-def sorting_key(s):
-    return int(s.split('_g')[-1])
-
-
 import pandas as pd
 
 
@@ -75,32 +70,16 @@ use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 
-save_folder = local_folder + mouse + "/"
-print('save folder: ', save_folder)
+temp_save_folder = local_folder + mouse + "/"
 
 # get the output folder of CatGT for SI to read
-nAcq = (len(dates))
-
-if nAcq == 1:
-    date=dates[0]
-    runName = date.split('/')
-    tempDates = dates[0].split('/')
-    outDir = save_folder +  save_date + '/' + tempDates[1] + '/' + 'catgt_' + mouse + '_' + runName[1] + '_g0/'
-    save_folder = outDir
-
-if nAcq > 1:
-    date = dates[0]
-    runName = date.split('/')
-    baseDate = runName[0]
-    tempDates = dates[0].split('/')
-    outDir = save_folder + baseDate + '/' + 'supercat_' + mouse + '_' + tempDates[1] + '_g0/'
-    save_folder = outDir
-
+parent_dir = temp_save_folder + save_date + '/'
+save_folder = temp_save_folder + save_date +'/SpikeSorting/'
 
 for probe in range(int(no_probe)):
 
     # load the pre-processed probe
-    probe_processed = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+    probe_processed = si.load_extractor(parent_dir+'probe'+str(probe)+'_preprocessed')
     print(probe_processed)
 
     # do the spike sorting
@@ -113,22 +92,24 @@ for probe in range(int(no_probe)):
         print("ks4 params: \n", ks4params)
 
         print('Running kilosort 4 on probe ', probe)
-        probe_sorting_ks4 = si.run_sorter(sorter_name='kilosort4', recording=probe_processed,
-                                           folder=save_folder + 'probe' + str(probe) + '/sorters/kilosort4/',
-                                           docker_image='spikeinterface/kilosort4-base:latest')
-        probe_sorting_ks4 = si.remove_duplicated_spikes(sorting=probe_sorting_ks4, censored_period_ms=0.3,
-                                                         method='keep_first')
-        probe_we_ks4 = si.create_sorting_analyzer(probe_sorting_ks4, probe_processed,
-                                                   format='binary_folder',
-                                                   folder=save_folder + 'probe' + str(probe) + '/waveform/kilosort4',
-                                                   sparse=True, overwrite=True,
-                                                   **job_kwargs)
-        probe_we_ks4.compute('random_spikes')
-        probe_we_ks4.compute('waveforms', ms_before=1.0, ms_after=2.0, **job_kwargs)
+        #probe_sorting_ks4 = si.run_sorter(sorter_name='kilosort4', recording=probe_processed,
+        #                                   folder=save_folder + 'probe' + str(probe) + '/sorters/kilosort4/',
+        #                                   docker_image='spikeinterface/kilosort4-base:latest')
+
+        #probe_sorting_ks4 = si.remove_duplicated_spikes(sorting=probe_sorting_ks4, censored_period_ms=0.3,
+        #                                                 method='keep_first')
+
+        #probe_we_ks4 = si.create_sorting_analyzer(probe_sorting_ks4, probe_processed,
+        #                                           format='binary_folder',
+        #                                           folder=save_folder + 'probe' + str(probe) + '/sorters/kilosort4/waveform/',
+        #                                           sparse=True, overwrite=True,
+        #                                           **job_kwargs)
+        #probe_we_ks4.compute('random_spikes')
+        #probe_we_ks4.compute('waveforms', ms_before=1.0, ms_after=2.0, **job_kwargs)
         probe_ks4_spikes = np.load(
-            save_folder + 'probe' + str(probe) + '/sorters/kilosort4/in_container_sorting/spikes.npy')
+            save_folder + 'probe' + str(probe) + '/sorters/kilosort4/waveform/sorting/spikes.npy')
         save_spikes_to_csv(probe_ks4_spikes,
-                           save_folder + 'probe' + str(probe) + '/sorters/kilosort4/in_container_sorting/')
+            save_folder + 'probe' + str(probe) + '/sorters/kilosort4/')
     if use_ks3:
         print('Running kilosort 3 on probe ', probe)
         probe_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe_processed,
