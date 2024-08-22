@@ -21,12 +21,11 @@ parent_folder = [base_folder,mouse,'/', date,'/'];
 
 for no_probe = 1:str2double(no_probe)
 
-    % get directories
     UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
     % N.B. if you want to use the functional score evaluation of UnitMatch, 'KSDir' should also contain typical 'Kilosort output', (e.g. spike times etc.)
     %         UMparam.KSDir = {fullfile('Z:\ibn-vision\DATA\SUBJECTS\M23028\ephys\20230703\kilosort_probe_',num2str(no_probe))};
-    %UMparam.SaveDir = fullfile(UMparam.KSDir{1},'UnitMatch','/');
-    UMparam.SaveDir = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','UnitMatch','/');
+    %UMparam.SaveDir = fullfile(UMparam.KSDir{1},'UnitMatch');
+    UMparam.SaveDir = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','UnitMatch');
     mkdir(UMparam.SaveDir);
     clusinfo = struct; % Note, this can be kilosort input,
     clusinfo.cluster_id = [];
@@ -34,26 +33,33 @@ for no_probe = 1:str2double(no_probe)
     clusinfo.ProbeID = [];
     clusinfo.RecSesID=[];
 
+
+
+
     %UMparam.SaveDir = fullfile(ephys_folder{iDate},['probe',num2str(no_probe)-1],'unit_match'); % Recommended to use end this path with \Probe0\IMRO_1\ if more probes/IMRO tables were used or \AllProbes\AllIMRO\ otherwise
 
 
     %% N.B. the following user input can also be automatically extracted and prepared/cleaned up using UMparam = ExtractKilosortData(KiloSortPaths, UMparam) for Kilosorted data of SpikeGLX recorded data (see next section);
     %UMparam.RawDataPaths = {'\\path\to\firstrecording','\\path\to\secondrecording','\\path\to\nthrecording'};  % This is a cell array with info on where to find the compressed recording (.cbin files OR .bin files)
-    UMparam.AllRawPaths ={fullfile(parent_folder,['probe',num2str(no_probe)-1,'preprocessed'])};
+UMparam.AllRawPaths ={fullfile(parent_folder,['probe',num2str(no_probe)-1,'preprocessed'])};
     UMparam.AllDecompPaths= {fullfile(parent_folder,['probe',num2str(no_probe)-1,'preprocessed'])};  % This is a cell array with info on where to find the decompressed recording (.bin files) --> Necessary when you want UnitMatch to do waveform extraction
 
     UMparam.AllChannelPos = {readNPY(fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','sorter_output','channel_positions.npy'))}; % These are coordinates of every recording channel on the probe (e.g. nRecordingChannels x 2)
     %         UMparam.AllChannelPos = {readNPY(fullfile(ephys_folder,['kilosort_probe_',num2str(no_probe)-1],'channel_positions.npy'))};
-
     %% convert spikeinterface waveforms to unit match version in kilosort folder
 
     % Specify the file path
+    %ks_random_spikes = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform','kilosort4','extensions','random_spikes','random_spikes_indices.npy');
     ks_random_spikes = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','waveform','extensions','random_spikes','random_spikes_indices.npy');
+    %ks_waveform_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform','kilosort4','extensions','waveforms','waveforms.npy');
     ks_waveform_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','waveform','extensions','waveforms','waveforms.npy');
+    %ks_spikes_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','in_container_sorting','spikes.csv');
     ks_spikes_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','spikes.csv');
+    %ks_sparsity_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'waveform','kilosort4','sparsity_mask.npy');
     ks_sparsity_path = fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','waveform','sparsity_mask.npy');
+
     ks_sparsity = readNPY(ks_sparsity_path);
-    ks_raw_waveform_path ={fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort4','waveform','RawWaveforms')};
+    ks_raw_waveform_path =fullfile(UMparam.KSDir,'RawWaveforms');
     mkdir(ks_raw_waveform_path{1});
     random_spikes = readNPY(ks_random_spikes);
     waveforms = readNPY(ks_waveform_path);
@@ -61,7 +67,6 @@ for no_probe = 1:str2double(no_probe)
     random_spike_ids = spikes(random_spikes+1,1);
     unit_ids = unique(spikes(:,1));
     no_channels = size(ks_sparsity,2);
-    
     for iUnit = 1:length(unit_ids)
         waveform_channel_ids = ks_sparsity(iUnit,:);
         % Assume 'cellArray' is your cell array
@@ -84,7 +89,7 @@ for no_probe = 1:str2double(no_probe)
         spikeMap = spikeMapAvg;
 
         %fetch the waveforms of the unit
-        writeNPY(spikeMap, char(fullfile(ks_raw_waveform_path,['Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy'])));
+        writeNPY(spikeMap, fullfile(UMparam.KSDir{1},'RawWaveforms',['Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']));
     end
 
 
@@ -147,11 +152,7 @@ for no_probe = 1:str2double(no_probe)
 
     end
     original_id = unit_id;
-    savepath = fullfile([UMparam.SaveDir,'um_merge_suggestion_ks4.mat']);
+    savepath = fullfile(base_folder,date,['probe',num2str(no_probe)-1,'um_merge_suggestion_ks4.mat']);
     match_ids =[original_id,merged_id,unstable_id];
     save(savepath,'match_ids');
 end
-
-
-
-

@@ -26,12 +26,10 @@ save_folder = local_folder + mouse + "/" + save_date + "/"
 print('Local directory location: ', save_folder)
 
 
-# move requeted acquisition directories to local machine
-date_count = 0
+# move requested acquisition directories to local machine
 for date in dates:
-    date_count = date_count + 1
     ephys_folder = server_path + mouse + '/ephys/' + date + '/'
-    save_folder = local_folder + mouse + "/" + date + '/'
+    save_folder = local_folder + mouse + '/' + date + '/'
     print('copying ephys data from: ', ephys_folder, ' to: ', save_folder)
     copy_tree(ephys_folder, save_folder)
 

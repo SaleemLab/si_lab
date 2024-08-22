@@ -43,32 +43,15 @@ base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + mouse + "/"
 
 # get the output folder of CatGT for SI to read
-nAcq = (len(dates))
-
-if nAcq == 1:
-    date=dates[0]
-    runName = date.split('/')
-    tempDates = dates[0].split('/')
-    outDir = save_folder +  save_date + '/' + tempDates[1] + '/' + 'catgt_' + mouse + '_' + runName[1] + '_g0/'
-    save_folder = outDir
-
-if nAcq > 1:
-    date = dates[0]
-    runName = date.split('/')
-    baseDate = runName[0]
-    tempDates = dates[0].split('/')
-    outDir = save_folder + baseDate + '/' + 'supercat_' + mouse + '_' + tempDates[1] + '_g0/'
-    print('Final concatenated file: ')
-    print(outDir)
-    save_folder = outDir
-
+save_folder = local_folder + mouse + '/' + save_date + '/SpikeSorting/'
+parent_folder = local_folder + mouse + '/' + save_date + '/'
 
 
 extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 
 for probe in range(int(no_probe)):
-    probe_preprocessed = si.load_extractor(save_folder+'/probe'+str(probe)+'_preprocessed')
+    probe_preprocessed = si.load_extractor(parent_folder+'/probe'+str(probe)+'_preprocessed')
     if use_ks4:
         
         # merge units based on UnitMatch 
