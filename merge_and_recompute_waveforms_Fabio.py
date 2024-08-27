@@ -22,6 +22,14 @@ import spikeinterface.curation
 import spikeinterface.widgets 
 import docker
 from datetime import datetime
+import pandas as pd
+import numpy as np
+def save_spikes_to_csv(spikes,save_folder):
+    unit_index = spikes['unit_index']
+    segment_index = spikes['segment_index']
+    sample_index = spikes['sample_index']
+    spikes_df = pd.DataFrame({'unit_index':unit_index,'segment_index':segment_index,'sample_index':sample_index})
+    spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
 #load mat file with merge suggestions
 def replace_text(obj, to_replace, replace_with):
     if isinstance(obj, dict):
@@ -144,6 +152,10 @@ for mouse in mice:
             print(qm_list)
             probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
             probe1_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+            probe0_ks4_spikes = np.load(save_folder + 'probe0/waveform/kilosort4_merged/sorting/spikes.npy')
+            save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe0/waveform/kilosort4_merged/sorting/')
+            probe1_ks4_spikes = np.load(save_folder + 'probe1/waveform/kilosort4_merged/sorting/spikes.npy')
+            save_spikes_to_csv(probe1_ks4_spikes,save_folder + 'probe1/waveform/kilosort4_merged/sorting/')
         
         else:
             print('Running single probe pipeline')
@@ -223,7 +235,8 @@ for mouse in mice:
             print('The following quality metrics are computed:')
             print(qm_list)
             probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
-    
+            probe0_ks4_spikes = np.load(save_folder + 'probe0/waveform/kilosort4_merged/sorting/spikes.npy')
+            save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe0/waveform/kilosort4_merged/sorting/')
         
 
 
