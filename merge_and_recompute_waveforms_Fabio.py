@@ -51,13 +51,29 @@ for mouse in mice:
     dates = all_dates[mouse_number]
     mouse_number += 1
     for date in dates:
-        ephys_folder = base_folder + mouse + '/ephys/' + date +'/kilosort4/'
-        analysis_folder = base_folder + mouse  + date + '/'
-        save_folder = base_folder + mouse + '/ephys/' + date +'/kilosort4/'
+        ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
+        analysis_folder = base_folder + mouse + '/ephys/' + date + '/'
+        save_folder = base_folder + mouse + '/ephys/' + date +'/'
 
         pathforprobe = base_folder + mouse + '/' + 'ephys' + '/' + date + '/' + mouse + '_' + date+'_g0/' + mouse +'_'+ date +'_g0_imec1'
+        # Ensure the kilosort4_folder exists
+        kilosort4_folder = os.path.join(ephys_folder, 'kilosort4')
+        if not os.path.exists(kilosort4_folder):
+            print(f"The directory {kilosort4_folder} does not exist.")
+        else:
+            # List all files in the kilosort4_folder
+            for filename in os.listdir(kilosort4_folder):
+                source_file_path = os.path.join(kilosort4_folder, filename)
+                destination_file_path = os.path.join(ephys_folder, filename)
+                
+                # Move the file to the ephys_folder
+                shutil.move(source_file_path, destination_file_path)
+                print(f"Moved: {source_file_path} -> {destination_file_path}")
 
-        import os.path
+            # Optionally, remove the now-empty kilosort4_folder
+            os.rmdir(kilosort4_folder)
+            print(f"Removed empty directory: {kilosort4_folder}")
+            import os.path
         if os.path.isdir(pathforprobe):
             print('Running dual probe pipeline')
                 #awarkwardly, the path in the JSON file is different from the path in the folder
@@ -171,8 +187,7 @@ for mouse in mice:
                 else:
                     return obj
             import json
-            file_list = [ephys_folder + 'probe0/sorters/kilosort4/spikeinterface_recording.json',
-                        ephys_folder + 'probe1/sorters/kilosort4/spikeinterface_recording.json']
+            file_list = [ephys_folder + 'probe0/sorters/kilosort4/spikeinterface_recording.json']
             for files in file_list:
                 
                 # open the JSON file and load the data
