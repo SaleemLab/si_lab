@@ -7,7 +7,7 @@ import os
 import shutil
 
 import numpy as np
-import glob
+
 import spikeinterface.sorters
 import spikeinterface.full as si
 import  scipy.signal
@@ -40,11 +40,6 @@ use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + save_date +'/'
-
-# Check g files to ignore are correct (tcat should always be ignored)
-g_files_to_ignore = ['tcat','0_g6','0_g7','0_g8','0_g9']
-#g_files_to_ignore = sys.argv[8]
-print(g_files_to_ignore)
 # get all the recordings on that day
 
 import os
@@ -69,24 +64,8 @@ for date in dates:
     dst_folder = local_folder + date + '/'
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     g_files = []
-
-    # Rename all tcat files to t0 if they exist
-    tcat_pattern = os.path.join(ephys_folder,'**','*tcat.imec*.lf*')
-    files_to_rename = glob.glob(tcat_pattern, recursive=True)
-    # Step 1: Iterate over the list of files with tcat in the name
-    for old_name in files_to_rename:
-        # Step 2: Construct the new filename (REMEMBER to switch the name back to tcat)
-        new_name = old_name.replace('tcat', 't0')
-        
-        # Step 3: Rename the file
-        os.rename(old_name, new_name)
-        print(f'Renamed {old_name} to {new_name}')
-
     print('copying ephys data from:' + ephys_folder)
     for dirname in os.listdir(ephys_folder):
-        # ignore some folders or files includiing tcat and other G files (such as checkerboard recordings)
-        if any(ignore_str in dirname for ignore_str in g_files_to_ignore):
-            continue
     #     # check if '_g' is in the directory name
     #     #only grab recording folders - there might be some other existing folders for analysis or sorted data
         if '_g' in dirname:
@@ -132,7 +111,7 @@ for probe in range(int(no_probe)):
             probe0_end_sample_frames = probe0_end_sample_frames + [probe0_end_sample_frames_tmp[i] + probe0_end_sample_frames[-1] for i in range(0, len(probe0_num_segments))]
 
             
-        
+
         #several preprocessing steps and concatenation of the recordings
         #highpass filter - threhsold at 300Hz
         probe0_highpass = si.highpass_filter(probe0_raw,freq_min=300.)
@@ -156,26 +135,12 @@ for probe in range(int(no_probe)):
     bad_channel_ids, channel_labels = si.detect_bad_channels(probe0_cat_all)
     probe0_cat_all = probe0_cat_all.remove_channels(bad_channel_ids)
     print('probe0_bad_channel_ids',bad_channel_ids)
-
-   '''Motion Drift Correction'''
+    '''Motion Drift Correction'''
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
     #assign parallel processing as job_kwargs
-    probe0_cat_all = probe0_cat_all.astype(np.float32)
-    si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
-    #probe0_cat_all = si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
-    
-    # not sure why the error happens if save probe0_cat_all directly after motion correction
-    # But it works if load motion info then interpolate motion then save, it works 
-    motion_info = si.load_motion_info(save_folder+'probe'+str(probe)+'_motion')
 
-    from spikeinterface.sortingcomponents.motion import estimate_motion, interpolate_motion
-    probe0_motion_corrected = interpolate_motion(
-                    recording=probe0_cat_all,
-                    motion=motion_info['motion'],
-                    **motion_info['parameters']['interpolate_motion_kwargs'])
-
-    probe0_cat_all = probe0_motion_corrected
+    #probe0_nonrigid_accurate = si.correct_motion(recording=probe0_cat_all, preset="kilosort_like",**job_kwargs)
 
     print('Start to motion correction finished:')
     print(datetime.now() - startTime)
@@ -188,11 +153,9 @@ for probe in range(int(no_probe)):
 
     #after saving, sorters will read this preprocessed binary file instead
     probe0_preprocessed_corrected = probe0_cat_all.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
-    
-
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
-    #probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+    #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe0_preprocessed')
     #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe1_preprocessed')
     ''' prepare sorters - currently using the default parameters and motion correction is turned off as it was corrected already above
         you can check if the parameters using:
@@ -249,16 +212,6 @@ for probe in range(int(no_probe)):
     probe0_segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
 
 
-    temp_wh_files = []
-    # Go through each folder in the folder list
-    for folder in folder_list:
-        # Recursively find all temp files in the folder and its subfolders
-        for temp_wh_file in glob.glob(os.path.join(folder, '**', 'temp_wh.dat'), recursive=True):
-            # Append the found temp file path to the list
-            temp_wh_files.append(temp_wh_file)
-
-    for files in temp_wh_files:
-        os.remove(files)
 
     ''' read sorters directly from the output folder - so you dont need to worry if something went wrong and you can't access the temp variables
         This section reads sorter outputs and extract waveforms 
