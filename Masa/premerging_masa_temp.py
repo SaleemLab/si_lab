@@ -95,7 +95,7 @@ for date in dates:
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
-            shutil.copytree(source, destination)
+            #shutil.copytree(source, destination)
     print('Start to copying files to local folder: ')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
@@ -109,7 +109,8 @@ for date in dates:
     # stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     # print(stream_names)
     # print(stream_ids)
-for probe in range(int(no_probe)):
+probes = [0]
+for probe in probes:
     date_count = 0
     probe0_start_sample_fames = []
     probe0_end_sample_frames = []
@@ -156,13 +157,12 @@ for probe in range(int(no_probe)):
     bad_channel_ids, channel_labels = si.detect_bad_channels(probe0_cat_all)
     probe0_cat_all = probe0_cat_all.remove_channels(bad_channel_ids)
     print('probe0_bad_channel_ids',bad_channel_ids)
-
-   '''Motion Drift Correction'''
+    '''Motion Drift Correction'''
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
     #assign parallel processing as job_kwargs
     probe0_cat_all = probe0_cat_all.astype(np.float32)
-    si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
+    #si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
     #probe0_cat_all = si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
     
     # not sure why the error happens if save probe0_cat_all directly after motion correction
@@ -247,7 +247,6 @@ for probe in range(int(no_probe)):
     import pandas as pd
     probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
     probe0_segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
-
 
     temp_wh_files = []
     # Go through each folder in the folder list
