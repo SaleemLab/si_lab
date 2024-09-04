@@ -157,7 +157,7 @@ for probe in range(int(no_probe)):
     probe0_cat_all = probe0_cat_all.remove_channels(bad_channel_ids)
     print('probe0_bad_channel_ids',bad_channel_ids)
 
-   '''Motion Drift Correction'''
+    '''Motion Drift Correction'''
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
     #assign parallel processing as job_kwargs
