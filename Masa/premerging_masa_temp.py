@@ -111,7 +111,7 @@ for date in dates:
     # print(stream_ids)
 
 probes = [0]
-for probe = probes:
+for probe in probes:
     date_count = 0
     probe0_start_sample_fames = []
     probe0_end_sample_frames = []
