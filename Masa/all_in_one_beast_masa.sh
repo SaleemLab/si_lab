@@ -6,7 +6,7 @@ save_date='20240715' #date of recording
 dates='20240715/20240715_0' #acquisition date and session e.g. dates='20240624/20240624_0,20240624/20240624_1'
 base_folder='/home/lab/spikeinterface_sorting/temp_data/'  # Adjust this path if necessary
 no_probe=2 #number of probes you have in this session
-use_ks4=false #use kilosort4
+use_ks4=true #use kilosort4
 use_ks3=true #use kilosort3
 # g_files_to_ignore input currently not working for some reasons.... but it works if it is inside
 g_files_to_ignore=['tcat'] # e.g. g_files_to_ignore=['tcat','0_g6','0_g7','0_g8','0_g9']

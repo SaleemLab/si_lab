@@ -109,8 +109,9 @@ for date in dates:
     # stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     # print(stream_names)
     # print(stream_ids)
+
 probes = [0]
-for probe in probes:
+for probe = probes:
     date_count = 0
     probe0_start_sample_fames = []
     probe0_end_sample_frames = []
@@ -157,12 +158,13 @@ for probe in probes:
     bad_channel_ids, channel_labels = si.detect_bad_channels(probe0_cat_all)
     probe0_cat_all = probe0_cat_all.remove_channels(bad_channel_ids)
     print('probe0_bad_channel_ids',bad_channel_ids)
+
     '''Motion Drift Correction'''
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
     #assign parallel processing as job_kwargs
     probe0_cat_all = probe0_cat_all.astype(np.float32)
-    #si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
+    si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
     #probe0_cat_all = si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
     
     # not sure why the error happens if save probe0_cat_all directly after motion correction
@@ -176,6 +178,8 @@ for probe in probes:
                     **motion_info['parameters']['interpolate_motion_kwargs'])
 
     probe0_cat_all = probe0_motion_corrected
+    # Back to int16 to save space
+    probe0_cat_all = probe0_cat_all.astype(np.int16)
 
     print('Start to motion correction finished:')
     print(datetime.now() - startTime)
@@ -220,7 +224,7 @@ for probe in probes:
     # probe1_sorting_ks2_5 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks2_5, censored_period_ms=0.3,method='keep_first')
     # probe1_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks3, censored_period_ms=0.3,method='keep_first')
     if use_ks4:
-        probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest')
+        probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False)
         probe0_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks4, censored_period_ms=0.3,method='keep_first')
         probe0_we_ks4 = si.create_sorting_analyzer(probe0_sorting_ks4, probe0_preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
@@ -231,7 +235,7 @@ for probe in probes:
         probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
         save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
     if use_ks3:
-        probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest')
+        probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest',do_correction=False)
         probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks3, censored_period_ms=0.3,method='keep_first')
         probe0_we_ks3 = si.create_sorting_analyzer(probe0_sorting_ks3, probe0_preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort3',
@@ -247,6 +251,15 @@ for probe in probes:
     import pandas as pd
     probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
     probe0_segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
+
+    #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
+    import os
+    import glob
+
+    # Define the folder list
+    folder_list = [save_folder + 'probe'+str(probe)+'_preprocessed', 
+                save_folder + 'probe'+str(probe)+'/waveform/',
+                save_folder + 'probe'+str(probe)+'/sorters/']
 
     temp_wh_files = []
     # Go through each folder in the folder list
