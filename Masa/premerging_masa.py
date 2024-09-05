@@ -248,6 +248,14 @@ for probe in range(int(no_probe)):
     probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
     probe0_segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
 
+    #process to change all the folder paths in text and .json files on Beast to the server before uploading it to the server
+    import os
+    import glob
+
+    # Define the folder list
+    folder_list = [save_folder + 'probe'+str(probe)+'_preprocessed', 
+                save_folder + 'probe'+str(probe)+'/waveform/',
+                save_folder + 'probe'+str(probe)+'/sorters/']
 
     temp_wh_files = []
     # Go through each folder in the folder list
