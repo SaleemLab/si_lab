@@ -18,7 +18,7 @@ for iMouse = 1:size(mouses,1)
     dates = SESSION{iMouse};
     for iDate = 1:size(dates,1)
         date = dates(iDate,:);
-        for no_probe = 2
+        for no_probe = 1:2
             ephys_folder = fullfile(base_folder,mouse,'ephys',date);
 
             UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort3','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
