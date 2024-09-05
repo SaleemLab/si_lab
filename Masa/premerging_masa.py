@@ -176,6 +176,8 @@ for probe in range(int(no_probe)):
                     **motion_info['parameters']['interpolate_motion_kwargs'])
 
     probe0_cat_all = probe0_motion_corrected
+    # Back to int16 to save space
+    probe0_cat_all = probe0_cat_all.astype(np.int16)
 
     print('Start to motion correction finished:')
     print(datetime.now() - startTime)
