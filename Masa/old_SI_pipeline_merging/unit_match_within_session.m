@@ -1,16 +1,17 @@
 %% Unitmatch DT implementation
 addpath(genpath('C:\Users\adam.tong\Documents\GitHub\UnitMatch'))
+addpath(genpath('C:\Users\masahiro.takigawa\Documents\GitHub\UnitMatch'))
+
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
-mouses = ['M23031';'M23032';'M23034';'M23037';'M23038'];
-SESSION = {['20230711';'20230712';'20230713';'20230714'];
-    ['20230718';'20230719';'20230720';'20230721';'20230722'];
-    ['20230804';'20230805';'20230806';'20230807'];
-    ['20230810';'20230811';'20230812';'20230813'];
-    ['20230816';'20230817']};
+mouses = ['M23017';'M23028';'M23034';'M23029'];
+SESSION = {['20230628';'20230629';'20230630';'20230701'];
+    ['20230703';'20230704';'20230705';'20230706'];
+    ['20230704';'20230706';'20230707'];
+
 %     ['20230816';'20230817']};
 % mouses = ['M23032'];
 % SESSION = {['20230718']};
-for iMouse = [1]
+for iMouse = 1:length(mouses)
     mouse = mouses(iMouse,:);
     dates = SESSION{iMouse};
 for iDate = 1:size(dates,1)
