@@ -17,12 +17,12 @@ SESSION = {['20230628';'20230629';'20230630';'20230701'];
 %     ['20230816';'20230817']};
 % mouses = ['M23032'];
 % SESSION = {['20230718']};
-for iMouse = 3:size(mouses,1)
+for iMouse = 1:size(mouses,1)
     mouse = mouses(iMouse,:);
     dates = SESSION{iMouse};
     for iDate = 1:size(dates,1)
         date = dates(iDate,:);
-        for no_probe = 1
+        for no_probe = 1:2
             ephys_folder = fullfile(base_folder,mouse,'ephys',date);
 
             UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort3','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
