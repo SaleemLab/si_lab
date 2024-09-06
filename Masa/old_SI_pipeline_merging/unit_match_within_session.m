@@ -4,21 +4,25 @@ addpath(genpath('C:\Users\adam.tong\Documents\GitHub\UnitMatch'))
 addpath(genpath('C:\Users\masahiro.takigawa\Documents\GitHub\UnitMatch'))
 addpath(genpath('C:\Users\masah\Documents\GitHub\UnitMatch'))
 
+addpath(genpath('C:\Users\adam.tong\Documents\GitHub\si_lab'))
+addpath(genpath('C:\Users\masahiro.takigawa\Documents\GitHub\si_lab'))
+addpath(genpath('C:\Users\masah\Documents\GitHub\si_lab'))
+
 base_folder = 'Z:\ibn-vision\DATA\SUBJECTS\';
 mouses = ['M23017';'M23028';'M23029'];
 SESSION = {['20230628';'20230629';'20230630';'20230701'];
     ['20230703';'20230704';'20230705';'20230706'];
-    ['20230704';'20230706';'20230707']};
+    ['20230706';'20230707']};
 
 %     ['20230816';'20230817']};
 % mouses = ['M23032'];
 % SESSION = {['20230718']};
-for iMouse = 1:size(mouses,1)
+for iMouse = 3:size(mouses,1)
     mouse = mouses(iMouse,:);
     dates = SESSION{iMouse};
     for iDate = 1:size(dates,1)
         date = dates(iDate,:);
-        for no_probe = 1:2
+        for no_probe = 1
             ephys_folder = fullfile(base_folder,mouse,'ephys',date);
 
             UMparam.KSDir = {fullfile(ephys_folder,['probe',num2str(no_probe)-1],'sorters','kilosort3','sorter_output')};  % This is a cell array with a path, in the path there should be a subfolder called 'RawWaveforms'.
@@ -163,6 +167,8 @@ for iMouse = 1:size(mouses,1)
             match_ids =[original_id,merged_id,unstable_id];
             save(savepath,'match_ids');
         end
+
+        close all
     end
 end
 
