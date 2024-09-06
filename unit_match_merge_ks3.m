@@ -46,30 +46,30 @@ for no_probe = 1:str2double(noprobe)
     random_spike_ids = spikes(random_spikes+1,1);
     unit_ids = unique(spikes(:,1));
     no_channels = size(ks_sparsity,2);
-    % for iUnit = 1:length(unit_ids)
-    %     waveform_channel_ids = ks_sparsity(iUnit,:);
-    %     % Assume 'cellArray' is your cell array
-    %     unit_random_spikes = random_spike_ids == unit_ids(iUnit);
-    %     unit_waveform = waveforms(unit_random_spikes,:,:);
-    %     unit_waveform = permute(unit_waveform,[2 3 1]);
-    %     spikeMap = zeros(size(unit_waveform,1),no_channels,size(unit_waveform,3));
-    % 
-    %     spikeMap(:,waveform_channel_ids,:) = unit_waveform(:,1:sum(waveform_channel_ids),:);
-    %     spikeMapAvg = zeros(size(unit_waveform,1),no_channels,2);
-    %     nwavs = size(spikeMap,3);
-    %     for cv = 1:2
-    %         if cv==1
-    %             wavidx = floor(1:nwavs/2);
-    %         else
-    %             wavidx = floor(nwavs/2+1:nwavs);
-    %         end
-    %         spikeMapAvg(:,:,cv) = nanmedian(spikeMap(:,:,wavidx),3);
-    %     end
-    %     spikeMap = spikeMapAvg;
-    % 
-    %     %fetch the waveforms of the unit
-    %     writeNPY(spikeMap, fullfile(UMparam.KSDir{1},'RawWaveforms',['Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']));
-    % end
+    for iUnit = 1:length(unit_ids)
+        waveform_channel_ids = ks_sparsity(iUnit,:);
+        % Assume 'cellArray' is your cell array
+        unit_random_spikes = random_spike_ids == unit_ids(iUnit);
+        unit_waveform = waveforms(unit_random_spikes,:,:);
+        unit_waveform = permute(unit_waveform,[2 3 1]);
+        spikeMap = zeros(size(unit_waveform,1),no_channels,size(unit_waveform,3));
+
+        spikeMap(:,waveform_channel_ids,:) = unit_waveform(:,1:sum(waveform_channel_ids),:);
+        spikeMapAvg = zeros(size(unit_waveform,1),no_channels,2);
+        nwavs = size(spikeMap,3);
+        for cv = 1:2
+            if cv==1
+                wavidx = floor(1:nwavs/2);
+            else
+                wavidx = floor(nwavs/2+1:nwavs);
+            end
+            spikeMapAvg(:,:,cv) = nanmedian(spikeMap(:,:,wavidx),3);
+        end
+        spikeMap = spikeMapAvg;
+
+        %fetch the waveforms of the unit
+        writeNPY(spikeMap, fullfile(UMparam.KSDir{1},'RawWaveforms',['Unit',num2str(unit_ids(iUnit)),'_RawSpikes.npy']));
+    end
 
 
 
