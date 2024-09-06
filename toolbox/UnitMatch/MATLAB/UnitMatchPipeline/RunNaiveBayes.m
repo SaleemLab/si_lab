@@ -23,8 +23,11 @@ nCellsPerSession = diff(SessionSwitch);
 IncludeThesePairs = find(EuclDist<param.maxdist);
 % Prepare a set INCLUDING the cross-validated self-scores, otherwise the probability
 % distributions are just weird
-priorMatch = 1-(param.nExpectedMatches./length(IncludeThesePairs)); %
-
+if param.nExpectedMatches <= length(IncludeThesePairs)
+    priorMatch = 1-(param.nExpectedMatches./length(IncludeThesePairs)); %
+else
+    priorMatch = 0.01;
+end
 % priorMatch = 1-((nclus+nclus.*sqrt(ndays-1)*2*param.ExpectMatches)./length(IncludeThesePairs)); %Punish multiple days (unlikely to find as many matches after a few days) *2 for symmetry
 % priorMatch = 1-(nclus*ndays)./(nclus*nclus); %Now use the actual expected prior for bayes'
 ThrsOpt = quantile(TotalScore(IncludeThesePairs),priorMatch);
