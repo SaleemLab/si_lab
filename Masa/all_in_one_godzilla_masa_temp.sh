@@ -8,6 +8,7 @@ base_folder='/home/saleem_lab/spikeinterface_sorting/temp_data/'  # local folder
 no_probe=2 #number of probes you have in this session
 use_ks4=false #use kilosort4
 use_ks3=true #use kilosort3
+export KILOSORT3_PATH=/home/saleem_lab/Kilosort-main #path to kilosort3
 # g_files_to_ignore input currently not working for some reasons.... but it works if it is inside
 g_files_to_ignore=['tcat'] # e.g. g_files_to_ignore=['tcat','0_g6','0_g7','0_g8','0_g9']
 # Run the first Python script with inputs
