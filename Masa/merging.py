@@ -125,7 +125,15 @@ for probe in range(int(no_probe)):
     # Define the folder list
     folder_list = [save_folder + 'probe'+str(probe)+'_preprocessed', 
                 save_folder + 'probe'+str(probe)+'/waveform/',
-                save_folder + 'probe'+str(probe)+'/sorters/']
+                save_folder + 'probe'+str(probe)+'/sorters/',
+                save_folder + 'probe'+str(probe)+'/motion/']
+
+    # Move merge suggestion files to the server
+    if use_ks3:
+        shutil.copytree(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks3.mat', base_folder + mouse + '/ephys/' +save_date)
+    
+    if use_ks4:
+        shutil.copytree(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat', base_folder + mouse + '/ephys/' +save_date)
 
     # Initialize an empty list to store the paths of JSON files
     json_file_list = []
