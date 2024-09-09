@@ -14,7 +14,7 @@ g_files_to_ignore=['tcat'] # e.g. g_files_to_ignore=['tcat','0_g6','0_g7','0_g8'
 #python premerging_masa.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3 $g_files_to_ignore
 
 #python premerging_masa_temp_godzilla.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3 $g_files_to_ignore
-python premerging_masa_temp2_godzilla.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3 $g_files_to_ignore
+python premerging_masa_fix_ks3.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3 $g_files_to_ignore
 
 #python premerging.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
 # Run the MATLAB script for unit_match_merge_ks4_one_probe
