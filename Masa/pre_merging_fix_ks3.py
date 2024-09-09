@@ -109,7 +109,8 @@ for date in dates:
     # stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     # print(stream_names)
     # print(stream_ids)
-for probe in range(int(no_probe)):
+probes = [1]
+for probe in probes:
     date_count = 0
 
 
@@ -154,7 +155,7 @@ for probe in range(int(no_probe)):
         probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
         save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
     if use_ks3:
-        si.Kilosort3Sorter.set_kilosort3_path('/home/lab/Kilosort-main')
+        si.Kilosort3Sorter.set_kilosort3_path('/home/saleem_lab/Kilosort-main')
         probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
         probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',do_correction=False)
         probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks3, censored_period_ms=0.3,method='keep_first')
