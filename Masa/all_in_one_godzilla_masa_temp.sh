@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Define variables
-mouse='M24016' #mouse id
-save_date='20240626' #date of recording
-dates='20240626/20240626_0' #acquisition date and session e.g. dates='20240624/20240624_0,20240624/20240624_1'
+mouse='M24017' #mouse id
+save_date='20240606' #date of recording
+dates='20240606/20240606_0' #acquisition date and session e.g. dates='20240624/20240624_0,20240624/20240624_1'
 base_folder='/home/saleem_lab/spikeinterface_sorting/temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
 use_ks4=false #use kilosort4
