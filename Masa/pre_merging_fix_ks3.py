@@ -165,7 +165,7 @@ for probe in probes:
                                 **job_kwargs)
         probe0_we_ks3.compute('random_spikes')
         probe0_we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
+        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3/in_container_sorting/spikes.npy')
         save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
