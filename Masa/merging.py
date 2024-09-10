@@ -81,6 +81,7 @@ for probe in range(int(no_probe)):
         qm_list = si.get_default_qm_params()
         print(qm_list)
         probe0_we_ks4_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        export_report(sorting_analyzer = probe0_we_ks4_merged, output_folder = ephys_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged_report/')
         
         
     if use_ks3:
@@ -114,6 +115,7 @@ for probe in range(int(no_probe)):
         print('The following quality metrics are computed:')
         print(qm_list)
         probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        export_report(sorting_analyzer = probe0_we_ks3_merged, output_folder = ephys_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged_report/')
 
 
 
