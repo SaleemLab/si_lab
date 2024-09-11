@@ -109,7 +109,6 @@ for date in dates:
     # stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     # print(stream_names)
     # print(stream_ids)
-
 probes = [0]
 for probe in probes:
     date_count = 0
@@ -133,8 +132,7 @@ for probe in probes:
             [probe0_end_sample_frames[-1]+probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
             probe0_end_sample_frames = probe0_end_sample_frames + [probe0_end_sample_frames_tmp[i] + probe0_end_sample_frames[-1] for i in range(0, len(probe0_num_segments))]
 
-            
-        
+
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
     probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')

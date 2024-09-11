@@ -109,7 +109,6 @@ for date in dates:
     # stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     # print(stream_names)
     # print(stream_ids)
-
 probes = [1]
 for probe in probes:
     date_count = 0
@@ -133,9 +132,70 @@ for probe in probes:
             [probe0_end_sample_frames[-1]+probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
             probe0_end_sample_frames = probe0_end_sample_frames + [probe0_end_sample_frames_tmp[i] + probe0_end_sample_frames[-1] for i in range(0, len(probe0_num_segments))]
 
+            
+        
+        #several preprocessing steps and concatenation of the recordings
+        #highpass filter - threhsold at 300Hz
+        probe0_highpass = si.highpass_filter(probe0_raw,freq_min=300.)
+        #detect bad channels
+
+        #phase shift correction - equivalent to T-SHIFT in catGT
+        probe0_phase_shift = si.phase_shift(probe0_highpass)
+        probe0_common_reference = si.common_reference(probe0_phase_shift,operator='median',reference='global')
+        probe0_preprocessed = probe0_common_reference
+        probe0_cat = si.concatenate_recordings([probe0_preprocessed])
+        print('probe0_preprocessed',probe0_preprocessed)
+        print('probe0 concatenated',probe0_cat)
+
+        
+        if date_count == 1:
+            probe0_cat_all = probe0_cat
+
+        else:
+            probe0_cat_all = si.concatenate_recordings([probe0_cat_all,probe0_cat])
+
+    bad_channel_ids, channel_labels = si.detect_bad_channels(probe0_cat_all)
+    probe0_cat_all = probe0_cat_all.remove_channels(bad_channel_ids)
+    print('probe0_bad_channel_ids',bad_channel_ids)
+
+    '''Motion Drift Correction'''
+    #motion correction if needed
+    #this is nonrigid correction - need to do parallel computing to speed up
+    #assign parallel processing as job_kwargs
+    probe0_cat_all = probe0_cat_all.astype(np.float32)
+    si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
+    #probe0_cat_all = si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
+    
+    # not sure why the error happens if save probe0_cat_all directly after motion correction
+    # But it works if load motion info then interpolate motion then save, it works 
+    motion_info = si.load_motion_info(save_folder+'probe'+str(probe)+'_motion')
+
+    from spikeinterface.sortingcomponents.motion import estimate_motion, interpolate_motion
+    probe0_motion_corrected = interpolate_motion(
+                    recording=probe0_cat_all,
+                    motion=motion_info['motion'],
+                    **motion_info['parameters']['interpolate_motion_kwargs'])
+
+    probe0_cat_all = probe0_motion_corrected
+    # Back to int16 to save space
+    probe0_cat_all = probe0_cat_all.astype(np.int16)
+
+    print('Start to motion correction finished:')
+    print(datetime.now() - startTime)
+    #kilosort like to mimic kilosort - no need if you are just running kilosort
+    # probe0_kilosort_like = correct_motion(recording=probe0_cat, preset="kilosort_like")
+    # probe1_kilosort_like = correct_motion(recording=probe1_cat, preset="kilosort_like")
+
+    '''save preprocessed bin file before sorting'''
+
+
+    #after saving, sorters will read this preprocessed binary file instead
+    probe0_preprocessed_corrected = probe0_cat_all.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
+    
+
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
-    probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+    #probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
     #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe1_preprocessed')
     ''' prepare sorters - currently using the default parameters and motion correction is turned off as it was corrected already above
         you can check if the parameters using:
