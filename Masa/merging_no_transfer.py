@@ -59,7 +59,8 @@ def save_spikes_to_csv(spikes,save_folder):
 
 extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
-for probe in range(int(no_probe)):
+probes = [1]
+for probe in probes:
     probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe'+str(probe)+'_preprocessed')
     if use_ks4:
         probe0_sorting_ks4 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort4')
@@ -190,20 +191,7 @@ for probe in range(int(no_probe)):
         os.remove(files)
     #move spikeinterface folder on Beast to the server
 
-    import shutil
-    import os
 
-    ##
-    #
-    folders_to_move = [save_folder + 'probe'+str(probe)+'_preprocessed', 
-                save_folder + 'probe'+str(probe),
-                save_folder + 'probe'+str(probe)+'/motion/']
-
-    for folder in folders_to_move:
-        # construct the destination path
-        destination = os.path.join(base_folder + mouse + '/ephys/' +save_date, folder)
-        # copy the folder to the destination
-        shutil.copytree(save_folder+folder, destination)
 #
 #remove all temmp files
 #shutil.rmtree(save_folder)
