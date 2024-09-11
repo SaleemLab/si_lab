@@ -15,8 +15,8 @@ def save_spikes_to_csv(spikes,save_folder):
     spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
     
 base_folder = '//rdp.arc.ucl.ac.uk/ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
-mouse = 'M24018'
-dates = ['20240715']
+mouse = 'M24017'
+dates = ['20240606']
 #dates = ['20230711','20230712','20230713','20230714']
 for date in dates:
     save_folder = base_folder + '/' + mouse + '/ephys/' + date + '/'
