@@ -7,14 +7,7 @@ import shutil
 
 import numpy as np
 
-import spikeinterface.sorters
-import spikeinterface.full as si
 import  scipy.signal
-import spikeinterface.extractors as se
-import spikeinterface.comparison
-import spikeinterface.exporters
-import spikeinterface.curation
-import spikeinterface.widgets 
 from datetime import datetime
 import itertools
 import glob
@@ -23,11 +16,11 @@ startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
 mouse = 'M24016'
-session = '20240706'
-dates = ['20240706/20240706_0']
+session = '20240626'
+dates = ['20240626/20240626_0']
 g_files_to_ignore = ['tcat','0_g6','0_g7','0_g8','0_g9']
 
-save_date = '20240706'
+save_date = '20240626'
 base_folder = 'Z:/ibn-vision/DATA/SUBJECTS/'
 save_base_folder = base_folder
 save_folder = save_base_folder + mouse + '/ephys/' + save_date + '/'
