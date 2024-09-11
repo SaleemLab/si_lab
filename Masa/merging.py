@@ -47,6 +47,14 @@ subprocess.run('ulimit -n 10000',shell=True)
 def sorting_key(s):
     return int(s.split('_g')[-1])
 
+import pandas as pd
+def save_spikes_to_csv(spikes,save_folder):
+    unit_index = spikes['unit_index']
+    segment_index = spikes['segment_index']
+    sample_index = spikes['sample_index']
+    spikes_df = pd.DataFrame({'unit_index':unit_index,'segment_index':segment_index,'sample_index':sample_index})
+    spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
+    
 #grab recordings from the server to local machine (Beast)
 
 extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
@@ -82,7 +90,8 @@ for probe in range(int(no_probe)):
         print(qm_list)
         probe0_we_ks4_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
         export_report(sorting_analyzer = probe0_we_ks4_merged, output_folder = ephys_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged_report/')
-        
+        probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged/sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged/sorting/')
         
     if use_ks3:
         probe0_sorting_ks3 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort3')
@@ -116,7 +125,8 @@ for probe in range(int(no_probe)):
         print(qm_list)
         probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
         export_report(sorting_analyzer = probe0_we_ks3_merged, output_folder = ephys_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged_report/')
-
+        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/')
 
 
     '''minor corrections to the folder path of files before moving the files to server'''
