@@ -155,6 +155,7 @@ for probe in probes:
         probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
         save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
     if use_ks3:
+        # Use local KS3
         si.Kilosort3Sorter.set_kilosort3_path('/home/saleem_lab/Kilosort')
         probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
         probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',do_correction=False)
@@ -167,6 +168,11 @@ for probe in probes:
         probe0_we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
         probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/spikes.npy') # testing waveform folder rather than sorters folder for reading spikes.npy file
         #probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
+
+        if not os.path.exists(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/'): #if missing in_container_sorting folder, create one just for saving spike.csv in it
+            os.makedirs(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
+            shutil.copyfile(save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/spikes.npy', save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/')
         save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
