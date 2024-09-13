@@ -21,15 +21,3 @@ use_ks4=true #use kilosort4
 use_ks3=true #use kilosort3
 python premerging_masa_local_temp2.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3 $g_files_to_ignore
 #python pre_merging_fix_ks3.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3 $g_files_to_ignore
-
-#python premerging.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
-# Run the MATLAB script for unit_match_merge_ks4_one_probe
-matlab -nodisplay -nosplash -r "mouse='${mouse}'; date='${save_date}'; base_folder='${base_folder}';noprobe='${no_probe}'; run('unit_match_merge_ks4.m'); exit;"
-matlab -nodisplay -nosplash -r "mouse='${mouse}'; date='${save_date}'; base_folder='${base_folder}';noprobe='${no_probe}'; run('unit_match_merge_ks3.m'); exit;"
-# Run the MATLAB script for the ks3 version (assuming the script name and required adjustments)
-# matlab -nodisplay -nosplash -r "mouse='$mouse'; date=''; base_folder=''; run('your_ks3_script_name.m'); exit;"
-
-# Run the second Python script with inputs
-use_ks4=true #use kilosort4
-use_ks3=true #use kilosort3
-python merging.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
