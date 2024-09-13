@@ -93,7 +93,7 @@ for probe in range(int(no_probe)):
         qm_list = si.get_default_qm_params()
         print(qm_list)
         probe0_we_ks4_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
-        export_report(sorting_analyzer = probe0_we_ks4_merged, output_folder = ephys_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged_report/')
+        si.export_report(sorting_analyzer = probe0_we_ks4_merged, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged_report/',**job_kwargs)
         probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged/sorting/spikes.npy')
         save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged/sorting/')
         
@@ -131,7 +131,7 @@ for probe in range(int(no_probe)):
         print('The following quality metrics are computed:')
         print(qm_list)
         probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
-        export_report(sorting_analyzer = probe0_we_ks3_merged, output_folder = ephys_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged_report/')
+        si.export_report(sorting_analyzer = probe0_we_ks3_merged, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged_report/',**job_kwargs)
         probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/spikes.npy')
         save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/')
 
@@ -145,14 +145,14 @@ for probe in range(int(no_probe)):
     folder_list = [save_folder + 'probe'+str(probe)+'_preprocessed', 
                 save_folder + 'probe'+str(probe)+'/waveform/',
                 save_folder + 'probe'+str(probe)+'/sorters/',
-                save_folder + 'probe'+str(probe)+'/motion/']
+                save_folder + 'probe'+str(probe)+'_motion/']
 
     # Move merge suggestion files to the server
     if use_ks3:
-        shutil.copytree(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks3.mat', base_folder + mouse + '/ephys/' +save_date)
+        shutil.copyfile(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks3.mat', base_folder + mouse + '/ephys/' +save_date +'/probe'+str(probe)+'um_merge_suggestion_ks3.mat')
     
     if use_ks4:
-        shutil.copytree(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat', base_folder + mouse + '/ephys/' +save_date)
+        shutil.copyfile(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat', base_folder + mouse + '/ephys/' +save_date +'/probe'+str(probe)+'um_merge_suggestion_ks3.mat')
 
     # Initialize an empty list to store the paths of JSON files
     json_file_list = []
@@ -204,7 +204,7 @@ for probe in range(int(no_probe)):
     #
     folders_to_move = [save_folder + 'probe'+str(probe)+'_preprocessed', 
                 save_folder + 'probe'+str(probe),
-                save_folder + 'probe'+str(probe)+'/motion/']
+                save_folder + 'probe'+str(probe)+'_motion/']
 
     for folder in folders_to_move:
         # construct the destination path
