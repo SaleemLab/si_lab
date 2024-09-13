@@ -64,12 +64,15 @@ for probe in probes:
     probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe'+str(probe)+'_preprocessed')
     if use_ks4:
         probe0_sorting_ks4 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort4')
+        # Remvoe excess spikes to avoid spike indexing error
+        probe0_sorting_ks4_remove_excess_spikes=spikeinterface.curation.remove_excess_spikes(probe0_sorting_ks4,probe0_preprocessed_corrected)
+
         merge_suggestions = sio.loadmat(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat')
         match_ids = merge_suggestions['match_ids']
         merge_ids = match_ids[:,1] - 1
-        cs_probe0 = si.CurationSorting(probe0_sorting_ks4)
+        cs_probe0 = si.CurationSorting(probe0_sorting_ks4_remove_excess_spikes)
         unique_ids = np.unique(merge_ids)
-        original_ids = probe0_sorting_ks4.get_unit_ids()
+        original_ids = probe0_sorting_ks4_remove_excess_spikes.get_unit_ids()
         for id in unique_ids:
             id_count = np.count_nonzero(merge_ids == id)
             if id_count > 1:
@@ -96,12 +99,15 @@ for probe in probes:
         
     if use_ks3:
         probe0_sorting_ks3 = si.read_sorter_folder(save_folder + 'probe'+str(probe)+'/sorters/kilosort3')
+        # Remvoe excess spikes to avoid spike indexing error
+        probe0_sorting_ks3_remove_excess_spikes=spikeinterface.curation.remove_excess_spikes(probe0_sorting_ks3,probe0_preprocessed_corrected)
+
         merge_suggestions = sio.loadmat(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks3.mat')
         match_ids = merge_suggestions['match_ids']
         merge_ids = match_ids[:,1] - 1
-        cs_probe0 = si.CurationSorting(probe0_sorting_ks3)
+        cs_probe0 = si.CurationSorting(probe0_sorting_ks3_remove_excess_spikes)
         unique_ids = np.unique(merge_ids)
-        original_ids = probe0_sorting_ks3.get_unit_ids()
+        original_ids = probe0_sorting_ks3_remove_excess_spikes.get_unit_ids()
         for id in unique_ids:
             id_count = np.count_nonzero(merge_ids == id)
             if id_count > 1:
