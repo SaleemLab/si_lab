@@ -152,7 +152,7 @@ for probe in probes:
         shutil.copyfile(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks3.mat', base_folder + mouse + '/ephys/' +save_date +'/probe'+str(probe)+'um_merge_suggestion_ks3.mat')
     
     if use_ks4:
-        shutil.copyfile(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat', base_folder + mouse + '/ephys/' +save_date +'/probe'+str(probe)+'um_merge_suggestion_ks3.mat')
+        shutil.copyfile(save_folder + 'probe'+str(probe)+'um_merge_suggestion_ks4.mat', base_folder + mouse + '/ephys/' +save_date +'/probe'+str(probe)+'um_merge_suggestion_ks4.mat')
 
     # Initialize an empty list to store the paths of JSON files
     json_file_list = []
