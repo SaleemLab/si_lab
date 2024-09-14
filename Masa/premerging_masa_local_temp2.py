@@ -109,7 +109,7 @@ for date in dates:
     # stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     # print(stream_names)
     # print(stream_ids)
-probes=[0]
+probes=[1]
 for probe in probes:
     date_count = 0
     probe0_start_sample_fames = []
