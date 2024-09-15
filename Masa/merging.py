@@ -210,7 +210,7 @@ for probe in range(int(no_probe)):
         # construct the destination path
         destination = os.path.join(base_folder + mouse + '/ephys/' +save_date, folder)
         # copy the folder to the destination
-        shutil.copytree(save_folder+folder, destination)
+        shutil.copytree(folder, destination)
 #
 #remove all temmp files
 #shutil.rmtree(save_folder)
