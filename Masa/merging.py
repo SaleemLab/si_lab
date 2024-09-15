@@ -202,15 +202,15 @@ for probe in range(int(no_probe)):
 
     ##
     #
-    folders_to_move = [save_folder + 'probe'+str(probe)+'_preprocessed', 
-                save_folder + 'probe'+str(probe),
-                save_folder + 'probe'+str(probe)+'_motion/']
+    folders_to_move = ['probe'+str(probe)+'_preprocessed', 
+                'probe'+str(probe),
+                'probe'+str(probe)+'_motion/']
 
     for folder in folders_to_move:
         # construct the destination path
         destination = os.path.join(base_folder + mouse + '/ephys/' +save_date, folder)
         # copy the folder to the destination
-        shutil.copytree(folder, destination)
+        shutil.copytree(save_folder + folder, destination)
 #
 #remove all temmp files
 #shutil.rmtree(save_folder)
