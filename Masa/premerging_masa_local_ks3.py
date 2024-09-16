@@ -95,7 +95,7 @@ for date in dates:
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
-            #shutil.copytree(source, destination)
+            shutil.copytree(source, destination)
     print('Start to copying files to local folder: ')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
