@@ -95,7 +95,7 @@ for date in dates:
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
-            #shutil.copytree(source, destination)
+            shutil.copytree(source, destination)
     print('Start to copying files to local folder: ')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
@@ -109,7 +109,8 @@ for date in dates:
     # stream_names, stream_ids = si.get_neo_streams('spikeglx',dst_folder)
     # print(stream_names)
     # print(stream_ids)
-probes = [0]
+    
+probes=[0]
 for probe in probes:
     date_count = 0
     probe0_start_sample_fames = []
@@ -132,10 +133,73 @@ for probe in probes:
             [probe0_end_sample_frames[-1]+probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
             probe0_end_sample_frames = probe0_end_sample_frames + [probe0_end_sample_frames_tmp[i] + probe0_end_sample_frames[-1] for i in range(0, len(probe0_num_segments))]
 
+        #several preprocessing steps and concatenation of the recordings
+        #highpass filter - threhsold at 300Hz
+        probe0_highpass = si.highpass_filter(probe0_raw,freq_min=300.)
+        #detect bad channels
+
+        #phase shift correction - equivalent to T-SHIFT in catGT
+        probe0_phase_shift = si.phase_shift(probe0_highpass)
+        probe0_common_reference = si.common_reference(probe0_phase_shift,operator='median',reference='global')
+        probe0_preprocessed = probe0_common_reference
+        probe0_cat = si.concatenate_recordings([probe0_preprocessed])
+        print('probe0_preprocessed',probe0_preprocessed)
+        print('probe0 concatenated',probe0_cat)
+
+        
+        if date_count == 1:
+            probe0_cat_all = probe0_cat
+
+        else:
+            probe0_cat_all = si.concatenate_recordings([probe0_cat_all,probe0_cat])
+
+    bad_channel_ids, channel_labels = si.detect_bad_channels(probe0_cat_all)
+    probe0_cat_all = probe0_cat_all.remove_channels(bad_channel_ids)
+    print('probe0_bad_channel_ids',bad_channel_ids)
+
+    '''Motion Drift Correction'''
+    #motion correction if needed
+    #this is nonrigid correction - need to do parallel computing to speed up
+    #assign parallel processing as job_kwargs
+    probe0_cat_all = probe0_cat_all.astype(np.float32)
+    si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
+    #probe0_cat_all = si.correct_motion(recording=probe0_cat_all, preset="nonrigid_accurate",folder=save_folder+'probe'+str(probe)+'_motion',output_motion_info=True,**job_kwargs)
+    
+    # not sure why the error happens if save probe0_cat_all directly after motion correction
+    # But it works if load motion info then interpolate motion then save, it works 
+    motion_info = si.load_motion_info(save_folder+'probe'+str(probe)+'_motion')
+
+    from spikeinterface.sortingcomponents.motion import estimate_motion, interpolate_motion
+    probe0_motion_corrected = interpolate_motion(
+                    recording=probe0_cat_all,
+                    motion=motion_info['motion'],
+                    **motion_info['parameters']['interpolate_motion_kwargs'])
+
+    probe0_cat_all = probe0_motion_corrected
+    # Back to int16 to save space
+    probe0_cat_all = probe0_cat_all.astype(np.int16)
+
+    print('Start to motion correction finished:')
+    print(datetime.now() - startTime)
+    #kilosort like to mimic kilosort - no need if you are just running kilosort
+    # probe0_kilosort_like = correct_motion(recording=probe0_cat, preset="kilosort_like")
+    # probe1_kilosort_like = correct_motion(recording=probe1_cat, preset="kilosort_like")
+
+    '''save preprocessed bin file before sorting'''
+
+
+    #after saving, sorters will read this preprocessed binary file instead
+    probe0_preprocessed_corrected = probe0_cat_all.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
+    
 
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
-    probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+    #probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+    #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe1_preprocessed')
+
+    print('Start to prepocessed files saved:')
+    print(datetime.now() - startTime)
+    #probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
     #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe1_preprocessed')
     ''' prepare sorters - currently using the default parameters and motion correction is turned off as it was corrected already above
         you can check if the parameters using:
@@ -163,6 +227,8 @@ for probe in probes:
     # probe1_sorting_ks2_5 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks2_5, censored_period_ms=0.3,method='keep_first')
     # probe1_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks3, censored_period_ms=0.3,method='keep_first')
     if use_ks4:
+        # Use docker KS4
+        probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
         probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False)
         probe0_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks4, censored_period_ms=0.3,method='keep_first')
         probe0_we_ks4 = si.create_sorting_analyzer(probe0_sorting_ks4, probe0_preprocessed_corrected, 
@@ -174,7 +240,10 @@ for probe in probes:
         probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
         save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
     if use_ks3:
-        probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest',do_correction=False)
+        # Use local KS3
+        si.Kilosort3Sorter.set_kilosort3_path('/home/saleem_lab/Kilosort')
+        probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+        probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',do_correction=False)
         probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks3, censored_period_ms=0.3,method='keep_first')
         probe0_we_ks3 = si.create_sorting_analyzer(probe0_sorting_ks3, probe0_preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort3',
@@ -182,7 +251,13 @@ for probe in probes:
                                 **job_kwargs)
         probe0_we_ks3.compute('random_spikes')
         probe0_we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
+        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/spikes.npy') # testing waveform folder rather than sorters folder for reading spikes.npy file
+        #probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
+
+        if not os.path.exists(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/'): #if missing in_container_sorting folder, create one just for saving spike.csv in it
+            os.makedirs(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
+            shutil.copyfile(save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/spikes.npy', save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/')
         save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
