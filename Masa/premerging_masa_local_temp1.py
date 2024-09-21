@@ -166,7 +166,7 @@ for probe in probes:
         # Use local KS4
         #si.Kilosort3Sorter.set_kilosort3_path('/home/saleem_lab/Kilosort')
         probe0_preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
-        probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',do_correction=False)
+        probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',do_correction=False,use_binary_file=True)
         probe0_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks4, censored_period_ms=0.3,method='keep_first')
         probe0_we_ks4 = si.create_sorting_analyzer(probe0_sorting_ks4, probe0_preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
