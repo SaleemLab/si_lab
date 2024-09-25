@@ -116,6 +116,7 @@ for probe in range(int(no_probe)):
     for date in dates:
         date_count = date_count + 1
         probe_name = 'imec' + str(probe) + '.ap'
+        dst_folder = local_folder + date + '/'
         probe0_raw = si.read_spikeglx(dst_folder,stream_name=probe_name)
         print(probe0_raw)
 

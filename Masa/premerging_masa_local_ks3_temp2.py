@@ -42,7 +42,7 @@ base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + save_date +'/'
 
 # Check g files to ignore are correct (tcat should always be ignored)
-g_files_to_ignore = ['tcat','0_g6','0_g7','0_g8','0_g9']
+g_files_to_ignore = ['tcat','0_g6','0_g7','0_g8','0_g9','1_g']
 #g_files_to_ignore = sys.argv[8]
 print(g_files_to_ignore)
 # get all the recordings on that day
@@ -95,7 +95,7 @@ for date in dates:
             source = os.path.join(ephys_folder, dirname)
             destination = os.path.join(dst_folder, dirname)
             # copy the directory to the destination folder
-            shutil.copytree(source, destination)
+            #shutil.copytree(source, destination)
     print('Start to copying files to local folder: ')
     print(datetime.now() - startTime)
     ''' read spikeglx recordings and preprocess them'''
@@ -118,6 +118,7 @@ for probe in probes:
     for date in dates:
         date_count = date_count + 1
         probe_name = 'imec' + str(probe) + '.ap'
+        dst_folder = local_folder + date + '/'
         probe0_raw = si.read_spikeglx(dst_folder,stream_name=probe_name)
         print(probe0_raw)
 
