@@ -15,12 +15,12 @@ import scipy.io as sio
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
-mouse = 'M24017'
-session = '20240613'
-dates = ['20240613/20240613_0','20240613/20240613_1']
+mouse = 'M24018'
+session = '20240718'
+dates = ['20240718/20240718_0','20240718/20240718_1','20240718/20240718_2']
 g_files_to_ignore = ['tcat','0_g6','0_g7','0_g8','0_g9']
 
-save_date = '20240613'
+save_date = '20240607'
 base_folder = 'Z:/ibn-vision/DATA/SUBJECTS/'
 save_base_folder = base_folder
 save_folder = save_base_folder + mouse + '/ephys/' + save_date + '/'
