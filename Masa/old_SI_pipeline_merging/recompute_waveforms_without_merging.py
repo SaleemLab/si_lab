@@ -90,7 +90,7 @@ for date in dates:
     probe1_preprocessed_corrected = si.load_extractor(ephys_folder + 'probe1_preprocessed/')
 #    match_ids = merge_suggestions['match_ids']
 #    merge_ids = match_ids[:,1] - 1
-#    cs_probe1 = si.CurationSorting(probe1_sorting_ks3)
+    cs_probe1 = si.CurationSorting(probe1_sorting_ks3)
 #    unique_ids = np.unique(merge_ids)
 #    original_ids = probe1_sorting_ks3.get_unit_ids()
 #    for id in unique_ids:
