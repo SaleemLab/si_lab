@@ -68,8 +68,8 @@ for date in dates:
     probe0_sorting_ks3 = si.read_sorter_folder(ephys_folder + 'probe0/sorters/kilosort3/')
     probe0_we_ks3 = si.load_waveforms(ephys_folder + 'probe0/waveform/kilosort3/') 
     probe0_preprocessed_corrected = si.load_extractor(ephys_folder + 'probe0_preprocessed/')
-    match_ids = merge_suggestions['match_ids']
-    merge_ids = match_ids[:,1] - 1
+#    match_ids = merge_suggestions['match_ids']
+#    merge_ids = match_ids[:,1] - 1
     cs_probe0 = si.CurationSorting(probe0_sorting_ks3)
 #    unique_ids = np.unique(merge_ids)
 #    original_ids = probe0_sorting_ks3.get_unit_ids()
