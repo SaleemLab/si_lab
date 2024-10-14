@@ -133,8 +133,8 @@ for date in save_date:
      spikes = probe0_ks3_sorting.to_spike_vector()
      #unit_ids=[0];
     
-     V1_spike_amplitudes
-     HPC_spike_amplitudes
+     V1_spikes
+     HPC_spikes
      
      probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/spikes.npy')
      for current_spike in probe0_ks3_spikes[2]:
@@ -146,25 +146,25 @@ for date in save_date:
          peak_channel = peak_channel[0]
          
          # Initialize a list to store the indices of the arrays that contain the value
-        indices_with_value = []
+         indices_with_value = []
         
-        # Iterate through the HPC channel groups and check for the peak channel
-        for index, arr in enumerate(channel_clusters):
-            if peak_channel in arr:
-                indices_with_value.append(index)
+         # Iterate through the HPC channel groups and check for the peak channel
+         for index, arr in enumerate(channel_clusters):
+             if peak_channel in arr:
+                 indices_with_value.append(index)
         
-        if any(indices_with_value):
+         if any(indices_with_value):
             indices_with_value = indices_with_value[0]
             spike_amplitudes[channel_clusters[indices_with_value]]
         
-        # Iterate through the V1 channel groups and check for the peak channel
-        for index, arr in enumerate(channel_clusters_V1):
-            if peak_channel in arr:
-                indices_with_value.append(index)
+         # Iterate through the V1 channel groups and check for the peak channel
+         for index, arr in enumerate(channel_clusters_V1):
+             if peak_channel in arr:
+                 indices_with_value.append(index)
         
-        if any(indices_with_value):
-            indices_with_value = indices_with_value[0]
-            spike_amplitudes[channel_clusters[indices_with_value]]
+         if any(indices_with_value):
+             indices_with_value = indices_with_value[0]
+             spike_amplitudes[channel_clusters_V1[indices_with_value]]
             
      #print(np.size(traces[0:29,:],0))
      #print(np.size(channel_locations,1))
