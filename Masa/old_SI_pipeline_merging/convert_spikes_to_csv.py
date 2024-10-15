@@ -14,19 +14,79 @@ def save_spikes_to_csv(spikes,save_folder):
     spikes_df = pd.DataFrame({'unit_index':unit_index,'segment_index':segment_index,'sample_index':sample_index})
     spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
     
-base_folder = '//rdp.arc.ucl.ac.uk/ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+base_folder = '//rdp.arc.ucl.ac.uk/ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/' 
 mouse = 'M24017'
-dates = ['20240606']
+dates = ['20240604','20240606','20240607','20240613']
 #dates = ['20230711','20230712','20230713','20230714']
+
+# For non-merged clusters
 for date in dates:
     save_folder = base_folder + '/' + mouse + '/ephys/' + date + '/'
     for probe in [0,1]:
+        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/')
+        #probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/spikes.npy')
+        #save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/') 
+        
+mouse = 'M24016'
+dates = ['20240626','20240701','20240706']
+#dates = ['20230711','20230712','20230713','20230714']
+
+# For non-merged clusters
+for date in dates:
+    save_folder = base_folder + '/' + mouse + '/ephys/' + date + '/'
+    for probe in [0,1]:
+        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/')
+        #probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/spikes.npy')
+        #save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')       
+        
+mouse = 'M24018'
+dates = ['20240715','20240718','20240723']
+#dates = ['20230711','20230712','20230713','20230714']
+
+# For non-merged clusters
+for date in dates:
+    save_folder = base_folder + '/' + mouse + '/ephys/' + date + '/'
+    for probe in [0,1]:
+        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/')
+        #probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/spikes.npy')
+        #save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')       
+        
+##################################################################################################################
+##############################################################################################################
+# For merged clusters
+base_folder = '//rdp.arc.ucl.ac.uk/ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+mouse = 'M23017'
+#dates = ['20240606']
+dates = ['20230628','20230629','20230630','20230701']
+
+        
+base_folder = '//rdp.arc.ucl.ac.uk/ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+mouse = 'M23028'
+#dates = ['20240606']
+dates = ['20230703','20230704','20230705','20230706']
+for date in dates:
+    save_folder = base_folder + '/' + mouse + '/ephys/' + date + '/'
+    for probe in [0]:
         probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/spikes.npy')
-        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/')
-        probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged/sorting/spikes.npy')
-        save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4_merged/sorting/')        
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/')   
+        #probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/spikes.npy')
+        #save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')  
         
-        
+base_folder = '//rdp.arc.ucl.ac.uk/ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+mouse = 'M23029'
+#dates = ['20240606']
+dates = ['20230706','20230707']
+for date in dates:
+    save_folder = base_folder + '/' + mouse + '/ephys/' + date + '/'
+    for probe in [0]:
+        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/')   
+        #probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/spikes.npy')
+        #save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')      
+
         
 import os
 import shutil

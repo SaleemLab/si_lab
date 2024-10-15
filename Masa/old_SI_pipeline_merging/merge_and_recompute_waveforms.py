@@ -135,6 +135,19 @@ for date in dates:
     print(qm_list)
     probe0_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
     probe1_we_ks3_merged.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+
+    import pandas as pd
+    import numpy as np
+    def save_spikes_to_csv(spikes,save_folder):
+        unit_index = spikes['unit_index']
+        segment_index = spikes['segment_index']
+        sample_index = spikes['sample_index']
+        spikes_df = pd.DataFrame({'unit_index':unit_index,'segment_index':segment_index,'sample_index':sample_index})
+        spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
+        
+    for probe in [0,1]:
+        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/spikes.npy')
+        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3_merged/sorting/')
 #we use UnitMatch to merge units that are similar and recompute the waveforms
 #This script loads um_merge_suggestions.mat and merge units suggeted by UnitMatch
 # Variable match_id: first column original id, and second column the id to merge with
