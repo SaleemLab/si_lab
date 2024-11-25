@@ -40,25 +40,25 @@ def get_unique_place_field_centers(place_field_centers):
 
 def make_two_environment_data():
 
-    dges1 = [(0, 1), (1, 2), (2, 3)]
-        node_positions1 = [
-                       (50, 40),
-                       (50, 80),
-                       (50, 120),
-                       (50, 160),
+    edges1 = [(0, 1), (1, 2), (2, 3)]
+    node_positions1 = [
+                       (100, 40),
+                       (100, 80),
+                       (100, 120),
+                       (100, 160),
                        ]
         
     edge_order1 = ((0, 1), (1, 2), (2, 3))
     edge_spacing1 = 0
-    track_graph1 = make_track_graph(node_positions2, edges2)
+    track_graph1 = make_track_graph(node_positions1, edges1)
     
-    traversal_path2 = [(0, 1), (1, 2), (2, 3),
+    traversal_path1 = [(0, 1), (1, 2), (2, 3),
                        (3, 2), (2, 1), (1, 0)]
-    position2 = generate_position(traversal_path2, track_graph2)
-    position_df2 = get_linearized_position(position2,
-                                          track_graph2,
-                                          edge_order=edge_order2,
-                                          edge_spacing=edge_spacing2,
+    position1 = generate_position(traversal_path1, track_graph1)
+    position_df1 = get_linearized_position(position1,
+                                          track_graph1,
+                                          edge_order=edge_order1,
+                                          edge_spacing=edge_spacing1,
                                           use_HMM=False)
     
     sampling_frequency = 1000
@@ -102,7 +102,7 @@ def make_two_environment_data():
                                                     variance=6.0**2)
                    for center in place_field_centers2], axis=1)
     spikes2 = np.zeros((spikes2_temp.shape[0], spikes1.shape[1]))
-    spikes2[:, [7, 17, 27, 4, 14, 24, 10, 1, 12, 23]] = spikes2_temp
+    spikes2[:, [5, 2, 0, 9, 7, 6, 1, 4, 8, 3]] = spikes2_temp
     
     return (spikes1, spikes2,
             position_df1, position_df2,
@@ -112,3 +112,28 @@ def make_two_environment_data():
             edge_order1, edge_spacing1,
             edge_order2, edge_spacing2
            )
+
+
+(spikes1, spikes2,
+ position_df1, position_df2,
+ track_graph1, track_graph2, 
+ place_field_centers1, place_field_centers2,
+ position1, position2,
+ edge_order1, edge_spacing1,
+ edge_order2, edge_spacing2,
+) = make_two_environment_data()
+
+
+fig, axes = plt.subplots(1, 2, figsize=(14, 7))
+axes[0].scatter(place_field_centers1[:, 0], place_field_centers1[:, 1], alpha=0.3, s=600, zorder=0)
+for ind, center in enumerate(place_field_centers1):
+    axes[0].text(center[0], center[1], ind, ha='center', va='center', fontsize=20, zorder=1)
+axes[0].set_title('Linear Track 1')
+axes[0].set_ylabel('Y-Position')
+axes[0].set_xlabel('X-Position')
+    
+axes[1].scatter(place_field_centers2[:, 0], place_field_centers2[:, 1], alpha=0.3, s=600, zorder=0)
+for ind, center in zip([7, 17, 27, 4, 14, 24, 10, 1, 12, 23], place_field_centers2):
+    axes[1].text(center[0], center[1], ind, ha='center', va='center', fontsize=20, zorder=1)
+axes[1].set_title('Linear Track 2')
+axes[1].set_xlabel('X-Position')

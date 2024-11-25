@@ -66,7 +66,7 @@ dates = ['20230628','20230629','20230630','20230701']
 base_folder = '//rdp.arc.ucl.ac.uk/ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
 mouse = 'M23028'
 #dates = ['20240606']
-dates = ['20230703','20230704','20230705','20230706']
+dates = ['20230704','20230705','20230706']
 for date in dates:
     save_folder = base_folder + '/' + mouse + '/ephys/' + date + '/'
     for probe in [0]:

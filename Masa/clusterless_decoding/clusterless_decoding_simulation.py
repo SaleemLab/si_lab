@@ -18,8 +18,19 @@ np.random.seed(0)
 # Enable logging
 logging.basicConfig(level=logging.INFO)
 
-from replay_trajectory_classification.clusterless_simulation import make_simulated_run_data
+from __future__ import annotations
 
+import numpy as np
+
+from replay_trajectory_classification.simulate import (
+    get_trajectory_direction,
+    simulate_multiunit_with_place_fields,
+    simulate_position,
+    simulate_time
+)
+
+
+from replay_trajectory_classification.clusterless_simulation import make_simulated_run_data
 # Environment 1
 (time, position, sampling_frequency,
  multiunits, multiunits_spikes) = make_simulated_run_data()
@@ -27,7 +38,7 @@ from replay_trajectory_classification.clusterless_simulation import make_simulat
 # Environment 2
 np.random.seed(1)
 (time2, position2, sampling_frequency2,
- multiunits2, multiunits_spikes2) = make_simulated_run_data()
+ multiunits2, multiunits_spikes2) = make_simulated_run_data2()
 
 ##
 spike_ind, neuron_ind = np.nonzero(multiunits_spikes2)
@@ -76,10 +87,10 @@ clusterless_algorithm_params = {
 
 # If your marks are integers, use this algorithm because it is much faster
 # clusterless_algorithm = 'multiunit_likelihood_integer_gpu'
- clusterless_algorithm_params = {
-     'mark_std': 1.0,
-     'position_std': 12.5,
- }
+#clusterless_algorithm_params = {
+#     'mark_std': 1.0,
+#     'position_std': 12.5,
+# }
     
 
 decoder = ClusterlessDecoder(
