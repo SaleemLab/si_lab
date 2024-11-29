@@ -213,7 +213,7 @@ for probe in range(int(no_probe)):
         shutil.copytree(save_folder + folder, destination)
 #
 #remove all temmp files
-#shutil.rmtree(save_folder)
+shutil.rmtree(save_folder)
 
 print('All Done! Overall it took:')
 
