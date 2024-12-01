@@ -34,7 +34,7 @@ no_dates = len(save_date_list)
 acquisition_folders = []
 date_count = 0
 for save_date_tmp in save_date_list:
-    save_date = str(save_date_tmp)
+    save_date = str(save_date_tmp[0])
     acquisitions = acquisition_list[date_count]
     for acquisition in acquisitions:
         acquisition_folders.append(local_folder + mouse + '/ephys/' + save_date + '/' + save_date + '_' + str(acquisition)) 
