@@ -25,6 +25,7 @@ mouse = sys.argv[1]
 # All command-line arguments after `mouse` and before `save_date` are considered dates.
 acquisition_list = ast.literal_eval(sys.argv[2])   # This captures all acquisitions as a list.
 # The last command-line argument is `save_date`.
+print(sys.argv[3])
 save_date_list = ast.literal_eval(sys.argv[3])
 local_folder = sys.argv[4]
 no_probe = sys.argv[5]
