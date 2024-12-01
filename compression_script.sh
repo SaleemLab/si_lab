@@ -6,8 +6,8 @@
 
 # Define variables
 mouse='M24016' #mouse id
-save_date='[20240626,20240701,20240706]' #date of recording
-acquisitions ='[[0],[0],[0]' #acquisitions you have so there will be same number of compression folders
+save_date='[[20240626],[20240701],[20240706]]' #date of recording
+acquisitions='[[0],[0],[0]]' #acquisitions you have so there will be same number of compression folders
 base_folder='/mnt/rds01/ibn-vision/DATA/SUBJECTS/'  # Adjust this path if necessary
 no_probe=2 #number of probes you have in this session
 
