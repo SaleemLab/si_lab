@@ -57,6 +57,7 @@ for save_date_tmp in save_date_list:
             recording_raw = si.read_spikeglx(acquisition_folder,stream_name='imec' + str(probe) + '.ap')
             print(recording_raw)
             compression_folder = local_folder + save_date + '/probe' + str(probe) + '_compressed' + acquisition_folder[-2:]
+            print('compressing to folder: '+compression_folder)
             raw_compressed = recording_raw.save(format="zarr", folder=compression_folder, compressor=compressor_wv, n_jobs=16, chunk_duration="1s")
             tcat_pattern = os.path.join(acquisition_folder, '**', '*t0.imec*.lf*')
             files_to_rename = glob.glob(tcat_pattern, recursive=True)
