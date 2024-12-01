@@ -23,9 +23,9 @@ compressor_wv = WavPack(level=3, bps=None)
 # The first command-line argument after the script name is the mouse identifier.
 mouse = sys.argv[1]
 # All command-line arguments after `mouse` and before `save_date` are considered dates.
-acquisition_list = ast.literal_eval(sys.argv[2].split(','))   # This captures all acquisitions as a list.
+acquisition_list = ast.literal_eval(sys.argv[2])   # This captures all acquisitions as a list.
 # The last command-line argument is `save_date`.
-save_date_list = ast.literal_eval(sys.argv[3].split(','))
+save_date_list = ast.literal_eval(sys.argv[3])
 local_folder = sys.argv[4]
 no_probe = sys.argv[5]
 
