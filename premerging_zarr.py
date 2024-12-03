@@ -7,7 +7,7 @@ import os
 import shutil
 
 import numpy as np
-
+import glob
 import spikeinterface.sorters
 import spikeinterface.full as si
 import  scipy.signal
@@ -19,7 +19,7 @@ import spikeinterface.widgets
 import docker
 from datetime import datetime
 import itertools
-
+import ast
 import scipy.io as sio
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
@@ -28,18 +28,22 @@ import sys
 # The first command-line argument after the script name is the mouse identifier.
 mouse = sys.argv[1]
 # All command-line arguments after `mouse` and before `save_date` are considered dates.
-dates = sys.argv[2].split(',')   # This captures all dates as a list.
+acquisition_list = ast.literal_eval(sys.argv[2])   # This captures all dates as a list.
 # The last command-line argument is `save_date`.
 save_date = sys.argv[3]
 local_folder = sys.argv[4]
 no_probe = sys.argv[5]
 print(mouse)
-print('acquisition folder: ',dates)
+print('date: ',save_date,'acquisitions: ',sys.argv[2])
 print(save_date)
 use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + save_date +'/'
+
+# Check g files to ignore are correct (tcat should always be ignored)
+g_files_to_ignore = ast.literal_eval(sys.argv[8])
+print('ignore following segments:',sys.argv[8])
 # get all the recordings on that day
 
 import os
@@ -53,11 +57,33 @@ def sorting_key(s):
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 
-print(dates)
 g_files_all = []
 # iterate over all directories in source folder
 date_count = 0
+for acquisition in acquisition_list:
+    print('acquisition folder:',str(acquisition))
+    date_count = date_count + 1
+    for probe in range(int(no_probe)): 
+        ephys_folder = base_folder + mouse + '/ephys/' + save_date +'/probe' + str(probe) + '_compressed_' + str(acquisition) + '.zarr'
+        dst_folder = local_folder + save_date + '/'
+        
+        print('copying compressed data from:' + ephys_folder)
 
+    
+        destination = os.path.join(dst_folder, 'probe' + str(probe) + '_compressed_' + str(acquisition) + '.zarr')
+        shutil.copytree(ephys_folder, destination)
+        print('Start to copying files to local folder: ')
+        print(datetime.now() - startTime)
+        ''' read spikeglx recordings and preprocess them'''
+        # Define a custom sorting key that extracts the number after 'g'
+
+        # Sort the list using the custom sorting key
+        g_files = sorted(g_files, key=sorting_key)
+        g_files_all = g_files_all + g_files
+        print(g_files)
+        print('all g files:',g_files_all) 
+
+    
 for probe in range(int(no_probe)):
     date_count = 0
     probe0_start_sample_fames = []
@@ -66,8 +92,20 @@ for probe in range(int(no_probe)):
         date_count = date_count + 1
         probe_name = 'imec' + str(probe) + '.ap'
         dst_folder = local_folder + date + '/'
-        probe0_raw = si.read_zarr(dst_folder + 'probe' + str(probe) + '_raw_compressed.zarr')
+        probe0_raw = si.read_spikeglx(dst_folder,stream_name=probe_name)
         print(probe0_raw)
+
+
+        probe0_num_segments = [probe0_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
+        
+        probe0_end_sample_frames_tmp = list(itertools.accumulate(probe0_num_segments))
+        if date_count == 1:
+            probe0_start_sample_frames = [1] + [probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
+            probe0_end_sample_frames = probe0_end_sample_frames + probe0_end_sample_frames_tmp
+        else:
+            probe0_start_sample_frames = probe0_start_sample_frames + [probe0_end_sample_frames[-1]+1] + \
+            [probe0_end_sample_frames[-1]+probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
+            probe0_end_sample_frames = probe0_end_sample_frames + [probe0_end_sample_frames_tmp[i] + probe0_end_sample_frames[-1] for i in range(0, len(probe0_num_segments))]
 
 
             
@@ -167,6 +205,9 @@ for probe in range(int(no_probe)):
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
 
+    import pandas as pd
+    probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
+    probe0_segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
 
 
 
