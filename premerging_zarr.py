@@ -21,6 +21,7 @@ from datetime import datetime
 import itertools
 import ast
 import scipy.io as sio
+import pandas as pd
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
@@ -28,22 +29,27 @@ import sys
 # The first command-line argument after the script name is the mouse identifier.
 mouse = sys.argv[1]
 # All command-line arguments after `mouse` and before `save_date` are considered dates.
-acquisition_list = ast.literal_eval(sys.argv[2])   # This captures all dates as a list.
+
 # The last command-line argument is `save_date`.
-save_date = sys.argv[3]
-local_folder = sys.argv[4]
-no_probe = sys.argv[5]
+save_date = sys.argv[2]
+local_folder = sys.argv[3]
+no_probe = sys.argv[4]
 print(mouse)
-print('date: ',save_date,'acquisitions: ',sys.argv[2])
 print(save_date)
-use_ks4 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
-use_ks3 = sys.argv[7].lower() in ['true', '1', 't', 'y', 'yes']
+use_ks4 = sys.argv[5].lower() in ['true', '1', 't', 'y', 'yes']
+use_ks3 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
 base_folder = '/mnt/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + save_date +'/'
 
 # Check g files to ignore are correct (tcat should always be ignored)
-g_files_to_ignore = ast.literal_eval(sys.argv[8])
-print('ignore following segments:',sys.argv[8])
+# Check if sys.argv[8] is empty
+if sys.argv[7]:
+    g_files_to_ignore = ast.literal_eval(sys.argv[7])
+else:
+    g_files_to_ignore = []
+
+# Print the result to verify
+print(f"g_files_to_ignore: {g_files_to_ignore}")
 # get all the recordings on that day
 
 import os
@@ -59,6 +65,9 @@ job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 
 g_files_all = []
 # iterate over all directories in source folder
+acquisition_base_path = base_folder + mouse + '/ephys/' + save_date + '/*' + save_date
+acquisition_folders = glob.glob(acquisition_base_path + '_*')
+acquisition_list = [int(folder.split('_')[-1]) for folder in acquisition_folders]
 date_count = 0
 for acquisition in acquisition_list:
     print('acquisition folder:',str(acquisition))
@@ -77,62 +86,75 @@ for acquisition in acquisition_list:
         ''' read spikeglx recordings and preprocess them'''
         # Define a custom sorting key that extracts the number after 'g'
 
-        # Sort the list using the custom sorting key
-        g_files = sorted(g_files, key=sorting_key)
-        g_files_all = g_files_all + g_files
-        print(g_files)
-        print('all g files:',g_files_all) 
 
     
 for probe in range(int(no_probe)):
     date_count = 0
-    probe0_start_sample_fames = []
-    probe0_end_sample_frames = []
-    for date in dates:
-        date_count = date_count + 1
-        probe_name = 'imec' + str(probe) + '.ap'
-        dst_folder = local_folder + date + '/'
-        probe0_raw = si.read_spikeglx(dst_folder,stream_name=probe_name)
-        print(probe0_raw)
-
-
-        probe0_num_segments = [probe0_raw.get_num_frames(segment_index=i) for i in range(probe0_raw.get_num_segments())]
+    start_sample_fames = []
+    end_sample_frames = []
+    segment_info_all = []
+    bad_channel_ids_all = []
+    for acquisition in acquisition_list:
         
-        probe0_end_sample_frames_tmp = list(itertools.accumulate(probe0_num_segments))
-        if date_count == 1:
-            probe0_start_sample_frames = [1] + [probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
-            probe0_end_sample_frames = probe0_end_sample_frames + probe0_end_sample_frames_tmp
+        probe_name = 'imec' + str(probe) + '.ap'
+        dst_folder = local_folder + save_date + '/probe' + str(probe) + '_compressed_' + str(acquisition) + '.zarr'
+        raw = si.read_zarr(dst_folder)
+        print(raw)
+        no_segments = raw.get_num_segments()
+        if g_files_to_ignore:
+            g_files_to_ignore_this_acquisition = g_files_to_ignore[date_count]
         else:
-            probe0_start_sample_frames = probe0_start_sample_frames + [probe0_end_sample_frames[-1]+1] + \
-            [probe0_end_sample_frames[-1]+probe0_end_sample_frames_tmp[i] + 1 for i in range(0, len(probe0_num_segments)-1)]
-            probe0_end_sample_frames = probe0_end_sample_frames + [probe0_end_sample_frames_tmp[i] + probe0_end_sample_frames[-1] for i in range(0, len(probe0_num_segments))]
-
+            g_files_to_ignore_this_acquisition = []
+        segments = [i for i in range(no_segments) if i not in g_files_to_ignore_this_acquisition]
+        num_segments = [raw.get_num_frames(segment_index=i) for i in segments]
+        segment_info = [str(acquisition) + '_g' + str(i) for i in segments]
+        segment_info_all = segment_info_all + segment_info
+        end_sample_frames_tmp = list(itertools.accumulate(num_segments))
+        if date_count == 0:
+            start_sample_frames = [1] + [end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
+            end_sample_frames = end_sample_frames + end_sample_frames_tmp
+        else:
+            start_sample_frames = start_sample_frames + [end_sample_frames[-1]+1] + \
+            [end_sample_frames[-1]+end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
+            end_sample_frames = end_sample_frames + [end_sample_frames_tmp[i] + end_sample_frames[-1] for i in range(0, len(num_segments))]
+            
+        
 
             
-
+        #select segments if needed
+        
+        raw_selected = si.select_segment(raw,segments=segments)
+        
+        
         #several preprocessing steps and concatenation of the recordings
         #highpass filter - threhsold at 300Hz
-        probe0_highpass = si.highpass_filter(probe0_raw,freq_min=300.)
-        #detect bad channels
-
+        highpass = si.highpass_filter(raw_selected,freq_min=300.)
         #phase shift correction - equivalent to T-SHIFT in catGT
-        probe0_phase_shift = si.phase_shift(probe0_highpass)
-        probe0_common_reference = si.common_reference(probe0_phase_shift,operator='median',reference='global')
-        probe0_preprocessed = probe0_common_reference
-        probe0_cat = si.concatenate_recordings([probe0_preprocessed])
-        print('probe0_preprocessed',probe0_preprocessed)
-        print('probe0 concatenated',probe0_cat)
-
-        
+        phase_shift = si.phase_shift(highpass)
+        common_reference = si.common_reference(phase_shift,operator='median',reference='global')
+        preprocessed = common_reference
+        cat = si.concatenate_recordings([preprocessed])
+        print('preprocessed',preprocessed)
+        print('concatenated',cat)
+        bad_channel_ids, channel_labels = si.detect_bad_channels(cat)
+        print('bad_channel_ids',bad_channel_ids,'in acquisition:',str(acquisition))
+        bad_channel_ids_all = bad_channel_ids_all + bad_channel_ids
         if date_count == 1:
-            probe0_cat_all = probe0_cat
+            cat_all = cat
 
         else:
-            probe0_cat_all = si.concatenate_recordings([probe0_cat_all,probe0_cat])
+            cat_all = si.concatenate_recordings([cat_all,cat])
+            
+        date_count = date_count + 1
+    
 
-    bad_channel_ids, channel_labels = si.detect_bad_channels(probe0_cat_all)
-    probe0_cat_all = probe0_cat_all.remove_channels(bad_channel_ids)
-    print('probe0_bad_channel_ids',bad_channel_ids)
+    segment_frames = pd.DataFrame({'segment_info':segment_info_all,'segment start frame': start_sample_frames, 'segment end frame': end_sample_frames})
+    segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
+
+    bad_channel_ids_all = list(set(bad_channel_ids_all))
+    print('total bad channel ids all',bad_channel_ids_all,'in probe:',str(probe),'in all acquisitions:',str(acquisition_list))
+    cat_all = cat_all.remove_channels(bad_channel_ids_all)
+
     '''Motion Drift Correction'''
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
@@ -150,7 +172,7 @@ for probe in range(int(no_probe)):
 
 
     #after saving, sorters will read this preprocessed binary file instead
-    probe0_preprocessed_corrected = probe0_cat_all.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
+    preprocessed_corrected = cat_all.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
     #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe0_preprocessed')
@@ -161,10 +183,8 @@ for probe in range(int(no_probe)):
     print("Parameters:\n", params)
 
     desc = get_sorter_params_description('kilosort3')
-    print("Descriptions:\n", desc)
+    print("Descriptions:\n", desc)'''
 
-    Beware that moutainsort5 is commented out as the sorter somehow stops midway with no clue - currently raising this issue on their github page
-    '''
     import pandas as pd
     def save_spikes_to_csv(spikes,save_folder):
         unit_index = spikes['unit_index']
@@ -173,41 +193,33 @@ for probe in range(int(no_probe)):
         spikes_df = pd.DataFrame({'unit_index':unit_index,'segment_index':segment_index,'sample_index':sample_index})
         spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
 
-    #probe0_sorting_ks2_5 = si.run_sorter(sorter_name= 'kilosort2_5',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort2_5/',docker_image="spikeinterface/kilosort2_5-compiled-base:latest",do_correction=False)
-    #probe1_sorting_ks2_5 = si.run_sorter(sorter_name= 'kilosort2_5',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort2_5/',docker_image="spikeinterface/kilosort2_5-compiled-base:latest",do_correction=False)
-    #probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=dst_folder+'probe0/sorters/kilosort3/',docker_image="spikeinterface/kilosort3-compiled-base:latest",do_correction=False)
-    #probe1_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe1_preprocessed_corrected,output_folder=dst_folder+'probe1/sorters/kilosort3/',docker_image="spikeinterface/kilosort3-compiled-base:latest",do_correction=False)
-      # probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks3, censored_period_ms=0.3,method='keep_first')
-    # probe1_sorting_ks2_5 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks2_5, censored_period_ms=0.3,method='keep_first')
-    # probe1_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe1_sorting_ks3, censored_period_ms=0.3,method='keep_first')
     if use_ks4:
-        probe0_sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest')
-        probe0_sorting_ks4 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks4, censored_period_ms=0.3,method='keep_first')
-        probe0_we_ks4 = si.create_sorting_analyzer(probe0_sorting_ks4, probe0_preprocessed_corrected, 
+        sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest')
+        sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
+        we_ks4 = si.create_sorting_analyzer(sorting_ks4, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
                                 sparse = True,overwrite = True,
                                 **job_kwargs)
-        probe0_we_ks4.compute('random_spikes')
-        probe0_we_ks4.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-        probe0_ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
-        save_spikes_to_csv(probe0_ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
+        we_ks4.compute('random_spikes')
+        we_ks4.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
+        ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
+        save_spikes_to_csv(ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
+        
     if use_ks3:
-        probe0_sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=probe0_preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest')
-        probe0_sorting_ks3 = si.remove_duplicated_spikes(sorting = probe0_sorting_ks3, censored_period_ms=0.3,method='keep_first')
-        probe0_we_ks3 = si.create_sorting_analyzer(probe0_sorting_ks3, probe0_preprocessed_corrected, 
+        sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest')
+        sorting_ks3 = si.remove_duplicated_spikes(sorting = sorting_ks3, censored_period_ms=0.3,method='keep_first')
+        we_ks3 = si.create_sorting_analyzer(sorting_ks3, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort3',
                                 sparse = True,overwrite = True,
                                 **job_kwargs)
-        probe0_we_ks3.compute('random_spikes')
-        probe0_we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-        probe0_ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
-        save_spikes_to_csv(probe0_ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
+        we_ks3.compute('random_spikes')
+        we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
+        ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
+        save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
 
-    import pandas as pd
-    probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
-    probe0_segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
+
 
 
 
