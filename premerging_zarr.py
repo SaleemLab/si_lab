@@ -43,7 +43,7 @@ save_folder = local_folder + save_date +'/'
 
 # Check g files to ignore are correct (tcat should always be ignored)
 # Check if sys.argv[8] is empty
-if sys.argv[7]:
+if len(sys.argv) > 7 and sys.argv[7]:
     g_files_to_ignore = ast.literal_eval(sys.argv[7])
 else:
     g_files_to_ignore = []
