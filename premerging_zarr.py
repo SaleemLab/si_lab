@@ -22,6 +22,8 @@ import itertools
 import ast
 import scipy.io as sio
 import pandas as pd
+
+
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
@@ -67,7 +69,7 @@ g_files_all = []
 # iterate over all directories in source folder
 acquisition_base_path = base_folder + mouse + '/ephys/' + save_date + '/*' + save_date
 acquisition_folders = glob.glob(acquisition_base_path + '_*')
-acquisition_list = [int(folder.split('_')[-1]) for folder in acquisition_folders]
+acquisition_list = sorted([int(folder.split('_')[-1]) for folder in acquisition_folders])
 date_count = 0
 for acquisition in acquisition_list:
     print('acquisition folder:',str(acquisition))
@@ -90,10 +92,10 @@ for acquisition in acquisition_list:
     
 for probe in range(int(no_probe)):
     date_count = 0
-    start_sample_fames = []
+    start_sample_frames = []
     end_sample_frames = []
     segment_info_all = []
-    bad_channel_ids_all = []
+    bad_channel_ids_all = np.array([])
     for acquisition in acquisition_list:
         
         probe_name = 'imec' + str(probe) + '.ap'
@@ -123,7 +125,7 @@ for probe in range(int(no_probe)):
             
         #select segments if needed
         
-        raw_selected = si.select_segment(raw,segments=segments)
+        raw_selected = si.select_segment_recording(raw,segment_indices=segments)
         
         
         #several preprocessing steps and concatenation of the recordings
@@ -138,8 +140,9 @@ for probe in range(int(no_probe)):
         print('concatenated',cat)
         bad_channel_ids, channel_labels = si.detect_bad_channels(cat)
         print('bad_channel_ids',bad_channel_ids,'in acquisition:',str(acquisition))
-        bad_channel_ids_all = bad_channel_ids_all + bad_channel_ids
-        if date_count == 1:
+        bad_channel_ids_all = np.concatenate((bad_channel_ids_all,bad_channel_ids))
+        print(cat)
+        if date_count == 0:
             cat_all = cat
 
         else:
@@ -149,12 +152,13 @@ for probe in range(int(no_probe)):
     
 
     segment_frames = pd.DataFrame({'segment_info':segment_info_all,'segment start frame': start_sample_frames, 'segment end frame': end_sample_frames})
-    segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
+    segment_frames.to_csv(save_folder+'probe'+str(probe)+'segment_frames.csv', index=False)
 
-    bad_channel_ids_all = list(set(bad_channel_ids_all))
+    bad_channel_ids_all = np.unique(bad_channel_ids_all)
     print('total bad channel ids all',bad_channel_ids_all,'in probe:',str(probe),'in all acquisitions:',str(acquisition_list))
     cat_all = cat_all.remove_channels(bad_channel_ids_all)
 
+    print('concatenated all recordings:',cat_all)
     '''Motion Drift Correction'''
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
@@ -169,10 +173,13 @@ for probe in range(int(no_probe)):
     # probe1_kilosort_like = correct_motion(recording=probe1_cat, preset="kilosort_like")
 
     '''save preprocessed bin file before sorting'''
-
-
+    cat_all = cat_all.astype(np.float32)
+    recording_corrected, motion, motion_info = si.correct_motion(
+        recording=cat_all, preset="nonrigid_accurate", folder=save_folder+'probe'+str(probe)+'_motion', output_motion=True, output_motion_info=True, **job_kwargs
+        )
+    recording_corrected = recording_corrected.astype(np.int16)
     #after saving, sorters will read this preprocessed binary file instead
-    preprocessed_corrected = cat_all.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
+    preprocessed_corrected = recording_corrected.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
     #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe0_preprocessed')
