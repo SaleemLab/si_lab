@@ -146,7 +146,7 @@ for probe in range(int(no_probe)):
             cat_all = cat
 
         else:
-            cat_all = si.concatenate_recordings([cat_all,cat])
+            cat_all = si.concatenate_recordings([cat_all,cat],sampling_frequency_max_diff=1.0)
             
         date_count = date_count + 1
     
@@ -201,7 +201,7 @@ for probe in range(int(no_probe)):
         spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
 
     if use_ks4:
-        sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest')
+        sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False,use_binary_file=True,clear_cache=True)
         sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
         we_ks4 = si.create_sorting_analyzer(sorting_ks4, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
@@ -213,7 +213,7 @@ for probe in range(int(no_probe)):
         save_spikes_to_csv(ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
         
     if use_ks3:
-        sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest')
+        sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest',do_correction=False)
         sorting_ks3 = si.remove_duplicated_spikes(sorting = sorting_ks3, censored_period_ms=0.3,method='keep_first')
         we_ks3 = si.create_sorting_analyzer(sorting_ks3, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort3',
