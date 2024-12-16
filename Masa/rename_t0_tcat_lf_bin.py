@@ -15,15 +15,12 @@ import scipy.io as sio
 startTime = datetime.now()
 print('Start Time:' + startTime.strftime("%m/%d/%Y, %H:%M:%S"))
 ''' this section defines the animal and dates and fetch the recordings from the server to Beast'''
-mouse = 'M24018'
-session = '20240718'
-dates = ['20240718/20240718_0','20240718/20240718_1','20240718/20240718_2']
+mouse = 'M24062'
+session = '20241128'
+dates = ['20241128/20241128_0','20241128/20241128_1','20241128/20241128_2']
 g_files_to_ignore = ['tcat','0_g6','0_g7','0_g8','0_g9']
 
-save_date = '20240607'
 base_folder = 'Z:/ibn-vision/DATA/SUBJECTS/'
-save_base_folder = base_folder
-save_folder = save_base_folder + mouse + '/ephys/' + save_date + '/'
 # get all the recordings on that day
 probe0_start_sample_fames = []
 probe1_start_sample_frames = []
@@ -46,8 +43,6 @@ g_files_all = []
 date_count = 0
 for date in dates:
     date_count = date_count + 1
-    ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
-    dst_folder =  save_folder 
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     g_files = []
     # Step 1: Iterate over the list of files with tcat in the name
@@ -110,8 +105,6 @@ g_files_all = []
 date_count = 0
 for date in dates:
     date_count = date_count + 1
-    ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
-    dst_folder =  save_folder 
     ephys_folder = base_folder + mouse + '/ephys/' + date +'/'
     g_files = []
     # Step 1: Iterate over the list of files with tcat in the name
