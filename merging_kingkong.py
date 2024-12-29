@@ -201,8 +201,8 @@ for probe in range(int(no_probe)):
 
     ##
     #
-   folders_to_move = ['probe'+str(probe),
-               'probe'+str(probe)+'_motion/']
+    folders_to_move = ['probe'+str(probe),
+                'probe'+str(probe)+'_motion/']
 
     for folder in folders_to_move:
         # construct the destination path
