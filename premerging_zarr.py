@@ -64,7 +64,7 @@ def sorting_key(s):
 
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
-
+si.set_global_job_kwargs(**job_kwargs)
 g_files_all = []
 # iterate over all directories in source folder
 acquisition_base_path = base_folder + mouse + '/ephys/' + save_date + '/*' + save_date
