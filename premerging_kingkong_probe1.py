@@ -183,7 +183,7 @@ for probe in probes:
 
     import pandas as pd
     probe0_segment_frames = pd.DataFrame({'segment_info':g_files_all,'segment start frame': probe0_start_sample_frames, 'segment end frame': probe0_end_sample_frames})
-    probe0_segment_frames.to_csv(save_folder+'probe'+str(probe)+'/sorters/segment_frames.csv', index=False)
+    probe0_segment_frames.to_csv(save_folder+'probe'+str(probe)+'segment_frames.csv', index=False)
 
 
     '''Motion Drift Correction'''
