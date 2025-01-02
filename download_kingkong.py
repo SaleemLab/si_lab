@@ -45,7 +45,7 @@ base_folder = '/saleem/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder + save_date +'/'
 
 # Check g files to ignore are correct (tcat should always be ignored)
-g_files_to_ignore = ['tcat','0_g6','0_g7','0_g8','0_g9','1_g','2_g','lf.bin','if.meta']
+g_files_to_ignore = ['tcat','0_g6','0_g7','0_g8','0_g9','lf.bin','if.meta']
 #g_files_to_ignore = sys.argv[8]
 print(g_files_to_ignore)
 # get all the recordings on that day
