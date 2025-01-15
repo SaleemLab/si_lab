@@ -1,6 +1,20 @@
 # si_lab
-Developed implementation of spikeinterface on Beast and Godzilla
+Developed implementation of spikeinterface in Saleem Lab
 
+# Data Compression
+You can run compression immediately after recording and also extract the sync pulse and LFP data to independent files.
+
+`test_compression.ipynb` uses jupyter notebook to allow you to do so with plotting as well.
+
+Change variables to your own:
+`mouse='M24072'`
+`save_date_list=[[20241206]]`
+`base_folder='/mnt/rds01/ibn-vision/DATA/SUBJECTS/' `
+`no_probe = 1`
+`acquisition_to_slice = [] # slice off the reocrding that had failing errors happened during the recording`
+`slice_time_ranges = []`
+
+This script fetches N acquisitions on the day and compress them in N folders of 'probeX_compressed_N'.
 
 # Batch Processing in Background
 Before you run it in python, please enter the following command line on Beast:

@@ -9,9 +9,8 @@ no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
 # Run the first Python script with inputs
-python download_kingkong.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
-python premerging_kingkong_probe1.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
-python premerging_kingkong_probe0.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
+#python download_kingkong.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
+python premerging_kingkong_probe0_temp.py $mouse $dates $save_date $base_folder $no_probe $use_ks4 $use_ks3
 
 # Run the MATLAB script for unit_match_merge_ks4_one_probe
 matlab -nodisplay -nosplash -r "mouse='${mouse}'; date='${save_date}'; base_folder='${base_folder}';noprobe='${no_probe}'; run('unit_match_merge_ks4.m'); exit;"
