@@ -116,7 +116,7 @@ for no_probe = 1:str2double(noprobe)
 
         match_id = avgMatrix(id_count,:) >= 0.9;
         if ~isnan(unit_peak_depths(id_count))
-            nearby_id = unit_peak_depths <= unit_peak_depths(id_count)+150 & unit_peak_depths>= unit_peak_depths(id_count) -150;
+            nearby_id = unit_peak_depths <= unit_peak_depths(id_count)+75 & unit_peak_depths>= unit_peak_depths(id_count) -75;
         else
             nearby_id = false(size(unit_peak_depths));
         end
