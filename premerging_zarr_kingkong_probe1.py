@@ -40,13 +40,13 @@ print(mouse)
 print(save_date)
 use_ks4 = sys.argv[5].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
-base_folder = '/saleem/ibn-vision/DATA/SUBJECTS/'
+base_folder = sys.argv[7]
 save_folder = local_folder + save_date +'/'
 
 # Check g files to ignore are correct (tcat should always be ignored)
 # Check if sys.argv[8] is empty
-if len(sys.argv) > 7 and sys.argv[7]:
-    g_files_to_ignore = ast.literal_eval(sys.argv[7])
+if len(sys.argv) > 8 and sys.argv[8]:
+    g_files_to_ignore = ast.literal_eval(sys.argv[8])
 else:
     g_files_to_ignore = []
 
@@ -64,7 +64,7 @@ def sorting_key(s):
 
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
-
+si.set_global_job_kwargs(**job_kwargs)
 g_files_all = []
 # iterate over all directories in source folder
 acquisition_base_path = base_folder + mouse + '/ephys/' + save_date + '/*' + save_date
@@ -72,8 +72,9 @@ acquisition_folders = glob.glob(acquisition_base_path + '_*')
 acquisition_list = sorted([int(folder.split('_')[-1]) for folder in acquisition_folders])
 date_count = 0
 
+
     
-probes=[1]
+probes=[0]
 for probe in probes:
     date_count = 0
     start_sample_frames = []
@@ -111,7 +112,9 @@ for probe in probes:
         
         raw_selected = si.select_segment_recording(raw,segment_indices=segments)
         
-        
+        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
+        new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
+        raw_selected = new_decompressed
         #several preprocessing steps and concatenation of the recordings
         #highpass filter - threhsold at 300Hz
         highpass = si.highpass_filter(raw_selected,freq_min=300.)
@@ -183,7 +186,7 @@ for probe in probes:
         sample_index = spikes['sample_index']
         spikes_df = pd.DataFrame({'unit_index':unit_index,'segment_index':segment_index,'sample_index':sample_index})
         spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
-
+    extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
     if use_ks4:
         sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False,use_binary_file=True,clear_cache=True)
         sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
@@ -195,6 +198,14 @@ for probe in probes:
         we_ks4.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
         ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
         save_spikes_to_csv(ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
+        we_ks4.compute(extensions,**job_kwargs)
+        we_ks4.compute('principal_components',**job_kwargs)  
+        we_ks4.compute('spike_amplitudes',**job_kwargs)
+        qm_list = si.get_default_qm_params()
+        print('The following quality metrics are computed:')
+        print(qm_list)
+        we_ks4.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        si.export_report(sorting_analyzer = we_ks4, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort4_report/',**job_kwargs)
         
     if use_ks3:
         sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest',do_correction=False)
@@ -207,6 +218,14 @@ for probe in probes:
         we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
         ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
         save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
+        we_ks3.compute(extensions,**job_kwargs)
+        we_ks3.compute('principal_components',**job_kwargs)  
+        we_ks3.compute('spike_amplitudes',**job_kwargs)
+        qm_list = si.get_default_qm_params()
+        print('The following quality metrics are computed:')
+        print(qm_list)
+        we_ks3.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        si.export_report(sorting_analyzer = we_ks3, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort3_report/',**job_kwargs)
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
 

@@ -40,13 +40,13 @@ print(mouse)
 print(save_date)
 use_ks4 = sys.argv[5].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
-base_folder = '/saleem/ibn-vision/DATA/SUBJECTS/'
+base_folder = sys.argv[7]
 save_folder = local_folder + save_date +'/'
 
 # Check g files to ignore are correct (tcat should always be ignored)
 # Check if sys.argv[8] is empty
-if len(sys.argv) > 7 and sys.argv[7]:
-    g_files_to_ignore = ast.literal_eval(sys.argv[7])
+if len(sys.argv) > 8 and sys.argv[8]:
+    g_files_to_ignore = ast.literal_eval(sys.argv[8])
 else:
     g_files_to_ignore = []
 
@@ -64,7 +64,7 @@ def sorting_key(s):
 
 
 job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
-
+si.set_global_job_kwargs(**job_kwargs)
 g_files_all = []
 # iterate over all directories in source folder
 acquisition_base_path = base_folder + mouse + '/ephys/' + save_date + '/*' + save_date
@@ -87,5 +87,5 @@ for acquisition in acquisition_list:
         print(datetime.now() - startTime)
         ''' read spikeglx recordings and preprocess them'''
         # Define a custom sorting key that extracts the number after 'g'
-
+        
 sys.exit(0)
