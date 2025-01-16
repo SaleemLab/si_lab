@@ -8,7 +8,7 @@ base_folder='/home/masa/spikesorting_temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
-server_folder=''/mnt/rds01/ibn-vision/DATA/SUBJECTS/'' #server folder where the data is stored
+server_folder='/home/masa/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
 g_files_to_ignore='[[],[0,1],[0,1]]' #files to ignore for each probe
 
 # Run the first Python script with inputs
