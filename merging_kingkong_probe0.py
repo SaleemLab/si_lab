@@ -35,7 +35,8 @@ local_folder = sys.argv[3]
 no_probe = sys.argv[4]
 use_ks4 = sys.argv[5].lower() in ['true', '1', 't', 'y', 'yes']
 use_ks3 = sys.argv[6].lower() in ['true', '1', 't', 'y', 'yes']
-base_folder = '/saleem/ibn-vision/DATA/SUBJECTS/'
+#base_folder = '/saleem/ibn-vision/DATA/SUBJECTS/'
+base_folder = '/home/masa/rds01/ibn-vision/DATA/SUBJECTS/'
 save_folder = local_folder +save_date+'/'
 # get all the recordings on that day
 probe0_start_sample_fames = []
