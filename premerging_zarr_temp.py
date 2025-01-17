@@ -63,9 +63,9 @@ def sorting_key(s):
 #grab recordings from the server to local machine (Beast)
 
 
-job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
-#si.set_global_job_kwargs(**job_kwargs)
-si.set_global_job_kwargs()
+job_kwargs = dict(n_jobs=20, chunk_duration='1s', progress_bar=True)
+si.set_global_job_kwargs(**job_kwargs)
+#si.set_global_job_kwargs()
 
 g_files_all = []
 # iterate over all directories in source folder
