@@ -112,8 +112,8 @@ for probe in range(int(no_probe)):
         
         raw_selected = si.select_segment_recording(raw,segment_indices=segments)
         
-        #decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
-        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary')
+        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
+        #decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary')
         new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
         raw_selected = new_decompressed
         #several preprocessing steps and concatenation of the recordings
