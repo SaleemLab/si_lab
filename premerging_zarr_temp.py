@@ -63,9 +63,9 @@ def sorting_key(s):
 #grab recordings from the server to local machine (Beast)
 
 
-#job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
+job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
 #si.set_global_job_kwargs(**job_kwargs)
-si.set_global_job_kwargs
+si.set_global_job_kwargs()
 
 g_files_all = []
 # iterate over all directories in source folder
@@ -112,7 +112,8 @@ for probe in range(int(no_probe)):
         
         raw_selected = si.select_segment_recording(raw,segment_indices=segments)
         
-        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
+        #decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
+        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary')
         new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
         raw_selected = new_decompressed
         #several preprocessing steps and concatenation of the recordings
