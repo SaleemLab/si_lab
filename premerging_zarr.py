@@ -124,33 +124,34 @@ for probe in range(int(no_probe)):
 
             
         #select segments if needed
-        
-        raw_selected = si.select_segment_recording(raw,segment_indices=segments)
-        
-        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
-        new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
-        raw_selected = new_decompressed
-        #several preprocessing steps and concatenation of the recordings
-        #highpass filter - threhsold at 300Hz
-        highpass = si.highpass_filter(raw_selected,freq_min=300.)
-        #phase shift correction - equivalent to T-SHIFT in catGT
-        phase_shift = si.phase_shift(highpass)
-        common_reference = si.common_reference(phase_shift,operator='median',reference='global')
-        preprocessed = common_reference
-        cat = si.concatenate_recordings([preprocessed])
-        print('preprocessed',preprocessed)
-        print('concatenated',cat)
-        bad_channel_ids, channel_labels = si.detect_bad_channels(cat)
-        print('bad_channel_ids',bad_channel_ids,'in acquisition:',str(acquisition))
-        bad_channel_ids_all = np.concatenate((bad_channel_ids_all,bad_channel_ids))
-        print(cat)
-        if date_count == 0:
-            cat_all = cat
+        if len(segments) > 1:
+            raw_selected = si.select_segment_recording(raw,segment_indices=segments)
+            decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
+            new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
+            raw_selected = new_decompressed
+            #several preprocessing steps and concatenation of the recordings
+            #highpass filter - threhsold at 300Hz
+            highpass = si.highpass_filter(raw_selected,freq_min=300.)
+            #phase shift correction - equivalent to T-SHIFT in catGT
+            phase_shift = si.phase_shift(highpass)
+            common_reference = si.common_reference(phase_shift,operator='median',reference='global')
+            preprocessed = common_reference
+            cat = si.concatenate_recordings([preprocessed])
+            print('preprocessed',preprocessed)
+            print('concatenated',cat)
+            bad_channel_ids, channel_labels = si.detect_bad_channels(cat)
+            print('bad_channel_ids',bad_channel_ids,'in acquisition:',str(acquisition))
+            bad_channel_ids_all = np.concatenate((bad_channel_ids_all,bad_channel_ids))
+            print(cat)
+            if date_count == 0:
+                cat_all = cat
 
-        else:
-            cat_all = si.concatenate_recordings([cat_all,cat],sampling_frequency_max_diff=1.0)
-            
-        date_count = date_count + 1
+            else:
+                cat_all = si.concatenate_recordings([cat_all,cat],sampling_frequency_max_diff=1.0)
+                
+            date_count = date_count + 1
+        
+
     
 
     segment_frames = pd.DataFrame({'segment_info':segment_info_all,'segment start frame': start_sample_frames, 'segment end frame': end_sample_frames})
