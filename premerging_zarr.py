@@ -63,7 +63,7 @@ def sorting_key(s):
 #grab recordings from the server to local machine (Beast)
 
 
-job_kwargs = dict(n_jobs=32, chunk_duration='1s', progress_bar=True)
+job_kwargs = dict(n_jobs=8, chunk_duration='1s', progress_bar=True)
 si.set_global_job_kwargs(**job_kwargs)
 g_files_all = []
 # iterate over all directories in source folder
@@ -127,7 +127,7 @@ for probe in range(int(no_probe)):
         
         raw_selected = si.select_segment_recording(raw,segment_indices=segments)
         
-        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary')
+        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
         new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
         raw_selected = new_decompressed
         #several preprocessing steps and concatenation of the recordings
@@ -181,7 +181,7 @@ for probe in range(int(no_probe)):
         )
     recording_corrected = recording_corrected.astype(np.int16)
     #after saving, sorters will read this preprocessed binary file instead
-    preprocessed_corrected = recording_corrected.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary')
+    preprocessed_corrected = recording_corrected.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
     print('Start to prepocessed files saved:')
     print(datetime.now() - startTime)
     #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe0_preprocessed')
