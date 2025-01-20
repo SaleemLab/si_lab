@@ -26,8 +26,8 @@ matlab -nodisplay -nosplash -r "mouse='${mouse}'; date='${save_date}'; base_fold
 # matlab -nodisplay -nosplash -r "mouse='$mouse'; date=''; base_folder=''; run('your_ks3_script_name.m'); exit;"
 
 # Run the second Python script with inputs
-python merging_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3
-python merging_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3
+python merging_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+python merging_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 
 
 # Define variables
@@ -56,8 +56,8 @@ matlab -nodisplay -nosplash -r "mouse='${mouse}'; date='${save_date}'; base_fold
 # matlab -nodisplay -nosplash -r "mouse='$mouse'; date=''; base_folder=''; run('your_ks3_script_name.m'); exit;"
 
 # Run the second Python script with inputs
-python merging_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3
-python merging_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3
+python merging_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+python merging_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 
 
 
@@ -87,5 +87,5 @@ matlab -nodisplay -nosplash -r "mouse='${mouse}'; date='${save_date}'; base_fold
 # matlab -nodisplay -nosplash -r "mouse='$mouse'; date=''; base_folder=''; run('your_ks3_script_name.m'); exit;"
 
 # Run the second Python script with inputs
-python merging_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3
-python merging_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3
+python merging_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+python merging_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
