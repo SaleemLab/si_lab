@@ -112,19 +112,20 @@ for probe in range(int(no_probe)):
         segment_info = [str(acquisition) + '_g' + str(i) for i in segments]
         segment_info_all = segment_info_all + segment_info
         end_sample_frames_tmp = list(itertools.accumulate(num_segments))
-        if date_count == 0:
-            start_sample_frames = [1] + [end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
-            end_sample_frames = end_sample_frames + end_sample_frames_tmp
-        else:
-            start_sample_frames = start_sample_frames + [end_sample_frames[-1]+1] + \
-            [end_sample_frames[-1]+end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
-            end_sample_frames = end_sample_frames + [end_sample_frames_tmp[i] + end_sample_frames[-1] for i in range(0, len(num_segments))]
-            
+       
         
 
             
         #select segments if needed
         if len(segments) > 1:
+            if date_count == 0:
+                start_sample_frames = [1] + [end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
+                end_sample_frames = end_sample_frames + end_sample_frames_tmp
+            else:
+                start_sample_frames = start_sample_frames + [end_sample_frames[-1]+1] + \
+                [end_sample_frames[-1]+end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
+                end_sample_frames = end_sample_frames + [end_sample_frames_tmp[i] + end_sample_frames[-1] for i in range(0, len(num_segments))]
+            
             raw_selected = si.select_segment_recording(raw,segment_indices=segments)
             decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
             new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
