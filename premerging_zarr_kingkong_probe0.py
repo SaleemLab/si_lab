@@ -77,65 +77,69 @@ date_count = 0
 probes=[0]
 for probe in probes:
     date_count = 0
+    acquisition_count = 0
     start_sample_frames = []
     end_sample_frames = []
     segment_info_all = []
     bad_channel_ids_all = np.array([])
     for acquisition in acquisition_list:
         
+        print('processing acquisition folder:',str(acquisition))
         probe_name = 'imec' + str(probe) + '.ap'
         dst_folder = local_folder + save_date + '/probe' + str(probe) + '_compressed_' + str(acquisition) + '.zarr'
         raw = si.read_zarr(dst_folder)
         print(raw)
         no_segments = raw.get_num_segments()
         if g_files_to_ignore:
-            g_files_to_ignore_this_acquisition = g_files_to_ignore[date_count]
+            g_files_to_ignore_this_acquisition = g_files_to_ignore[acquisition_count]
         else:
             g_files_to_ignore_this_acquisition = []
         segments = [i for i in range(no_segments) if i not in g_files_to_ignore_this_acquisition]
         num_segments = [raw.get_num_frames(segment_index=i) for i in segments]
         segment_info = [str(acquisition) + '_g' + str(i) for i in segments]
-        segment_info_all = segment_info_all + segment_info
+        
         end_sample_frames_tmp = list(itertools.accumulate(num_segments))
-        if date_count == 0:
-            start_sample_frames = [1] + [end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
-            end_sample_frames = end_sample_frames + end_sample_frames_tmp
-        else:
-            start_sample_frames = start_sample_frames + [end_sample_frames[-1]+1] + \
-            [end_sample_frames[-1]+end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
-            end_sample_frames = end_sample_frames + [end_sample_frames_tmp[i] + end_sample_frames[-1] for i in range(0, len(num_segments))]
-            
+        acquisition_count = acquisition_count + 1
+       
         
 
             
         #select segments if needed
-        
-        raw_selected = si.select_segment_recording(raw,segment_indices=segments)
-        
-        decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
-        new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
-        raw_selected = new_decompressed
-        #several preprocessing steps and concatenation of the recordings
-        #highpass filter - threhsold at 300Hz
-        highpass = si.highpass_filter(raw_selected,freq_min=300.)
-        #phase shift correction - equivalent to T-SHIFT in catGT
-        phase_shift = si.phase_shift(highpass)
-        common_reference = si.common_reference(phase_shift,operator='median',reference='global')
-        preprocessed = common_reference
-        cat = si.concatenate_recordings([preprocessed])
-        print('preprocessed',preprocessed)
-        print('concatenated',cat)
-        bad_channel_ids, channel_labels = si.detect_bad_channels(cat)
-        print('bad_channel_ids',bad_channel_ids,'in acquisition:',str(acquisition))
-        bad_channel_ids_all = np.concatenate((bad_channel_ids_all,bad_channel_ids))
-        print(cat)
-        if date_count == 0:
-            cat_all = cat
-
-        else:
-            cat_all = si.concatenate_recordings([cat_all,cat],sampling_frequency_max_diff=1.0)
+        if len(segments) > 1:
+            segment_info_all = segment_info_all + segment_info
+            if date_count == 0:
+                start_sample_frames = [1] + [end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
+                end_sample_frames = end_sample_frames + end_sample_frames_tmp
+            else:
+                start_sample_frames = start_sample_frames + [end_sample_frames[-1]+1] + \
+                [end_sample_frames[-1]+end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
+                end_sample_frames = end_sample_frames + [end_sample_frames_tmp[i] + end_sample_frames[-1] for i in range(0, len(num_segments))]
             
-        date_count = date_count + 1
+            raw_selected = si.select_segment_recording(raw,segment_indices=segments)
+            decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
+            new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
+            raw_selected = new_decompressed
+            #several preprocessing steps and concatenation of the recordings
+            #highpass filter - threhsold at 300Hz
+            highpass = si.highpass_filter(raw_selected,freq_min=300.)
+            #phase shift correction - equivalent to T-SHIFT in catGT
+            phase_shift = si.phase_shift(highpass)
+            common_reference = si.common_reference(phase_shift,operator='median',reference='global')
+            preprocessed = common_reference
+            cat = si.concatenate_recordings([preprocessed])
+            print('preprocessed',preprocessed)
+            print('concatenated',cat)
+            bad_channel_ids, channel_labels = si.detect_bad_channels(cat)
+            print('bad_channel_ids',bad_channel_ids,'in acquisition:',str(acquisition))
+            bad_channel_ids_all = np.concatenate((bad_channel_ids_all,bad_channel_ids))
+            print(cat)
+            if date_count == 0:
+                cat_all = cat
+
+            else:
+                cat_all = si.concatenate_recordings([cat_all,cat],sampling_frequency_max_diff=1.0)
+                
+            date_count = date_count + 1
     
 
     segment_frames = pd.DataFrame({'segment_info':segment_info_all,'segment start frame': start_sample_frames, 'segment end frame': end_sample_frames})
