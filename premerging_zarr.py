@@ -92,11 +92,13 @@ for acquisition in acquisition_list:
     
 for probe in range(int(no_probe)):
     date_count = 0
+    acquisition_count = 0
     start_sample_frames = []
     end_sample_frames = []
     segment_info_all = []
     bad_channel_ids_all = np.array([])
     for acquisition in acquisition_list:
+        
         print('processing acquisition folder:',str(acquisition))
         probe_name = 'imec' + str(probe) + '.ap'
         dst_folder = local_folder + save_date + '/probe' + str(probe) + '_compressed_' + str(acquisition) + '.zarr'
@@ -104,7 +106,7 @@ for probe in range(int(no_probe)):
         print(raw)
         no_segments = raw.get_num_segments()
         if g_files_to_ignore:
-            g_files_to_ignore_this_acquisition = g_files_to_ignore[date_count]
+            g_files_to_ignore_this_acquisition = g_files_to_ignore[acquisition_count]
         else:
             g_files_to_ignore_this_acquisition = []
         segments = [i for i in range(no_segments) if i not in g_files_to_ignore_this_acquisition]
@@ -112,6 +114,7 @@ for probe in range(int(no_probe)):
         segment_info = [str(acquisition) + '_g' + str(i) for i in segments]
         
         end_sample_frames_tmp = list(itertools.accumulate(num_segments))
+        acquisition_count = acquisition_count + 1
        
         
 
