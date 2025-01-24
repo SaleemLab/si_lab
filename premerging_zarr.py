@@ -120,7 +120,7 @@ for probe in range(int(no_probe)):
 
             
         #select segments if needed
-        if len(segments) > 1:
+        if len(segments) > 0:
             segment_info_all = segment_info_all + segment_info
             if date_count == 0:
                 start_sample_frames = [1] + [end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
