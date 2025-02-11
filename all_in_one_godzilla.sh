@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define variables
-mouse='M24072' #mouse id
-save_date='20241207' #date of recording
+mouse='M25002' #mouse id
+save_date='20250210' #date of recording
 base_folder='/home/saleem_lab/spikeinterface_sorting/temp_data/'  # local folder of godzilla
-no_probe=1 #number of probes you have in this session
+no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
 server_folder='/mnt/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
