@@ -2,7 +2,7 @@
 
 # Define variables
 mouse='M25002' #mouse id
-save_date='20250210' #date of recording
+save_date='20250211' #date of recording
 base_folder='/home/saleem_lab/spikeinterface_sorting/temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
