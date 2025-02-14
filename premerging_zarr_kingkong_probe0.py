@@ -194,6 +194,7 @@ for probe in probes:
     if use_ks4:
         sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False,use_binary_file=True,clear_cache=True)
         sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
+        sorting_ks4 = spikeinterface.curation.remove_excessive_spikes(sorting_ks4, preprocessed_corrected)
         we_ks4 = si.create_sorting_analyzer(sorting_ks4, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
                                 sparse = True,overwrite = True,
@@ -214,6 +215,7 @@ for probe in probes:
     if use_ks3:
         sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest',do_correction=False)
         sorting_ks3 = si.remove_duplicated_spikes(sorting = sorting_ks3, censored_period_ms=0.3,method='keep_first')
+        sorting_ks3 = spikeinterface.curation.remove_excessive_spikes(sorting_ks3, preprocessed_corrected)
         we_ks3 = si.create_sorting_analyzer(sorting_ks3, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort3',
                                 sparse = True,overwrite = True,
