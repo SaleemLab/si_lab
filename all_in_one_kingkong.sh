@@ -14,7 +14,7 @@ server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
 g_files_to_ignore='[[6,7,8,9]]' #files to ignore for each probe
 
 # Run the first Python script with inputs
-python premerging_zarr_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+python premerging_zarr_kingkong_probe1_temp.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 #python premerging_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 #python premerging_zarr.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 
@@ -35,9 +35,9 @@ server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
 g_files_to_ignore='[[6,7,8,9]]' #files to ignore for each probe
 
 # Run the first Python script with inputs
-python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
-python premerging_zarr_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
-python premerging_zarr_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+#python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+python premerging_zarr_kingkong_probe0_temp.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
+python premerging_zarr_kingkong_probe1_temp.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 #python premerging_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 #python premerging_zarr.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 
@@ -58,9 +58,9 @@ server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
 g_files_to_ignore='[[6,7,8,9]]' #files to ignore for each probe
 
 # Run the first Python script with inputs
-python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
-python premerging_zarr_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
-python premerging_zarr_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+#python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+python premerging_zarr_kingkong_probe0_temp.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
+python premerging_zarr_kingkong_probe1_temp.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 #python premerging_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 #python premerging_zarr.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 
@@ -83,9 +83,9 @@ server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
 g_files_to_ignore='[[6,7,8,9]]' #files to ignore for each probe
 
 # Run the first Python script with inputs
-python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
-python premerging_zarr_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
-python premerging_zarr_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+#python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+python premerging_zarr_kingkong_probe0_temp.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
+python premerging_zarr_kingkong_probe1_temp.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 #python premerging_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 #python premerging_zarr.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 
