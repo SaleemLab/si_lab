@@ -74,7 +74,7 @@ date_count = 0
 
 
     
-probes=[1]
+probes=[0]
 for probe in probes:
     date_count = 0
     acquisition_count = 0
