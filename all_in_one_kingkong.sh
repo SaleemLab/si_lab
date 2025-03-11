@@ -1,7 +1,7 @@
 #!/bin/bash
 # Define variables
 mouse='M24065' #mouse id
-save_date='2025131' #date of recording
+save_date='20250131' #date of recording
 #dates='20241220/20241220_0,20241220/20241220_1' #acquisition date and session e.g. dates='20240624/20240624_0,20240624/20240624_1'
 base_folder='/home/masa/spikesorting_temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
