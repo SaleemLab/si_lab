@@ -209,7 +209,7 @@ for probe in range(int(no_probe)):
         spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
     extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
     if use_ks4:
-        sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False,use_binary_file=True,clear_cache=True)
+        sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed,folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',do_correction=False,use_binary_file=True,clear_cache=True)
         sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
         we_ks4 = si.create_sorting_analyzer(sorting_ks4, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
@@ -247,6 +247,28 @@ for probe in range(int(no_probe)):
         print(qm_list)
         we_ks3.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
         si.export_report(sorting_analyzer = we_ks3, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort3_report/',**job_kwargs)
+        # Initialize an empty list to store the paths of JSON files
+    json_file_list = []
+    temp_wh_files = []
+        # Define the folder list
+    folder_list = [save_folder + 'probe'+str(probe)+'_preprocessed', 
+                save_folder + 'probe'+str(probe)+'/waveform/',
+                save_folder + 'probe'+str(probe)+'/sorters/',
+                save_folder + 'probe'+str(probe)+'_motion/']
+    # Go through each folder in the folder list
+    for folder in folder_list:
+        # Recursively find all JSON files in the folder and its subfolders
+        for json_file in glob.glob(os.path.join(folder, '**', '*.json'), recursive=True):
+            # Append the found JSON file path to the list
+            json_file_list.append(json_file)
+    for folder in folder_list:
+        # Recursively find all JSON files in the folder and its subfolders
+        for temp_wh_file in glob.glob(os.path.join(folder, '**', 'temp_wh.dat'), recursive=True):
+            # Append the found JSON file path to the list
+            temp_wh_files.append(temp_wh_file)
+            
+    for files in temp_wh_files:
+        os.remove(files)
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
 
