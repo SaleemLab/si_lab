@@ -7,7 +7,7 @@ base_folder='/home/masa/spikesorting_temp_data/'  # local folder of kingkong
 no_probe=1 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
-server_folder='/bendor/Ellie/DATA/SUBJECTS'
+server_folder='/bendor/Ellie/DATA/SUBJECTS/'
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
 # Run the first Python script with inputs
