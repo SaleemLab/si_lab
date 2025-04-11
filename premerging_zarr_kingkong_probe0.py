@@ -192,7 +192,7 @@ for probe in probes:
         spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
     extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
     if use_ks4:
-        sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False,use_binary_file=True,clear_cache=True)
+        sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',do_correction=False,use_binary_file=True,clear_cache=True)
         sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
         sorting_ks4 = spikeinterface.curation.remove_excess_spikes(sorting_ks4, preprocessed_corrected)
         we_ks4 = si.create_sorting_analyzer(sorting_ks4, preprocessed_corrected, 
@@ -201,8 +201,8 @@ for probe in probes:
                                 **job_kwargs)
         we_ks4.compute('random_spikes')
         we_ks4.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-        ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
-        save_spikes_to_csv(ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
+        ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/spikes.npy')
+        save_spikes_to_csv(ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')
         we_ks4.compute(extensions,**job_kwargs)
         we_ks4.compute('principal_components',**job_kwargs)  
         we_ks4.compute('spike_amplitudes',**job_kwargs)
