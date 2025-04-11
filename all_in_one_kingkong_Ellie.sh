@@ -11,7 +11,8 @@ server_folder='/bendor/Ellie/DATA/SUBJECTS/'
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
 # Run the first Python script with inputs
-python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+# comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
+#python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 python premerging_zarr_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
 #python premerging_zarr_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
 #python premerging_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
