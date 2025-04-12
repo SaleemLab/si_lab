@@ -195,6 +195,7 @@ for probe in probes:
         sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',do_correction=False,use_binary_file=True,clear_cache=True)
         sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
         sorting_ks4 = spikeinterface.curation.remove_excess_spikes(sorting_ks4, preprocessed_corrected)
+        sorting_ks4= se.KiloSortSortingExtractor(folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/sorter_output')
         we_ks4 = si.create_sorting_analyzer(sorting_ks4, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
                                 sparse = True,overwrite = True,
