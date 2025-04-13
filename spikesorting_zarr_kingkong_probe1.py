@@ -71,15 +71,13 @@ acquisition_base_path = base_folder + mouse + '/ephys/' + save_date + '/*' + sav
 acquisition_folders = glob.glob(acquisition_base_path + '_*')
 acquisition_list = sorted([int(folder.split('_')[-1]) for folder in acquisition_folders])
 date_count = 0
-
-
     
 probes=[1]
 for probe in probes:
-    import pandas as pd
 
     preprocessed_corrected = si.load(save_folder+'probe'+str(probe)+'_preprocessed')
 
+    import pandas as pd
     def save_spikes_to_csv(spikes,save_folder):
         unit_index = spikes['unit_index']
         segment_index = spikes['segment_index']
@@ -102,7 +100,27 @@ for probe in probes:
         ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/spikes.npy')
         save_spikes_to_csv(ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')
         we_ks4.compute(extensions,**job_kwargs)
-        we_ks4.compute('principal_components',n_jobs=4,chunk_duration="1s", progress_bar=True)
+
+        import psutil
+        import numpy as np
+
+        mem = psutil.virtual_memory()
+        available_ram = mem.available  # in bytes
+
+        # For example, target using 1/10th of available memory per chunk
+        target_memory = 0.8* available_ram / 32 # 0.8 for safety margin and 32 for 32 jobs
+        # Calculate optimal chunk duration in seconds
+        optimal_t = target_memory / (30000 * 384 * np.dtype(np.int16).itemsize)
+        print("Optimal chunk duration (s):", optimal_t)
+
+        job_kwargs_pca = dict(
+            n_jobs=32,  # or another number that suits your system
+            chunk_duration=f"{optimal_t}s",  # the dynamically computed duration
+            progress_bar=True
+        )
+        si.set_global_job_kwargs(**job_kwargs_pca)
+
+        we_ks4.compute('principal_components',**job_kwargs_pca)
         we_ks4.compute('spike_amplitudes',**job_kwargs)
         qm_list = si.get_default_qm_params()
         print('The following quality metrics are computed:')
