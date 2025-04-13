@@ -71,8 +71,6 @@ acquisition_base_path = base_folder + mouse + '/ephys/' + save_date + '/*' + sav
 acquisition_folders = glob.glob(acquisition_base_path + '_*')
 acquisition_list = sorted([int(folder.split('_')[-1]) for folder in acquisition_folders])
 date_count = 0
-
-preprocessed_corrected
     
 probes=[0]
 for probe in probes:
