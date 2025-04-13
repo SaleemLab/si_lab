@@ -77,6 +77,9 @@ date_count = 0
 probes=[1]
 for probe in probes:
     import pandas as pd
+
+    preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+
     def save_spikes_to_csv(spikes,save_folder):
         unit_index = spikes['unit_index']
         segment_index = spikes['segment_index']

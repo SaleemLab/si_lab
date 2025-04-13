@@ -72,10 +72,13 @@ acquisition_folders = glob.glob(acquisition_base_path + '_*')
 acquisition_list = sorted([int(folder.split('_')[-1]) for folder in acquisition_folders])
 date_count = 0
 
-
+preprocessed_corrected
     
 probes=[0]
 for probe in probes:
+
+    preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+
     import pandas as pd
     def save_spikes_to_csv(spikes,save_folder):
         unit_index = spikes['unit_index']
