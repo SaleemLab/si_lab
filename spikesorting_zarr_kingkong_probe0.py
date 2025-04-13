@@ -101,26 +101,7 @@ for probe in probes:
         save_spikes_to_csv(ks4_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')
         we_ks4.compute(extensions,**job_kwargs)
 
-        import psutil
-        import numpy as np
-
-        mem = psutil.virtual_memory()
-        available_ram = mem.available  # in bytes
-
-        # For example, target using 1/10th of available memory per chunk
-        target_memory = 0.8* available_ram / 32 # 0.8 for safety margin and 32 for 32 jobs
-        # Calculate optimal chunk duration in seconds
-        optimal_t = target_memory / (30000 * 384 * np.dtype(np.int16).itemsize)
-        print("Optimal chunk duration (s):", optimal_t)
-
-        job_kwargs_pca = dict(
-            n_jobs=32,  # or another number that suits your system
-            chunk_duration=f"{optimal_t}s",  # the dynamically computed duration
-            progress_bar=True
-        )
-        si.set_global_job_kwargs(**job_kwargs_pca)
-
-        we_ks4.compute('principal_components',**job_kwargs_pca)
+        we_ks4.compute('principal_components',n_jobs=1,chunk_duration="1s", progress_bar=True)
         we_ks4.compute('spike_amplitudes',**job_kwargs)
         qm_list = si.get_default_qm_params()
         print('The following quality metrics are computed:')
@@ -144,7 +125,7 @@ for probe in probes:
         save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
         save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')
         we_ks3.compute(extensions,**job_kwargs)
-        we_ks3.compute('principal_components',n_jobs=4,chunk_duration="1s", progress_bar=True)
+        we_ks3.compute('principal_components',n_jobs=1,chunk_duration="1s", progress_bar=True)
         we_ks3.compute('spike_amplitudes',**job_kwargs)
         qm_list = si.get_default_qm_params()
         print('The following quality metrics are computed:')
