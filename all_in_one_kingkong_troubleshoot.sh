@@ -10,6 +10,7 @@ use_ks3=true #use kilosort3
 server_folder='/bendor/Ellie/DATA/SUBJECTS/'
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 # Run the first Python script with inputs
 # comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
 #python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
