@@ -77,7 +77,7 @@ preprocessed_corrected
 probes=[0]
 for probe in probes:
 
-    preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+    preprocessed_corrected = si.load(save_folder+'probe'+str(probe)+'_preprocessed')
 
     import pandas as pd
     def save_spikes_to_csv(spikes,save_folder):

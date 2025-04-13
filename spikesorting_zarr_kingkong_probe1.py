@@ -78,7 +78,7 @@ probes=[1]
 for probe in probes:
     import pandas as pd
 
-    preprocessed_corrected = si.load_extractor(save_folder+'probe'+str(probe)+'_preprocessed')
+    preprocessed_corrected = si.load(save_folder+'probe'+str(probe)+'_preprocessed')
 
     def save_spikes_to_csv(spikes,save_folder):
         unit_index = spikes['unit_index']
