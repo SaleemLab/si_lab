@@ -195,7 +195,8 @@ for probe in probes:
         sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',do_correction=False,use_binary_file=True,clear_cache=True)
         sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
         sorting_ks4 = spikeinterface.curation.remove_excess_spikes(sorting_ks4, preprocessed_corrected)
-        sorting_ks4= se.KiloSortSortingExtractor(folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/sorter_output')        
+        sorting_ks4= se.KiloSortSortingExtractor(folder_path=save_folder+'probe'+str(probe)+'/sorters/kilosort4/sorter_output')
+ 
         we_ks4 = si.create_sorting_analyzer(sorting_ks4, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
                                 sparse = True,overwrite = True,
@@ -217,6 +218,8 @@ for probe in probes:
         sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest',do_correction=False)
         sorting_ks3 = si.remove_duplicated_spikes(sorting = sorting_ks3, censored_period_ms=0.3,method='keep_first')
         sorting_ks3 = spikeinterface.curation.remove_excess_spikes(sorting_ks3, preprocessed_corrected)
+        sorting_ks3= se.KiloSortSortingExtractor(folder_path=save_folder+'probe'+str(probe)+'/sorters/kilosort3/sorter_output')
+
         we_ks3 = si.create_sorting_analyzer(sorting_ks3, preprocessed_corrected, 
                                 format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort3',
                                 sparse = True,overwrite = True,
@@ -225,6 +228,7 @@ for probe in probes:
         we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
         ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
         save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
+        save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')
         we_ks3.compute(extensions,**job_kwargs)
         we_ks3.compute('principal_components',**job_kwargs)  
         we_ks3.compute('spike_amplitudes',**job_kwargs)
