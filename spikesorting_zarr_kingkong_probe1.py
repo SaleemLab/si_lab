@@ -4,6 +4,8 @@
 from pathlib import Path
 
 import os
+os.environ["QT_QPA_PLATFORM"] = "offscreen"
+
 import shutil
 
 import numpy as np
@@ -106,7 +108,7 @@ for probe in probes:
         qm_list = si.get_default_qm_params()
         print('The following quality metrics are computed:')
         print(qm_list)
-        we_ks4.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        we_ks4.compute('quality_metrics', qm_params=qm_list,n_jobs=1,chunk_duration="1s", progress_bar=True)
         si.export_report(sorting_analyzer = we_ks4, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort4_report/',**job_kwargs)
         
     if use_ks3:
@@ -130,7 +132,7 @@ for probe in probes:
         qm_list = si.get_default_qm_params()
         print('The following quality metrics are computed:')
         print(qm_list)
-        we_ks3.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
+        we_ks3.compute('quality_metrics', qm_params=qm_list,n_jobs=1,chunk_duration="1s", progress_bar=True)
         si.export_report(sorting_analyzer = we_ks3, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort3_report/',**job_kwargs)
     print('Start to all sorting done:')
     print(datetime.now() - startTime)
