@@ -15,7 +15,7 @@ export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 # comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
 #python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 #python premerging_zarr_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
-python spikesorting_zarr_kingkong_probe0.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
+python spikesorting_zarr_kingkong_probe0_debug.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
 #python premerging_zarr_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder 
 #python premerging_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
 #python premerging_zarr.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder $g_files_to_ignore
