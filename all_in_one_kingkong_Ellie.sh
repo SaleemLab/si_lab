@@ -1,7 +1,7 @@
 
 #!/bin/bash
 mouse='M00014' #mouse id
-save_date='20250318' #date of recording
+save_date='20250319' #date of recording
 #dates='20241220/20241220_0,20241220/20241220_1' #acquisition date and session e.g. dates='20240624/20240624_0,20240624/20240624_1'
 base_folder='/home/masa/spikesorting_temp_data/'  # local folder of kingkong
 no_probe=1 #number of probes you have in this session
