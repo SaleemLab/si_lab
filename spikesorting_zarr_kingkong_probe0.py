@@ -125,7 +125,7 @@ for probe in probes:
         we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
         ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
         save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
-        save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort4/sorting/')
+        save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/waveform/kilosort3/sorting/')
         we_ks3.compute(extensions,**job_kwargs)
         we_ks3.compute('principal_components',n_jobs=1,chunk_duration="1s", progress_bar=True)
         we_ks3.compute('spike_amplitudes',**job_kwargs)
