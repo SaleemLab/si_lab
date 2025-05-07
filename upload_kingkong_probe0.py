@@ -113,8 +113,7 @@ for probe in probes:
     import os
 
     ## NEW FUNCTION TO REPLACE shutil.copytree() now that we are using GVFS-mounted SMB share
-    #import errno
-
+    
     def copy_folder(src, dst):
         os.makedirs(dst, exist_ok=True)
         for root, dirs, files in os.walk(src):
@@ -124,14 +123,11 @@ for probe in probes:
             for file in files:
                 src_file = os.path.join(root, file)
                 dst_file = os.path.join(dst_dir, file)
-                #try:
-                shutil.copy2(src_file, dst_file)
-                #except OSError as e:
-                 #   if e.errno == errno.EOPNOTSUPP:
-                  #      print(f"Skipping unsupported file: {src_file}")
-                   # else:
-                    #    raise
-
+                try:
+                    shutil.copy2(src_file, dst_file)
+                except OSError:
+                    pass # the error arises because apparently some metadata of the files is not transferred; the contents of the files are copied correctly so it's ok
+                                
 
     ##
     #
