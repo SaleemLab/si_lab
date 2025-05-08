@@ -112,24 +112,6 @@ for probe in probes:
     import shutil
     import os
 
-
-    ## NEW FUNCTION TO REPLACE shutil.copytree() now that we are using GVFS-mounted SMB share
-    
-    def copy_folder(src, dst):
-        os.makedirs(dst, exist_ok=True)
-        for root, dirs, files in os.walk(src):
-            rel_path = os.path.relpath(root, src)
-            dst_dir = os.path.join(dst, rel_path)
-            os.makedirs(dst_dir, exist_ok=True)
-            for file in files:
-                src_file = os.path.join(root, file)
-                dst_file = os.path.join(dst_dir, file)
-                try:
-                    shutil.copy2(src_file, dst_file)
-                except OSError:
-                    pass # the error arises because apparently some metadata of the files is not transferred; the contents of the files are copied correctly so it's ok
-
-
     ##
     #
     folders_to_move = ['probe'+str(probe),
@@ -139,8 +121,7 @@ for probe in probes:
         # construct the destination path
         destination = os.path.join(base_folder + mouse + '/ephys/' +save_date, folder)
         # copy the folder to the destination
-        #shutil.copytree(save_folder + folder, destination)
-        copy_folder(save_folder + folder, destination)
+        shutil.copytree(save_folder + folder, destination)
 #
 #remove all temmp files
 #shutil.rmtree(save_folder)
