@@ -9,7 +9,7 @@ use_ks4=true #use kilosort4
 use_ks3=true #use kilosort3
 #server_folder='/home/masa/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
 #server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
-server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd-ag-e=e=ritd-ag-project-ee=ritd-agee=ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
 
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
@@ -33,8 +33,8 @@ base_folder='/home/masa/spikesorting_temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
-server_folder='/home/masa/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
-server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
+server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
 #### 1. comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
@@ -58,8 +58,8 @@ base_folder='/home/masa/spikesorting_temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
-server_folder='/home/masa/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
-server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
+server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
 #### 1. comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
@@ -85,6 +85,8 @@ use_ks4=true #use kilosort4
 use_ks3=true #use kilosort3
 server_folder='/home/masa/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
 server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
+server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
 #### 1. comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
@@ -108,8 +110,8 @@ base_folder='/home/masa/spikesorting_temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
-server_folder='/home/masa/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
-server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
+server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
 #### 1. comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
@@ -133,8 +135,8 @@ base_folder='/home/masa/spikesorting_temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
-server_folder='/home/masa/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
-server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
+server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+
 g_files_to_ignore='[[],[0,1],[0,1]]' #files to ignore for each probe
 
 #### 1. comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
@@ -158,8 +160,8 @@ base_folder='/home/masa/spikesorting_temp_data/'  # local folder of godzilla
 no_probe=2 #number of probes you have in this session
 use_ks4=true #use kilosort4 
 use_ks3=true #use kilosort3
-server_folder='/home/masa/rds01/ibn-vision/DATA/SUBJECTS/' #server folder where the data is stored
-server_folder='/saleem/ibn-vision/DATA/SUBJECTS/'
+server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd-ag-project-rd01ie-asale69/ibn-vision/DATA/SUBJECTS/'
+
 g_files_to_ignore='[],[],[],[0,1,2,3]]' #files to ignore for each probe
 
 #### 1. comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
