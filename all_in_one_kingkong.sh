@@ -39,7 +39,7 @@ server_folder='/run/user/1004/gvfs/smb-share:server=rdp.arc.ucl.ac.uk,share=ritd
 g_files_to_ignore='[[],[0,1,2,3]]' #files to ignore for each probe
 
 #### 1. comment out download_zarr_kingkong.py if this step completed successfully (copying of zarr files to Bendor24 temp folder)
-#python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
+python download_zarr_kingkong.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
 
 #### 2 and 3. as of 14th April, the premerging_zarr_premerging script has been broken down into two codes, preprocessing and then spikesorting
 python preprocessing_zarr_kingkong_probe1.py $mouse $save_date $base_folder $no_probe $use_ks4 $use_ks3 $server_folder
