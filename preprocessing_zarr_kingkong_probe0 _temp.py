@@ -74,7 +74,7 @@ date_count = 0
 
 
     
-probes=[1]
+probes=[0]
 for probe in probes:
     date_count = 0
     acquisition_count = 0
@@ -105,7 +105,7 @@ for probe in probes:
 
             
         #select segments if needed
-        if len(segments) > 1:
+        if len(segments) > 0:
             segment_info_all = segment_info_all + segment_info
             if date_count == 0:
                 start_sample_frames = [1] + [end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
@@ -115,10 +115,41 @@ for probe in probes:
                 [end_sample_frames[-1]+end_sample_frames_tmp[i] + 1 for i in range(0, len(num_segments)-1)]
                 end_sample_frames = end_sample_frames + [end_sample_frames_tmp[i] + end_sample_frames[-1] for i in range(0, len(num_segments))]
             
+            raw_selected = si.select_segment_recording(raw,segment_indices=segments)
+            decompress = raw_selected.save(folder=save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition), format='binary', **job_kwargs)
+            new_decompressed = si.read_binary_folder(save_folder+'probe'+str(probe)+'_uncompressed_'+ str(acquisition))
+            raw_selected = new_decompressed
+            #several preprocessing steps and concatenation of the recordings
+            #highpass filter - threhsold at 300Hz
+            highpass = si.highpass_filter(raw_selected,freq_min=300.)
+            #phase shift correction - equivalent to T-SHIFT in catGT
+            phase_shift = si.phase_shift(highpass)
+            common_reference = si.common_reference(phase_shift,operator='median',reference='global')
+            preprocessed = common_reference
+            cat = si.concatenate_recordings([preprocessed])
+            print('preprocessed',preprocessed)
+            print('concatenated',cat)
+            bad_channel_ids, channel_labels = si.detect_bad_channels(cat,method='mad')
+            print('bad_channel_ids',bad_channel_ids,'in acquisition:',str(acquisition))
+            bad_channel_ids_all = np.concatenate((bad_channel_ids_all,bad_channel_ids))
+            print(cat)
+            if date_count == 0:
+                cat_all = cat
 
+            else:
+                cat_all = si.concatenate_recordings([cat_all,cat],sampling_frequency_max_diff=1.0)
+                
             date_count = date_count + 1
     
 
+    segment_frames = pd.DataFrame({'segment_info':segment_info_all,'segment start frame': start_sample_frames, 'segment end frame': end_sample_frames})
+    segment_frames.to_csv(save_folder+'probe'+str(probe)+'segment_frames.csv', index=False)
+
+    bad_channel_ids_all = np.unique(bad_channel_ids_all)
+    print('total bad channel ids all',bad_channel_ids_all,'in probe:',str(probe),'in all acquisitions:',str(acquisition_list))
+    cat_all = cat_all.remove_channels(bad_channel_ids_all)
+
+    print('concatenated all recordings:',cat_all)
     '''Motion Drift Correction'''
     #motion correction if needed
     #this is nonrigid correction - need to do parallel computing to speed up
@@ -133,68 +164,14 @@ for probe in probes:
     # probe1_kilosort_like = correct_motion(recording=probe1_cat, preset="kilosort_like")
 
     '''save preprocessed bin file before sorting'''
+    cat_all = cat_all.astype(np.float32)
+    recording_corrected, motion, motion_info = si.correct_motion(
+        recording=cat_all, preset="nonrigid_accurate", folder=save_folder+'probe'+str(probe)+'_motion', output_motion=True, output_motion_info=True, **job_kwargs
+        )
+    recording_corrected = recording_corrected.astype(np.int16)
+    #after saving, sorters will read this preprocessed binary file instead
+    preprocessed_corrected = recording_corrected.save(folder=save_folder+'probe'+str(probe)+'_preprocessed', format='binary', **job_kwargs)
     print('Start to prepocessed files saved:')
-    print(datetime.now() - startTime)
-    #probe0_preprocessed_corrected = si.load_extractor(save_folder+'/probe0_preprocessed')
-    preprocessed_corrected = si.load_extractor(save_folder+'/probe1_preprocessed')
-    ''' prepare sorters - currently using the default parameters and motion correction is turned off as it was corrected already above
-        you can check if the parameters using:
-        params = get_default_sorter_params('kilosort3')
-    print("Parameters:\n", params)
-
-    desc = get_sorter_params_description('kilosort3')
-    print("Descriptions:\n", desc)'''
-
-    import pandas as pd
-    def save_spikes_to_csv(spikes,save_folder):
-        unit_index = spikes['unit_index']
-        segment_index = spikes['segment_index']
-        sample_index = spikes['sample_index']
-        spikes_df = pd.DataFrame({'unit_index':unit_index,'segment_index':segment_index,'sample_index':sample_index})
-        spikes_df.to_csv(save_folder + 'spikes.csv',index=False)
-    extensions = ['templates', 'template_metrics', 'noise_levels', 'template_similarity', 'correlograms', 'isi_histograms']
-    if use_ks4:
-        sorting_ks4 = si.run_sorter(sorter_name= 'kilosort4',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort4/',docker_image='spikeinterface/kilosort4-base:latest',do_correction=False,use_binary_file=True,clear_cache=True)
-        sorting_ks4 = si.remove_duplicated_spikes(sorting = sorting_ks4, censored_period_ms=0.3,method='keep_first')
-        sorting_ks4 = spikeinterface.curation.remove_excess_spikes(sorting_ks4, preprocessed_corrected)
-        we_ks4 = si.create_sorting_analyzer(sorting_ks4, preprocessed_corrected, 
-                                format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort4',
-                                sparse = True,overwrite = True,
-                                **job_kwargs)
-        we_ks4.compute('random_spikes')
-        we_ks4.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-        ks4_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/spikes.npy')
-        save_spikes_to_csv(ks4_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort4/in_container_sorting/')
-        we_ks4.compute(extensions,**job_kwargs)
-        we_ks4.compute('principal_components',**job_kwargs)  
-        we_ks4.compute('spike_amplitudes',**job_kwargs)
-        qm_list = si.get_default_qm_params()
-        print('The following quality metrics are computed:')
-        print(qm_list)
-        we_ks4.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
-        si.export_report(sorting_analyzer = we_ks4, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort4_report/',**job_kwargs)
-        
-    if use_ks3:
-        sorting_ks3 = si.run_sorter(sorter_name= 'kilosort3',recording=preprocessed_corrected,output_folder=save_folder+'probe'+str(probe)+'/sorters/kilosort3/',docker_image='spikeinterface/kilosort3-compiled-base:latest',do_correction=False)
-        sorting_ks3 = si.remove_duplicated_spikes(sorting = sorting_ks3, censored_period_ms=0.3,method='keep_first')
-        sorting_ks3 = spikeinterface.curation.remove_excess_spikes(sorting_ks3, preprocessed_corrected)
-        we_ks3 = si.create_sorting_analyzer(sorting_ks3, preprocessed_corrected, 
-                                format = 'binary_folder',folder=save_folder +'probe'+str(probe)+'/waveform/kilosort3',
-                                sparse = True,overwrite = True,
-                                **job_kwargs)
-        we_ks3.compute('random_spikes')
-        we_ks3.compute('waveforms',ms_before=1.0, ms_after=2.0,**job_kwargs)
-        ks3_spikes = np.load(save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/spikes.npy')
-        save_spikes_to_csv(ks3_spikes,save_folder + 'probe'+str(probe)+'/sorters/kilosort3/in_container_sorting/')
-        we_ks3.compute(extensions,**job_kwargs)
-        we_ks3.compute('principal_components',**job_kwargs)  
-        we_ks3.compute('spike_amplitudes',**job_kwargs)
-        qm_list = si.get_default_qm_params()
-        print('The following quality metrics are computed:')
-        print(qm_list)
-        we_ks3.compute('quality_metrics', qm_params=qm_list,**job_kwargs)
-        si.export_report(sorting_analyzer = we_ks3, output_folder = save_folder + 'probe'+str(probe)+'/waveform/kilosort3_report/',**job_kwargs)
-    print('Start to all sorting done:')
     print(datetime.now() - startTime)
 
 
