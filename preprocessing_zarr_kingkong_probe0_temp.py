@@ -129,7 +129,8 @@ for probe in probes:
             cat = si.concatenate_recordings([preprocessed])
             print('preprocessed',preprocessed)
             print('concatenated',cat)
-            bad_channel_ids, channel_labels = si.detect_bad_channels(cat,method='mad')
+            bad_channel_ids, channel_labels = si.detect_bad_channels(cat, method='snr', snr_threshold=2, verbose=True)
+
             print('bad_channel_ids',bad_channel_ids,'in acquisition:',str(acquisition))
             bad_channel_ids_all = np.concatenate((bad_channel_ids_all,bad_channel_ids))
             print(cat)
